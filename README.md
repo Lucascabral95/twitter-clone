@@ -13,7 +13,7 @@ Instalar Twitter Clone con npm
  
 ## 🌟 Descripción
 
-Un clon de Twitter diseñado como parte de mi portafolio de desarrollador web. Esta aplicación permite a los usuarios crear perfiles, publicar y compartir contenido, interactuar con publicaciones a través de comentarios, me gusta y reposts, y conectarse con otros mediante un sistema de seguidores y seguidos.
+Implementación completa de un clon de Twitter que permite a los usuarios crear perfiles, publicar y compartir contenido, interactuar mediante comentarios, "me gusta" y reposts, y establecer conexiones a través de un sistema de seguidores y seguidos. Diseñado con un enfoque en la funcionalidad, escalabilidad y experiencia del usuario.
 
 ## ⚙️ Características Principales:
 
