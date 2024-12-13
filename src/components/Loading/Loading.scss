@@ -1,0 +1,36 @@
+.loading {
+    width: 100%;
+    padding: 16px;
+
+    .contenedor-loading {
+        width: 100%;
+
+        .cargando {
+            width: 100%;
+
+            p {
+
+                color: var(--letra-titular);
+                font-size: 32px;
+                font-weight: 600;
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .loading {
+        padding: 16px;
+
+        .contenedor-loading {
+
+            .cargando {
+                width: 100%;
+
+                p {
+                    font-size: 22px;
+                }
+            }
+        }
+    }
+}

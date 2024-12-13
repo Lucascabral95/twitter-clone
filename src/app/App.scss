@@ -1,0 +1,528 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+:root {
+    --color-letra-gris: #71767B;
+    --fondo-celeste-boton: #1D9BF0;
+    --fondo-negro: black;
+    --letra-titular: white;
+    --fondo-busqueda: #202327;
+    --color-llamativo: #CC0088;
+    --color-gris: #868E96;
+    --width-busqueda: 380px --fondo-color-modal: rgba(29, 155, 240, 0.2);
+    --fondo-blur-modal: blur(10px);
+    --borde-modal: 0.5px solid white;
+}
+
+body,
+main,
+html {
+    margin: 0;
+    padding: 0;
+    background-color: var(--fondo-negro);
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0;
+    padding: 0;
+}
+
+.main-principal {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+
+    .contenedor-main-principal {
+        max-width: 724px;
+    }
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+h1 {
+    font-size: 48px;
+}
+
+.pagina-principal {
+    width: 100%;
+    height: 100vh;
+    background-color: var(--fondo-negro);
+
+    .pagina-principal-contenedor {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+
+        .secciones-inicio {
+            width: 100%;
+            display: flex;
+
+            .contenedores-medios {
+                display: flex;
+                width: 100%;
+
+                .medio-contenedor-logo {
+                    width: 50%;
+                    height: calc(100vh - 72px);
+
+                    .imagen-logo {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        height: calc(100vh - 72px);
+                        padding: 0;
+                        margin: 0;
+                    }
+                }
+
+                .medio-contenedor-form {
+                    width: 50%;
+                    height: calc(100vh - 72px);
+                    padding: 16px;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+
+                    .imagen-de-logo {
+                        display: none;
+                    }
+
+                    .titulo-home {
+                        display: flex;
+                        align-items: center;
+                        margin: 48px 0px 42px 0px;
+
+                        h2 {
+                            line-height: 1.2;
+                            word-wrap: break-word;
+                            font-weight: 700;
+                            color: white;
+                            font-size: 64px;
+                        }
+                    }
+
+                    .subtitulo-home {
+                        display: flex;
+                        align-items: center;
+                        margin: 0 0 26px 0;
+
+                        h3 {
+                            font-size: 31px;
+                            line-height: 1.2;
+                            color: var(--letra-titular);
+                            font-weight: 600;
+                        }
+                    }
+
+                    .crear-cuenta {
+                        display: flex;
+                        align-items: center;
+                        margin: 0 0 8px 0;
+
+                        .crear-cuenta-boton {
+                            height: 38px;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            width: 300px;
+                            color: var(--letra-titular);
+                            border: none;
+                            background-color: var(--fondo-celeste-boton);
+                            font-size: 15px;
+                            border-radius: 16px;
+                            font-weight: 600;
+
+                            &:hover {
+                                transition: 0.2s;
+                                background-color: var(--fondo-celeste-boton);
+                                opacity: 0.95;
+                            }
+                        }
+                    }
+
+                    .terminos-condiciones {
+                        display: flex;
+                        align-items: center;
+                        margin: 0 0 20px 0;
+                        width: 300px;
+
+                        p {
+                            line-height: 1.15;
+                            color: var(--color-letra-gris);
+                            font-size: 11px;
+                        }
+                    }
+
+                    .tenes-cuenta {
+                        margin: 28px 0 0 0;
+
+                        .texto {
+                            margin: 0 0 20px 0;
+
+                            p {
+                                color: var(--letra-titular);
+                                font-weight: 600;
+                            }
+                        }
+
+                        .boton-inicio-sesion {
+                            display: flex;
+                            align-items: center;
+
+                            button {
+                                height: 38px;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                width: 300px;
+                                border: 0.5px solid rgba(255, 255, 255, 0.42);
+                                color: var(--fondo-celeste-boton);
+                                font-size: 15px;
+                                border-radius: 16px;
+                                font-weight: 600;
+
+                                &:hover {
+                                    transition: 0.2s;
+                                    background-color: #1d9cf01c;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (min-width: 481px) and (max-width: 1200px) {
+    .pagina-principal {
+        width: 100%;
+        height: 100vh;
+
+        .pagina-principal-contenedor {
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+
+            .secciones-inicio {
+                width: 100%;
+                display: flex;
+
+                .contenedores-medios {
+                    width: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+
+                    .medio-contenedor-logo {
+                        display: none !important;
+                        width: 100%;
+                        height: 200px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+
+                        .imagen-logo {
+                            width: 200px;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            height: 200px;
+                        }
+                    }
+
+                    .medio-contenedor-form {
+                        width: 100%;
+                        max-width: 773px;
+                        height: calc(100vh - 272px);
+                        padding: 16px;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: flex-start;
+                        padding: 20px;
+
+                        .imagen-de-logo {
+                            width: 100%;
+                            display: flex;
+                            margin: 0;
+                            padding: 0;
+
+                            .imagen-d-e-logo {
+                                width: 100px;
+                                height: 100px;
+                            }
+                        }
+
+                        .titulo-home {
+                            display: flex;
+                            align-items: center;
+                            margin: 48px 0px 42px 0px;
+
+                            h2 {
+                                line-height: 1.2;
+                                font-size: 64px;
+                            }
+                        }
+
+                        .subtitulo-home {
+                            display: flex;
+                            align-items: center;
+                            margin: 0 0 26px 0;
+
+                            h3 {
+                                font-size: 31px;
+                                line-height: 1.2;
+                            }
+                        }
+
+                        .crear-cuenta {
+                            display: flex;
+                            align-items: center;
+                            margin: 0 0 8px 0;
+
+                            .crear-cuenta-boton {
+                                height: 38px;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                width: 300px;
+                                font-size: 15px;
+
+                            }
+                        }
+
+                        .terminos-condiciones {
+                            display: flex;
+                            align-items: center;
+                            margin: 0 0 20px 0;
+                            width: 300px;
+
+                            p {
+                                line-height: 1.15;
+                                font-size: 11px;
+                            }
+                        }
+
+                        .tenes-cuenta {
+                            margin: 28px 0 0 0;
+
+                            .texto {
+                                margin: 0 0 20px 0;
+                            }
+
+                            .boton-inicio-sesion {
+                                display: flex;
+                                align-items: center;
+
+                                button {
+                                    height: 38px;
+                                    display: flex;
+                                    justify-content: center;
+                                    align-items: center;
+                                    width: 300px;
+                                    font-size: 15px;
+                                    border-radius: 16px;
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 479px) {
+    .pagina-principal {
+        width: 100%;
+        height: 100vh;
+
+        .pagina-principal-contenedor {
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+
+            .secciones-inicio {
+                width: 100%;
+                display: flex;
+
+                .contenedores-medios {
+                    width: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+
+                    .medio-contenedor-logo {
+                        display: none !important;
+                        width: 100%;
+                        height: 200px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+
+                        .imagen-logo {
+                            width: 200px;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            height: 200px;
+                        }
+                    }
+
+                    .medio-contenedor-form {
+                        width: 100%;
+                        max-width: 773px;
+                        padding: 16px;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: flex-start;
+                        padding: 20px;
+
+                        .imagen-de-logo {
+                            width: 100%;
+                            display: flex;
+                            margin: 0;
+                            padding: 0;
+
+                            .imagen-d-e-logo {
+                                width: 100px;
+                                height: 100px;
+                            }
+                        }
+
+                        .titulo-home {
+                            display: flex;
+                            align-items: center;
+                            margin: 48px 0px 42px 0px;
+
+                            h2 {
+                                line-height: 1;
+                                font-size: 40px;
+                            }
+                        }
+
+                        .subtitulo-home {
+                            display: flex;
+                            align-items: center;
+                            margin: 0 0 26px 0;
+
+                            h3 {
+                                font-size: 23px;
+                                line-height: 1.2;
+                            }
+                        }
+
+                        .crear-cuenta {
+                            display: flex;
+                            align-items: center;
+                            margin: 0 0 8px 0;
+
+                            .crear-cuenta-boton {
+                                height: 38px;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                width: 300px;
+                                font-size: 15px;
+
+                            }
+                        }
+
+                        .terminos-condiciones {
+                            display: flex;
+                            align-items: center;
+                            margin: 0 0 20px 0;
+                            width: 300px;
+
+                            p {
+                                line-height: 1.15;
+                                font-size: 11px;
+                            }
+                        }
+
+                        .tenes-cuenta {
+                            margin: 28px 0 0 0;
+
+                            .texto {
+                                margin: 0 0 20px 0;
+                            }
+
+                            .boton-inicio-sesion {
+                                display: flex;
+                                align-items: center;
+
+                                button {
+                                    height: 38px;
+                                    display: flex;
+                                    justify-content: center;
+                                    align-items: center;
+                                    width: 300px;
+                                    font-size: 15px;
+                                    border-radius: 16px;
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Media queries del Root
+@media (min-width: 481px) and (max-width: 768px) {
+    :root {
+        --width-busqueda: 260px
+    }
+}
+
+@media (max-width: 480px) {
+    :root {
+        --width-busqueda: 180px
+    }
+}
+
+.not-found-original {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    .contenedor-not-found {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+    }
+}

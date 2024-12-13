@@ -1,0 +1,384 @@
+.header-header {
+    width: 100%;
+    margin: 0 0 30px 0;
+
+    .contenedor-header-header {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .imagen-de-portada {
+            width: 100%;
+
+            .foto-de-portada {
+                width: 100%;
+                height: 241px;
+            }
+        }
+
+        .contenido-header {
+            display: flex;
+            flex-direction: column;
+            margin: -40px 0 0 0;
+            width: 100%;
+            max-width: 576px;
+            padding: 0 16px;
+
+            .foto-follow {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin: 0 0 8px 0;
+
+                .foto-perfil {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    .foto-de-perfil {
+                        width: 137px;
+                        height: 137px;
+                        border-radius: 50%;
+                        border: 4px solid var(--color-llamativo);
+                    }
+                }
+
+                .foto-perfil-mobile {
+                    display: none;
+                    align-items: center;
+                    justify-content: center;
+
+                    .foto-de-perfil {
+                        width: 137px;
+                        height: 137px;
+                        border-radius: 50%;
+                        border: 4px solid var(--color-llamativo);
+                    }
+                }
+
+                .follow {
+                    display: flex;
+                    align-items: end;
+                    justify-content: center;
+
+                    .boton-de-follow {
+                        border-radius: 16px;
+                        background-color: var(--color-llamativo);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        padding: 2.8px 10px;
+                        cursor: pointer;
+                        border: 4px solid var(--color-llamativo);
+
+                        .texto {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+
+                            p {
+                                color: var(--letra-titular);
+                                font-size: 15.60px;
+                                font-weight: bolder;
+                            }
+                        }
+
+                        .icono {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin: 0 0 0 8px;
+
+                            .icon {
+                                font-size: 18px;
+                                color: white;
+                            }
+                        }
+
+                        &:hover {
+                            transition: 0.2s;
+                            border: 4px solid white;
+                        }
+                    }
+                }
+            }
+
+            .nombre-de-usuario {
+                display: flex;
+                align-items: center;
+
+                .nombre {
+                    display: flex;
+                    align-items: center;
+
+                    h2 {
+                        color: var(--letra-titular);
+                        font-weight: bolder;
+                        font-size: 37.5px;
+                    }
+                }
+
+                .icono {
+                    display: flex;
+                    align-items: center;
+                    margin: 0 0 0 8px;
+
+                    .icon {
+                        color: var(--color-llamativo);
+                        font-size: 26px;
+                    }
+                }
+            }
+
+            .descripcion {
+                display: flex;
+                align-items: center;
+                margin: 0 0 8px 0;
+
+                p {
+                    color: var(--letra-titular);
+                    font-size: 16px;
+                }
+            }
+
+            .caracteristicas {
+                display: flex;
+                align-items: center;
+
+                .car {
+                    display: flex;
+                    align-items: center;
+                    margin: 0 22px 0 0;
+
+                    .icono-de-caracteristica {
+                        display: flex;
+                        align-items: center;
+
+                        .icon {
+                            font-size: 20px;
+                            color: var(--color-gris);
+                        }
+                    }
+
+                    .texto {
+                        display: flex;
+                        align-items: center;
+                        margin: 0 0 0 4px;
+
+                        p {
+                            color: var(--color-gris);
+                            font-size: 15.61px;
+                        }
+                    }
+
+                    .texto-link {
+                        display: flex;
+                        align-items: center;
+                        margin: 0 0 0 4px;
+                        cursor: pointer;
+
+                        p {
+                            color: var(--color-llamativo);
+                            font-size: 15.61px;
+                            font-weight: bolder;
+                        }
+
+                        &:hover {
+                            transition: 0.2s ease-in-out;
+                            text-decoration: underline 3px var(--color-llamativo);
+                        }
+                    }
+                }
+            }
+
+            .seguidos-seguidores {
+                display: flex;
+                margin: 12px 0 0 0;
+
+                .seg {
+                    display: flex;
+                    align-items: center;
+                    cursor: pointer;
+
+                    p {
+                        color: var(--color-gris);
+                        font-size: 13.8px;
+                    }
+
+                    &:hover {
+                        transition: 0.2 ease-in-out;
+                        text-decoration: underline 1px var(--color-gris);
+                    }
+                }
+
+                .seg-seguidores {
+                    margin: 0 0 0 12px;
+                }
+            }
+        }
+    }
+}
+
+
+@media (max-width: 480px) {
+    .header-header {
+        width: 100%;
+        margin: 0 0 30px 0;
+
+        .contenedor-header-header {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            .imagen-de-portada {
+                width: 100%;
+
+                .foto-de-portada {
+                    width: 100%;
+                    height: 149px;
+                }
+            }
+
+            .contenido-header {
+                display: flex;
+                flex-direction: column;
+                margin: -40px 0 0 0;
+                width: 100%;
+                max-width: 576px;
+                padding: 0 16px;
+
+                .foto-follow {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin: 0 0 8px 0;
+
+                    .foto-perfil {
+                        display: none;
+                        align-items: center;
+                        justify-content: center;
+                    }
+
+                    .foto-perfil-mobile {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+
+                    .follow {
+                        display: flex;
+                        align-items: end;
+                        justify-content: center;
+
+                        .boton-de-follow {
+                            border-radius: 16px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            padding: 2.8px 10px;
+
+                            .texto {
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+
+                                p {
+                                    font-size: 13.84px;
+                                }
+                            }
+
+                            .icono {
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                margin: 0 0 0 8px;
+
+                                .icon {
+                                    font-size: 18px;
+                                }
+                            }
+
+                        }
+                    }
+                }
+
+                .nombre-de-usuario {
+                    display: flex;
+                    align-items: center;
+
+                    .nombre {
+                        display: flex;
+                        align-items: center;
+
+                        h2 {
+                            font-size: 29.5px;
+                        }
+                    }
+
+                    .icono {
+                        display: flex;
+                        align-items: center;
+                        margin: 0 0 0 8px;
+
+                        .icon {
+                            font-size: 26px;
+                        }
+                    }
+                }
+
+                .descripcion {
+                    display: flex;
+                    align-items: center;
+                    margin: 0 0 8px 0;
+
+                    p {
+                        font-size: 16px;
+                    }
+                }
+
+                .caracteristicas {
+                    display: flex;
+                    align-items: center;
+
+                    .car {
+                        display: flex;
+                        align-items: center;
+                        margin: 0 22px 0 0;
+
+                        .icono-de-caracteristica {
+                            display: flex;
+                            align-items: center;
+
+                            .icon {
+                                font-size: 20px;
+                            }
+                        }
+
+                        .texto {
+                            display: flex;
+                            align-items: center;
+                            margin: 0 0 0 4px;
+
+                            p {
+                                font-size: 13.85px;
+                            }
+                        }
+
+                        .texto-link {
+                            display: flex;
+                            align-items: center;
+                            margin: 0 0 0 4px;
+
+                            p {
+                                font-size: 15.61px;
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

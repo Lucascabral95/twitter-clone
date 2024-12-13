@@ -1,0 +1,260 @@
+.register {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 0;
+    left: 0;
+    position: fixed;
+    background: var(--fondo-color-modal);
+    backdrop-filter: var(--fondo-blur-modal);
+
+    .contenedor-register {
+        width: 100%;
+        max-width: 600px;
+        height: fit-content;
+        padding: 0 16px 60px 16px;
+        background-color: black;
+        border-radius: 8px;
+        border: var(--borde-modal);
+
+        .superior {
+            display: flex;
+            justify-content: center;
+            justify-content: space-between;
+            height: 53px;
+
+            .icono {
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+
+                .icon {
+                    color: white;
+                    font-size: 24px;
+                }
+            }
+
+            .imagen-register {
+                display: flex;
+                align-items: center;
+            }
+        }
+
+        .medio {
+            padding: 0 80px;
+
+            .medio-titulo {
+                height: 76px;
+                display: flex;
+                align-items: center;
+
+                h3 {
+                    color: white;
+                    font-size: 31px;
+                    font-weight: 700;
+                }
+            }
+
+            .formulario {
+                width: 100%;
+
+                .formulario-interno {
+
+                    .contenedor-input {
+                        margin: 12px 0 0 0;
+                        width: 100%;
+                        display: flex;
+                        align-items: center;
+                        padding: 0 12px;
+                        border-radius: 8px;
+                        border: 1px solid #71767b68;
+
+                        input {
+                            width: 100%;
+                            color: white;
+                            background-color: transparent;
+                            user-select: none;
+                            height: 56px;
+
+                            &::placeholder {
+                                color: var(--color-letra-gris);
+                            }
+
+                            &:focus {
+                                outline: none;
+                            }
+                        }
+
+                    }
+
+                    .texto-aclaratorio {
+                        display: flex;
+                        align-items: center;
+                        margin: 2px 0 20px -2px;
+
+                        p {
+                            color: var(--color-letra-gris);
+                            font-size: 11px;
+                            margin: 0 0 0 8px;
+                        }
+                    }
+
+                    .contenedor-texto-de-error {
+                        margin: 2px 0 20px 0;
+
+                        p {
+                            color: red;
+                            font-size: 12px;
+                        }
+                    }
+
+                    .contenedor-creacion-cuenta {
+                        width: 100%;
+
+                        button {
+                            border-radius: 16px;
+                            height: 38px;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            color: white;
+                            background-color: var(--fondo-celeste-boton);
+                            width: 100%;
+                            font-weight: 600;
+                            margin: 40px 0 0 0;
+
+                            &:hover {
+                                transition: 0.2s;
+                                background-color: var(--fondo-celeste-boton);
+                                opacity: 0.95;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+@media (max-width: 704px) {
+
+    .register {
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .contenedor-register {
+            width: 100%;
+            height: 100vh;
+            max-width: 100%;
+            padding: 0 16px 16px 16px;
+            border-radius: 0px;
+            border: none;
+
+            .superior {
+                width: 100%;
+                display: flex;
+                justify-content: center;
+                justify-content: space-between;
+                height: 53px;
+
+                .icono {
+                    display: flex;
+                    align-items: center;
+
+                    .icon {
+                        font-size: 24px;
+                    }
+                }
+
+                .imagen-register {
+                    display: flex;
+                    align-items: center;
+
+                }
+            }
+
+            .medio {
+                width: 100%;
+                padding: 0 20px;
+
+                .medio-titulo {
+                    height: 60px;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    align-items: flex-start;
+
+                    h3 {
+                        font-size: 31px;
+                    }
+                }
+
+                .formulario {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    height: calc(100vh - 161px);
+
+                    .formulario-interno {
+                        width: 100% !important;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: space-between;
+
+                        .contenedor-input {
+                            margin: 12px 0 0 0;
+                            width: 100%;
+                            display: flex;
+                            align-items: center;
+                            padding: 0 12px;
+
+                            input {
+                                height: 56px;
+
+                            }
+
+                        }
+
+                        .texto-aclaratorio {
+                            display: flex;
+                            align-items: center;
+                            margin: 2px 0 12px -2px;
+
+                            p {
+                                font-size: 11px;
+                                margin: 0 0 0 8px;
+                            }
+                        }
+                    }
+
+                    .contenedor-creacion-cuenta {
+                        width: 100%;
+
+                        button {
+                            height: 38px;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            width: 100%;
+                            margin: 40px 0 0 0;
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

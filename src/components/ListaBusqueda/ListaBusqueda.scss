@@ -1,0 +1,262 @@
+.lista-busqueda {
+    position: absolute;
+    z-index: 12000;
+    background-color: var(--fondo-negro);
+    border-radius: 8px;
+    width: var(--width-busqueda);
+    box-shadow: 0 8px 16px rgba(100, 100, 100, 0.3), 0 4px 6px rgba(150, 150, 150, 0.2);
+    overflow: hidden;
+
+    .contenedor-lista-busqueda {
+
+        .busqueda {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(128, 128, 128, 0.389);
+
+            .icono {
+                display: flex;
+                align-items: center;
+                margin: 0 8px 0 0;
+
+                .icon {
+                    color: var(--letra-titular);
+                    font-size: 20px;
+                }
+            }
+
+            .texto {
+                display: flex;
+                align-items: center;
+
+                p {
+                    color: var(--letra-titular);
+                    font-size: 15px;
+                    font-weight: 600;
+                }
+            }
+        }
+
+        .contenedor-de-posteos-personas-buscadas {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+
+            .usuario {
+                width: 100%;
+                display: flex;
+                padding: 12px 16px;
+                width: 100%;
+                height: fit-content;
+
+                .imagen-usuario {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 40px;
+                }
+
+                .nombre-email {
+                    display: flex;
+                    flex-direction: column;
+                    margin: 0 0 0 8px;
+
+                    .nombre-nombre {
+                        display: flex;
+                        padding: 0;
+                        margin: 0;
+
+                        p {
+                            font-weight: 600;
+                            color: var(--letra-titular);
+                            font-size: 14.5px;
+                        }
+                    }
+
+                    .email {
+                        padding: 0;
+                        margin: 0;
+                        display: flex;
+
+                        p {
+                            font-size: 14.5px;
+                            color: var(--color-gris);
+                        }
+                    }
+                }
+
+                &:hover {
+                    transition: 0.15s ease-in-out;
+                    background-color: #202327;
+                }
+            }
+        }
+    }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+    .lista-busqueda {
+        width: var(--width-busqueda);
+
+        .contenedor-lista-busqueda {
+
+            .busqueda {
+                display: flex;
+                align-items: center;
+                padding: 12px 16px;
+
+                .icono {
+                    display: flex;
+                    align-items: center;
+                    margin: 0 8px 0 0;
+
+                    .icon {
+                        font-size: 20px;
+                    }
+                }
+
+                .texto {
+                    display: flex;
+                    align-items: center;
+
+                    p {
+                        font-size: 15px;
+                    }
+                }
+            }
+
+            .contenedor-de-posteos-personas-buscadas {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+
+                .usuario {
+                    width: 100%;
+                    display: flex;
+                    padding: 12px 16px;
+                    width: 100%;
+                    height: fit-content;
+
+                    .imagen-usuario {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 40px;
+                    }
+
+                    .nombre-email {
+                        display: flex;
+                        flex-direction: column;
+                        margin: 0 0 0 8px;
+
+                        .nombre-nombre {
+                            display: flex;
+                            padding: 0;
+                            margin: 0;
+
+                            p {
+                                font-size: 14.5px;
+                            }
+                        }
+
+                        .email {
+                            padding: 0;
+                            margin: 0;
+                            display: flex;
+
+                            p {
+                                font-size: 14.5px;
+                            }
+
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .lista-busqueda {
+        width: var(--width-busqueda);
+
+        .contenedor-lista-busqueda {
+
+            .busqueda {
+                display: flex;
+                align-items: center;
+                padding: 12px 16px;
+
+                .icono {
+                    display: flex;
+                    align-items: center;
+                    margin: 0 8px 0 0;
+
+                    .icon {
+                        font-size: 20px;
+                    }
+                }
+
+                .texto {
+                    display: flex;
+                    align-items: center;
+
+                    p {
+                        font-size: 15px;
+                    }
+                }
+            }
+
+            .contenedor-de-posteos-personas-buscadas {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+
+                .usuario {
+                    width: 100%;
+                    display: flex;
+                    padding: 12px 16px;
+                    width: 100%;
+                    height: fit-content;
+
+                    .imagen-usuario {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 40px;
+                    }
+
+                    .nombre-email {
+                        display: flex;
+                        flex-direction: column;
+                        margin: 0 0 0 8px;
+
+                        .nombre-nombre {
+                            display: flex;
+                            padding: 0;
+                            margin: 0;
+
+                            p {
+                                font-size: 14.5px;
+                            }
+                        }
+
+                        .email {
+                            padding: 0;
+                            margin: 0;
+                            display: flex;
+
+                            p {
+                                font-size: 14.5px;
+                            }
+
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+}

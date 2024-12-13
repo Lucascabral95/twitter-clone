@@ -1,0 +1,182 @@
+.busqueda-de-usuarios {
+    width: 100%;
+    padding: 0 16px;
+
+    .contenedor-busqueda-de-usuarios {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        .contenedor-de-usuarios {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px;
+            margin: 0 0 16px 0;
+
+            .imagen-nombre-email {
+                width: 100%;
+                display: flex;
+                align-items: center;
+
+                .nombre-y-email {
+                    display: flex;
+                    justify-content: center;
+                    flex-direction: column;
+                    margin: 0 0 0 10px;
+
+                    .nombre {
+                        display: flex;
+                        align-items: center;
+
+                        p {
+                            font-size: 15px;
+                            font-weight: 600;
+                            color: var(--letra-titular);
+                        }
+                    }
+
+                    .email {
+                        display: flex;
+                        align-items: center;
+
+                        p {
+                            font-size: 15px;
+                            font-weight: 600;
+                            color: var(--color-gris);
+                        }
+                    }
+                }
+            }
+
+            .follow {
+                padding: 2px 6px;
+                background-color: var(--color-llamativo);
+                border-radius: 16px;
+                user-select: none;
+                border: 2px solid var(--color-llamativo);
+                cursor: pointer;
+
+                .boton-para-seguir {
+                    display: flex;
+                    align-items: center;
+                    padding: 0 6px;
+
+                    .bot {
+                        display: flex;
+                        align-items: center;
+                        border: 1px solid var(--color-llamativo);
+
+                        p {
+                            font-size: 15px;
+                            font-weight: 600;
+                            color: var(--letra-titular);
+                        }
+                    }
+
+                    .icono {
+                        display: flex;
+                        align-items: center;
+                        margin: 0 0 0 6px;
+
+                        .icon {
+                            color: var(--letra-titular);
+                            font-size: 20px;
+                        }
+                    }
+                }
+
+                &:hover {
+                    transition: 0.2s;
+                    border: 2px solid var(--letra-titular);
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    $font-size-letras: 13.4px;
+
+    .busqueda-de-usuarios {
+        width: 100%;
+        padding: 0 16px;
+    
+        .contenedor-busqueda-de-usuarios {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+    
+            .contenedor-de-usuarios {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 6px;
+                margin: 0 0 16px 0;
+    
+                .imagen-nombre-email {
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+    
+                    .nombre-y-email {
+                        display: flex;
+                        justify-content: center;
+                        flex-direction: column;
+                        margin: 0 0 0 10px;
+
+                        .nombre {
+                            display: flex;
+                            align-items: center;
+    
+                            p {
+                                font-size: $font-size-letras;
+                            }
+                        }
+    
+                        .email {
+                            display: flex;
+                            align-items: center;
+    
+                            p {
+                                font-size: $font-size-letras;
+                            }
+                        }
+                    }
+                }
+    
+                .follow {
+                    padding: 1px 3px;
+    
+                    .boton-para-seguir {
+                        display: flex;
+                        align-items: center;
+                        padding: 0 6px;
+    
+                        .bot {
+                            display: flex;
+                            align-items: center;
+    
+                            p {
+                                font-size: $font-size-letras;
+                            }
+                        }
+    
+                        .icono {
+                            display: flex;
+                            align-items: center;
+                            margin: 0 0 0 6px;
+    
+                            .icon {
+                                font-size: 20px;
+                            }
+                        }
+                    }
+    
+                }
+            }
+        }
+    }
+}

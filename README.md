@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Snapoo Blog
 
-## Getting Started
+## Instalación
 
-First, run the development server:
+Instalar Twitter Clone con npm
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+  git clone https://github.com/Lucascabral95/twitter-clone.git
+  cd twitter-clone
+  npm install 
+  npm run dev
 ```
+ 
+## 🌟 Descripción
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Un clon de Twitter diseñado como parte de mi portafolio de desarrollador web. Esta aplicación permite a los usuarios crear perfiles, publicar y compartir contenido, interactuar con publicaciones a través de comentarios, me gusta y reposts, y conectarse con otros mediante un sistema de seguidores y seguidos.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ⚙️ Características Principales:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Publicaciones y Reposts**: Los usuarios pueden publicar posteos con texto y luego compartir contenido de otros usuarios mediante reposts. Cada post incluye una sección para interactuar con comentarios y "me gusta".
+- **Almacenamiento de Datos en MongoDB**: Los datos de cada usuario, como su perfil, las fotos subidas y las interacciones (me gusta, reposts), se almacenan de manera persistente en MongoDB, asegurando que toda la información esté organizada y fácilmente accesible.
+- **Sistema de Seguidores**:Los usuarios pueden seguir y dejar de seguir a otros, lo que les permite ver publicaciones exclusivas de las personas que siguen. Cada perfil muestra un apartado de seguidores y seguidos.
+- **Perfiles de Usuario**: Cada usuario tiene un perfil personal que muestra sus publicaciones, reposts y detalles de su información personal, brindando una experiencia personalizada.
+- **Interacción en Comentarios**: Además de los posteos, los usuarios pueden comentar en cada publicación y dar "me gusta" a los comentarios de otros, fomentando una interacción activa en la plataforma.
+- **Autenticación Segura**: Implementada mediante cookies con JSON Web Tokens (JWT) utilizando jose. Esto garantiza un inicio de sesión confiable y seguro.
+- **Estado Global con Zustand**: Gestión eficiente de estados dentro de la aplicación, asegurando fluidez en la experiencia del usuario.
+- **Base de Datos Serverless**: Almacenamiento persistente y escalable con Neon Serverless PostgreSQL, ideal para manejar grandes cantidades de datos de usuarios y publicaciones.
 
-## Learn More
+## 📄 Conclusión:
 
-To learn more about Next.js, take a look at the following resources:
+- **Clon de Twitter**: Este proyecto refleja mis habilidades avanzadas en desarrollo web, combinando tecnologías modernas con una arquitectura en capas que garantiza un diseño escalable, modular y altamente mantenible. He aplicado principios de abstracción para estructurar componentes y funcionalidades de forma eficiente, logrando una experiencia dinámica y segura para los usuarios. Desde publicaciones interactivas hasta un sistema de seguidores y perfiles personalizados, esta aplicación demuestra mi capacidad para crear soluciones completas, bien organizadas y centradas en el usuario.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🚀 Tecnologías Utilizadas 
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Next.js**: Framework de React que permite la construcción de aplicaciones web y APIs con funcionalidades de renderizado del lado del servidor.
+- **Neon Serverless PostgreSQL**: Base de datos relacional serverless que permite almacenar información de usuarios, publicaciones y relaciones entre ellos.
+- **SASS**: Para estilos y diseño responsivo, asegurando una buena experiencia en diferentes dispositivos.
+- **Zustand**: Librería para la gestión del estado global, sencilla y eficiente.
+- **JSON Web Tokens (JWT) y jose**: Manejo de autenticación basado en cookies para garantizar la seguridad del usuario.
+- **Zod**: Biblioteca de validación y parsing de esquemas para TypeScript y JavaScript, que permite definir y validar datos con tipos seguros de manera sencilla y eficaz.
+- **TypeScript**: Superset de JavaScript que añade tipado estático y otras funcionalidades avanzadas, mejorando la calidad y el mantenimiento del código en aplicaciones grandes y complejas.
 
-## Deploy on Vercel
+## 📬 Contacto
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Si tenés alguna pregunta o sugerencia, no dudes en contactarme a través de lucassimple@hotmail.com o https://github.com/Lucascabral95
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Notas: 
+
+- Añadí secciones como **Tecnologías Utilizadas**, **Descripción**, **Conclusión**, **Características Principales** y **Contacto** para hacer el README más completo.

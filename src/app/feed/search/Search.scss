@@ -1,0 +1,96 @@
+.search {
+    width: 100%;
+    padding: 32px 0px 0 0px;
+
+    .contenedor-search {
+        width: 100%;
+
+        .formulario-de-busqueda-mobile {
+            width: 100%;
+            padding: 0 16px;
+
+            .input-busqueda {
+                width: 100%;
+                display: flex;
+                padding: 6px 10px 6px 14px;
+                border-radius: 16px;
+                border: 1px solid rgba(128, 128, 128, 0.355);
+                background-color: var(--fondo-busqueda);
+
+                input {
+                    width: 100%;
+                    border: none;
+                    background-color: var(--fondo-busqueda);
+                    color: var(--letra-titular);
+
+                    &:focus {
+                        outline: none;
+                    }
+                }
+                .icono{
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    border-radius: 50%;
+                    padding: 4px;
+
+                    .icon{
+                        color: var(--letra-titular);
+                        font-size: 20px;
+                    }
+
+                    &:hover{
+                        transition: 0.2s ease-in-out;
+                        background-color: rgba(255, 255, 255, 0.07);
+                    }
+                }
+            }
+
+            .buscar-por {
+                display: flex;
+                align-items: center;
+                margin: 12px 0 10% 0;
+
+                .por{
+                    flex: 1 1 auto;
+                    margin: 0 12px 0 0;
+                    p {
+                        color: var(--letra-titular);
+                        font-size: 15px;
+                        white-space: nowrap;
+                    }
+                }
+
+                .publicacion-o-usuario {
+                    width: 100%;
+                    margin: 2px 0 0 0;
+                    padding: 6px;
+                    border-radius: 16px;
+                    background-color: var(--fondo-busqueda);
+                    color: var(--letra-titular);
+
+                    &:focus{
+                        outline: none;
+                    }
+
+                    option {
+                        width: 100%;
+                        color: var(--letra-titular);
+                        background-color: var(--fondo-busqueda);
+                        padding: 12px;
+                        border-radius: 16px;
+                        cursor: pointer;
+
+                        &:focus{
+                            outline: none;
+                        }
+
+                        &:hover{
+                            background-color: rgba(255, 255, 255, 0.07);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

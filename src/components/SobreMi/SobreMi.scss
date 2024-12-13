@@ -1,0 +1,130 @@
+.sobre-mi {
+    width: 100%;
+
+    .contenedor-sobre-mi {
+        width: 100%;
+
+        .titulo-datos-personales {
+            width: 100%;
+        }
+
+        .formulario-datos-personales {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+
+            .contenedor-input {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                margin: 8px 12px 10px 12px;
+                padding: 14px 12px;
+                border-radius: 8px;
+                border: 1px solid #333639;
+                border: 0.2px solid #cc008890;
+
+                input {
+                    width: 100%;
+                    color: var(--letra-titular);
+                    background-color: transparent;
+                    font-size: 15px;
+                    
+                    &::placeholder {
+                        color: var(--color-gris);
+                        font-size: 15px;
+                        font-weight: 600;
+                    }
+
+                    &:focus {
+                        outline: none;
+                    }
+                }
+
+                label{
+                    color: var(--color-gris);
+                    font-size: 12px;
+                    margin: 0 0 4px 0;
+                    font-weight: 600;
+                }
+            }
+
+            .contenedor-input-boton{
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 16px 0 0 0;
+                border-radius: 4px;
+                
+                button {
+                    padding: 6px 16px;
+                    border-radius: 16px;
+                    color: var(--letra-titular);
+                    background-color: var(--color-llamativo);
+                    border: none;
+                    font-weight: bolder;
+                    font-size: 16px;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .sobre-mi {
+        padding: 0 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .sobre-mi {
+        width: 100%;
+    
+        .contenedor-sobre-mi {
+            width: 100%;
+    
+            .titulo-datos-personales {
+                width: 100%;
+            }
+    
+            .formulario-datos-personales {
+                width: 100%;
+                display: flex;
+                align-items: center;
+                flex-direction: column;
+    
+                .contenedor-input {
+                    width: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    margin: 8px 12px 10px 12px;
+                    padding: 14px 12px;
+    
+                    input {
+                        width: 100%;
+                        font-size: 15px;
+                    }
+    
+                    label{
+                        font-size: 12px;
+                        margin: 0 0 4px 0;
+                    }
+                }
+    
+                .contenedor-input-boton{
+                    width: 100%;
+                    margin: 12px 0 0 0;
+                    border-radius: 4px;
+                    
+                    button {
+                        padding: 6px 16px;
+                        font-size: 16px;
+                    }
+                }
+            }
+        }
+    }
+}
