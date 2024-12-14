@@ -31,7 +31,7 @@ const Home: React.FC = () => {
     
     fetchData();
   }, [getCookieLogueo, getTweetsByID, limit]);
-
+  
   useEffect(() => {
     if (datosLogueo?.id) {
       getDatosPersonalesByID(datosLogueo.id);
@@ -43,7 +43,7 @@ const Home: React.FC = () => {
       <div className="contenedor-home">
 
         <Header dataUser={datosLogueo} misDatosPersonales={datosPersonales} seguidos={misSeguidos} seguidores={seguidores} />
-        <CardSecciones id={Number(datosLogueo?.id)} publicaciones={posteos} />
+        <CardSecciones id={Number(datosLogueo?.id)} publicaciones={posteos} /> 
 
       </div>
     </div>

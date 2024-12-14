@@ -157,7 +157,7 @@ const useStore = create<StoreState>((set, get) => ({
         }
     },
 
-    addTweet: async (posteo): Promise<void> => {
+    addTweet: async (): Promise<void> => {
         set({ loading: true });
         await get().getCookieLogueo();
         const { datosLogueo } = get();

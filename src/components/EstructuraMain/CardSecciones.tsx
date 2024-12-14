@@ -94,13 +94,13 @@ const CardSecciones: React.FC<CardSeccionesProps> = ({ id, publicaciones }) => {
             {loading && <p style={{ color: "white" }}> Cargando... </p>}
 
             {seccionActual === "Inicio" ? (
-                <CardTweet posteos={publicaciones} loading={loading} />
+                <CardTweet posteos={publicaciones} />
             ) : seccionActual === "Seguidores" ? (
                 <BusquedaDeUsuarios usuarios={misSeguidos} />
             ) : seccionActual === "AcercaDe" ? (
                 <SobreMi id={id} />
             ) : seccionActual === "Reposteos" ? (
-                <CardTweet posteos={arrayDeReposteos} loading={loading} />
+                <CardTweet posteos={arrayDeReposteos} />
             ) : null}
 
         </div>
