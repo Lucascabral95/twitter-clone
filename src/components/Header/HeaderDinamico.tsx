@@ -170,7 +170,7 @@ const HeaderDinamico: React.FC<HeaderDinamicoProps> = ({ id }) => {
                 <div className="imagen-de-portada">
                     <Image
                         className="foto-de-portada"
-                        src="/img/kirby-cute.webp"
+                        src="/img/fondo-twitter-clone.gif"
                         alt="Portada"
                         width={730}
                         height={241}

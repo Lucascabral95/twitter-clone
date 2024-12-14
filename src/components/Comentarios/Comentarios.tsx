@@ -9,6 +9,7 @@ import "moment/locale/es";
 moment.locale("es");
 import { Toaster } from 'react-hot-toast';
 import { comentar, darLike } from '@/utils/functions/Comentarios';
+import Link from 'next/link';
 
 interface IPosteo {
     contenido: string;
@@ -119,24 +120,23 @@ const Comentarios: React.FC<{ dataPosteo: IPosteo }> = ({ dataPosteo }) => {
                 <div className="contenedor-comentarios-de-publicacion">
                     {arrayComentarios?.map((item, index: number) => (
                         <div className="comentarios-de-publicacion" key={index}>
-                            <div className="imagen-de-comentario">
+                            <Link href={`/home/user/${item?.creador_id}`} className="imagen-de-comentario">
                                 <Avvvatars value={item?.email ?? datosLogueo?.email ?? 'default@example.com'} size={40} style="shape" />
-                            </div>
+                            </Link>
                             <div className="contenido-del-comentario">
                                 <div className="nombre-email-fecha">
-                                    <div className="nombre">
+                                    <Link href={`/home/user/${item?.creador_id}`} className="nombre">
                                         <p> {item?.nombre ? item?.nombre : datosLogueo?.nombre} </p>
-                                    </div>
-                                    <div className="email-y-fecha">
+                                    </Link>
+                                    <Link href={`/home/user/${item?.creador_id}`} className="email-y-fecha">
                                         <p> {item?.email ? item?.email : datosLogueo?.email} - {moment(item?.comentario_created_at).locale('es').format('LLL')} </p>
-                                    </div>
+                                    </Link>
                                     <div className="solo-email">
                                         <p> {item?.email ? item?.email : datosLogueo?.email} </p>
                                     </div>
                                 </div>
                                 <div className="contenido">
                                     <p> {item?.comentario_contenido ? item?.comentario_contenido : item?.contenido } </p>
-                                    {/* <p> {item?.comentario_contenido ?? item?.comentario_contenido} </p> */}
                                 </div>
                                 <div className="likes-de-comentario">
                                     <div className="icono-cantidad-likes">

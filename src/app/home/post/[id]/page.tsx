@@ -16,6 +16,7 @@ import useStore from "@/zustand";
 import { darkLike } from "@/utils/functions/Posteos";
 import { repostearPosteo } from "@/utils/functions/Reposteos";
 import Loading from "@/components/Loading/Loading";
+import Link from "next/link";
 
 interface IPosteo {
     contenido: string;
@@ -45,7 +46,7 @@ interface DatosLogueo {
 
 const PostDetail: React.FC = () => {
     const { id } = useParams();
-    const { getCookieLogueo, datosLogueo } = useStore();
+    const { getCookieLogueo, datosLogueo, eliminarSeguimiento, seguirUsuario, esMiAmigo, existeEnMiListaDeAmigos} = useStore();
     const [dataPosteo, setDataPosteo] = useState<IPosteo>({} as IPosteo);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<boolean>(false);
@@ -80,10 +81,11 @@ const PostDetail: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             await getCookieLogueo();
+            await existeEnMiListaDeAmigos(datosLogueo?.id as number, dataPosteo?.creador_id as number);
         };
 
         fetchData();
-    }, [getCookieLogueo]);
+    }, [getCookieLogueo, dataPosteo]);
 
     if (loading) {
         return (
@@ -100,7 +102,7 @@ const PostDetail: React.FC = () => {
                     <div className="detalle-del-posteo">
                         <div className="parte-superior">
                             <div className="back-posteo">
-                                <div className="icono">
+                                <div className="icono" onClick={() => window.history.back()}>
                                     <FiArrowLeft className="icon" />
                                 </div>
                                 <div className="texto-posteo">
@@ -112,20 +114,24 @@ const PostDetail: React.FC = () => {
                             </div>
                         </div>
                         <div className="parte-intermedia">
-                            <div className="imagen-de-perfil">
+                            <Link href={`/home/user/${dataPosteo?.creador_id}`} className="imagen-de-perfil">
                                 <Avvvatars value="Lucas@hotmail.com" size={40} style="shape" />
-                            </div>
+                            </Link>
                             <div className="contenido-del-posteo">
                                 <div className="nombre-correo">
-                                    <div className="nombre">
+                                    <Link href={`/home/user/${dataPosteo?.creador_id}`} className="nombre">
                                         <p>{dataPosteo?.nombre}</p>
-                                    </div>
-                                    <div className="correo">
+                                    </Link>
+                                    <Link href={`/home/user/${dataPosteo?.creador_id}`} className="correo">
                                         <p>{dataPosteo?.email}</p>
-                                    </div>
+                                    </Link>
                                 </div>
-                                <div className="boton-follow">
-                                    <button>Seguir</button>
+                                <div className="boton-follow" 
+                                onClick={esMiAmigo ? () => eliminarSeguimiento(dataPosteo?.creador_id as number, datosLogueo?.id as number) : () => seguirUsuario(dataPosteo?.creador_id, datosLogueo?.id as number)}
+                                >
+                                    <button>
+                                        {esMiAmigo ? "Dejar de seguir" : "Seguir"}
+                                    </button>
                                 </div>
                             </div>
                         </div>

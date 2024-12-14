@@ -84,9 +84,11 @@ const Header: React.FC<TMisDatos> = ({ dataUser, misDatosPersonales, seguidores 
         <header className="header-header">
             <div className="contenedor-header-header">
                 <div className="imagen-de-portada">
+                    {/* <Image */}
                     <Image
                         className="foto-de-portada"
-                        src="/img/kirby-cute.webp"
+                        // src="https://i.pinimg.com/originals/5f/08/58/5f085809f2b711643e4eb4974cc03c0e.gif"
+                        src="/img/fondo-twitter-clone.gif"
                         alt="Portada"
                         width={730}
                         height={241}

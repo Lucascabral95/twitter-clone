@@ -13,15 +13,18 @@
     backdrop-filter: var(--fondo-blur-modal);
 
     .contenedor-seguidos-seguidores {
-        min-width: 474px;
-        max-width: 600px;
         border-radius: 8px;
         background-color: var(--fondo-negro);
         padding: 16px;
         border: var(--borde-modal);
-        height: fit-content;
+        min-width: 474px;
         min-height: 170px;
-        min-height: 600px;
+        overflow-y: scroll;
+
+        &::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
 
         .icono-close-seguidos-seguidores {
             width: 100%;
@@ -53,16 +56,21 @@
     .seguidos-seguidoress {
         width: 100%;
         display: flex;
-        justify-content: center;
-        align-items: center;
+        justify-content: flex-start;
+        align-items: flex-start;
+        height: 100vh !important;
+        padding: 0;
+        margin: 0;
 
         .contenedor-seguidos-seguidores {
             border-radius: 0px;
+            border: 0px solid transparent;
             width: 100%;
             min-width: auto;
             max-width: auto;
             padding: 16px;
-            height: 100vh;
+            overflow-y: scroll;
+            height: calc(100vh - 0px);
 
             .icono-close-seguidos-seguidores {
                 width: 100%;

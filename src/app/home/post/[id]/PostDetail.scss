@@ -99,6 +99,14 @@
                                 font-weight: bolder;
                                 font-size: 15px;
                             }
+
+                            &:hover {
+
+                                p {
+                                    transition: 0.2s ease-in-out;
+                                    text-decoration: underline;
+                                }
+                            }
                         }
 
                         .correo {
@@ -108,6 +116,13 @@
                             p {
                                 color: var(--color-gris);
                                 font-size: 15px;
+                            }
+
+                            &:hover {
+                                p {
+                                    transition: 0.2s ease-in-out;
+                                    text-decoration: underline;
+                                }
                             }
                         }
                     }
@@ -325,6 +340,13 @@
                                     font-size: 15px;
                                     color: var(--letra-titular);
                                 }
+
+                                &:hover {
+                                    p {
+                                        transition: 0.2s ease-in-out;
+                                        text-decoration: underline;
+                                    }
+                                }
                             }
 
                             .email-y-fecha {
@@ -336,15 +358,22 @@
                                     color: var(--color-gris);
                                     font-size: 15px;
                                 }
+
+                                &:hover {
+                                    p {
+                                        transition: 0.2s ease-in-out;
+                                        text-decoration: underline;
+                                    }
+                                }
                             }
 
-                            .solo-email{
+                            .solo-email {
                                 display: none;
                                 align-items: center;
 
-                                p{
-                                 color: var(--color-gris);
-                                 font-size: 15px;
+                                p {
+                                    color: var(--color-gris);
+                                    font-size: 15px;
                                 }
                             }
                         }
@@ -701,7 +730,7 @@
                                     }
                                 }
 
-                                .solo-email{
+                                .solo-email {
                                     margin: -1.2px 0 6px 0;
                                     display: flex;
                                 }
