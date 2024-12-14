@@ -12,13 +12,14 @@ const Home: React.FC = () => {
     datosLogueo,
     getTweetsByID,
     limit,
-    posteos,
     getDatosPersonalesByID,
     datosPersonales,
     misSeguidos,
     seguidores,
     obtenerSeguidores,
-    getMisSeguidos
+    getMisSeguidos,
+    posteosHome,
+    getTweetsOfHome
   } = useStore();
 
   useEffect(() => {
@@ -28,22 +29,36 @@ const Home: React.FC = () => {
       await obtenerSeguidores();
       await getMisSeguidos();
     };
-    
+
     fetchData();
   }, [getCookieLogueo, getTweetsByID, limit]);
-  
+
   useEffect(() => {
     if (datosLogueo?.id) {
       getDatosPersonalesByID(datosLogueo.id);
     }
   }, [datosLogueo?.id]);
 
+
+
+
+
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await getTweetsOfHome();
+    };
+
+    fetchData();
+  }, [getTweetsOfHome])
+
   return (
     <div className="home">
       <div className="contenedor-home">
 
         <Header dataUser={datosLogueo} misDatosPersonales={datosPersonales} seguidos={misSeguidos} seguidores={seguidores} />
-        <CardSecciones id={Number(datosLogueo?.id)} publicaciones={posteos} /> 
+        <CardSecciones id={Number(datosLogueo?.id)} publicaciones={posteosHome} />
 
       </div>
     </div>

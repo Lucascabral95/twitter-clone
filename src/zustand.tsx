@@ -68,11 +68,11 @@ interface StoreState {
     limit: number;
     limitFeed: number;
     getAllTweets: () => Promise<void>;
-    addTweet: (posteo: Posteos) => Promise<void>;
+    addTweet: () => Promise<void>;
     getTweetsByID: () => Promise<void>;
     getCookieLogueo: () => Promise<void>;
     getTweetsByIDUser: (id: number) => Promise<void>;
-    addTweetDinamico: (posteo: Posteos) => Promise<void>;
+    addTweetDinamico: () => Promise<void>;
     getDatosPersonalesByID: (id: number) => Promise<void>;
     datosPersonales: DatosPersonales;
     obtenerDatosDeCookie: () => Promise<Logueo | null>;
@@ -85,13 +85,15 @@ interface StoreState {
     misSeguidos: SeguidosYSeguidores[];
     seguidores: SeguidosYSeguidores[];
     obtenerSeguidores: () => Promise<void>;
+    posteosHome: Posteos[];
+    getTweetsOfHome: () => Promise<void>;
 }
 
 const useStore = create<StoreState>((set, get) => ({
     posteos: [],
     posteosUser: [],
     posteosTotales: 0,
-    loading: false,
+    loading: true,
     error: false,
     detalleError: "",
     datosLogueo: {} as Logueo,
@@ -103,6 +105,9 @@ const useStore = create<StoreState>((set, get) => ({
     change: false,
     misSeguidos: [],
     seguidores: [],
+
+
+    posteosHome: [],
 
     getCookieLogueo: async (): Promise<void> => {
         try {
@@ -170,8 +175,7 @@ const useStore = create<StoreState>((set, get) => ({
 
         try {
             const response = await axios.get('/api/posteo');
-            const filtro = response.data.result.filter((posteo: Posteos) => posteo.creador_id === datosLogueo.id);
-            set({ posteos: [...filtro], loading: false });
+            set({ posteos: response.data.result, loading: false, posteosHome: response.data.result });
         } catch (error) {
             if (error instanceof AxiosError) {
                 set({ error: true, loading: false });
@@ -184,12 +188,12 @@ const useStore = create<StoreState>((set, get) => ({
         }
     },
 
-    addTweetDinamico: async (posteo: Posteos): Promise<void> => {
+    addTweetDinamico: async (): Promise<void> => {
         set({ loading: true });
         try {
             const response = await axios.get('/api/posteo');
             const filtro = response.data.result.filter((posteo: Posteos) => posteo.creador_id === Number(posteo.creador_id));
-            set({ posteosUser: [...filtro, posteo], loading: false });
+            set({ posteosUser: filtro, loading: false, posteosHome: [...filtro] });
         } catch (error) {
             if (error instanceof AxiosError) {
                 set({ error: true, loading: false });
@@ -391,6 +395,29 @@ const useStore = create<StoreState>((set, get) => ({
                 const filtrarPorSeguidores = results.data.result.filter(({ id_a_seguir, id_mio }: { id_a_seguir: number, id_mio: number }) => id_a_seguir === get().datosLogueo?.id && id_mio !== get().datosLogueo?.id);
 
                 set({ seguidores: filtrarPorSeguidores });
+            }
+
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                if (error.response) {
+                    console.log(error.response.data.error)
+                } else {
+                    console.log(error)
+                }
+            }
+        }
+    },
+
+    getTweetsOfHome: async (): Promise<void> => {
+        try {
+            await get().getCookieLogueo();
+            const { datosLogueo } = get();
+
+            const results = await axios.get('/api/posteo');
+
+            if (results.status === 200) {
+                const filtro = results.data.result.filter((posteo: Posteos) => posteo.creador_id === Number(datosLogueo?.id));
+                set({ posteosHome: [...filtro] });
             }
 
         } catch (error) {

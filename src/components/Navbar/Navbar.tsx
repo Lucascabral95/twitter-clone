@@ -80,7 +80,7 @@ const Header: React.FC = () => {
     }
 
     getData();
-  }, [obtenerDatosDeCookie])
+  }, [])
 
   return (
     <>

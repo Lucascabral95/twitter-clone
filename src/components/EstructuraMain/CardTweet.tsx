@@ -7,7 +7,6 @@ moment.locale("es");
 import useStore from '@/zustand';
 import Link from 'next/link';
 import { Toaster } from 'react-hot-toast';
-import Image from 'next/image';
 
 interface IPosteos {
     contenido: string;
@@ -76,14 +75,7 @@ const CardTweet: React.FC<CardTweetProps> = ({ posteos }) => {
 
             {posteos.length === 0
                 ?
-                <div className="sin-posteos">
-                    <div className="texto">
-                        <p> No hay contenido que mostrar </p>
-                    </div>
-                    <div className="imagen-espera">
-                        <Image className="imagen" src="/img/cat-wait.webp" alt="Espera" width={120} height={120} />
-                    </div>
-                </div>
+                null
                 :
                 <div className="contenedor-boton-ver-mas">
                     {posteosTotales > 0 && cantidadPaginas > paginaActual && (

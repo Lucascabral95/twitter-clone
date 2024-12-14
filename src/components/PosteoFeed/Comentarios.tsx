@@ -29,7 +29,7 @@ const PosteoFeed: React.FC = () => {
             })
 
             if (result.status === 200) {
-                addTweet(result.data.result);
+                addTweet();
                 form.reset();
             }
 
