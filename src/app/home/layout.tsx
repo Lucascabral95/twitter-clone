@@ -4,6 +4,7 @@ import EstructuraMain from "@/components/EstructuraMain/EstructuraMain";
 import BotonPosteoFlotante from "@/components/BotonPosteoFlotante/BotonPosteoFlotante";
 import BotonBusquedaFlotante from "@/components/BotonPosteoFlotante/BotonBusquedaFlotante";
 import FooterInterior from "@/components/Footer/FooterInterior";
+import BotonLogoutFlotante from "@/components/BotonPosteoFlotante/BotonLogoutFlotante";
 
 export const metadata: Metadata = {
   title: "Tweets, Interacciones y Estadísticas",
@@ -17,6 +18,7 @@ const HomeLayout = ({ children }: { children: React.ReactNode }) => {
       {children}
       <BotonPosteoFlotante />
       <BotonBusquedaFlotante />
+      <BotonLogoutFlotante />
       <FooterInterior />
     </EstructuraMain>
   );
