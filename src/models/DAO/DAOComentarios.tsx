@@ -63,7 +63,7 @@ class DAOComentarios {
             }
 
             const data = await db();
-            const comments = await data`select * from comentarios_de_posteos where id_del_posteo = ${id} order by comentario_created_at asc`;
+            const comments = await data`select * from comentarios_de_posteos_new where id_del_posteo = ${id} order by comentario_created_at asc`;
 
             if (comments.length === 0) {
                 throw { error: "No existen comentarios para este posteo", status: 404 } as CustomError;

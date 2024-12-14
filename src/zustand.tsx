@@ -175,7 +175,7 @@ const useStore = create<StoreState>((set, get) => ({
 
         try {
             const response = await axios.get('/api/posteo');
-            set({ posteos: response.data.result, loading: false, posteosHome: response.data.result });
+            set({ posteos: response.data.result, loading: false, change: !get().change });
         } catch (error) {
             if (error instanceof AxiosError) {
                 set({ error: true, loading: false });
@@ -193,7 +193,7 @@ const useStore = create<StoreState>((set, get) => ({
         try {
             const response = await axios.get('/api/posteo');
             const filtro = response.data.result.filter((posteo: Posteos) => posteo.creador_id === Number(posteo.creador_id));
-            set({ posteosUser: filtro, loading: false, posteosHome: [...filtro] });
+            set({ posteosUser: filtro, loading: false, change: !get().change });
         } catch (error) {
             if (error instanceof AxiosError) {
                 set({ error: true, loading: false });
@@ -417,7 +417,7 @@ const useStore = create<StoreState>((set, get) => ({
 
             if (results.status === 200) {
                 const filtro = results.data.result.filter((posteo: Posteos) => posteo.creador_id === Number(datosLogueo?.id));
-                set({ posteosHome: [...filtro] });
+                set({ posteosHome: filtro });
             }
 
         } catch (error) {

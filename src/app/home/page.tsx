@@ -19,7 +19,8 @@ const Home: React.FC = () => {
     obtenerSeguidores,
     getMisSeguidos,
     posteosHome,
-    getTweetsOfHome
+    getTweetsOfHome, 
+    change
   } = useStore();
 
   useEffect(() => {
@@ -38,20 +39,10 @@ const Home: React.FC = () => {
       getDatosPersonalesByID(datosLogueo.id);
     }
   }, [datosLogueo?.id]);
-
-
-
-
-
-
-
+  
   useEffect(() => {
-    const fetchData = async () => {
-      await getTweetsOfHome();
-    };
-
-    fetchData();
-  }, [getTweetsOfHome])
+       getTweetsOfHome();
+  }, [getTweetsOfHome, change])
 
   return (
     <div className="home">

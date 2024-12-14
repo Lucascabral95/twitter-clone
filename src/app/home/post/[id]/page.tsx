@@ -32,6 +32,7 @@ interface IPosteo {
     titulo: string;
     updated_at: string;
     comentario_created_at: string;
+    posteo_contenido: string;
 }
 
 interface DatosLogueo {
@@ -140,7 +141,7 @@ const PostDetail: React.FC = () => {
                                 <h4>{dataPosteo?.titulo}</h4>
                             </div>
                             <div className="texto-contenido">
-                                <p>{dataPosteo?.contenido}</p>
+                                <p>{dataPosteo?.posteo_contenido}</p>
                             </div>
                             <div className="fecha-posteo">
                                 <div className="fecha">
