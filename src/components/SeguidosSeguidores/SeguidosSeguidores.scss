@@ -20,6 +20,8 @@
         min-width: 474px;
         min-height: 170px;
         overflow-y: scroll;
+        height: fit-content;
+        max-height: 600px;
 
         &::-webkit-scrollbar {
             width: 0px;
@@ -70,7 +72,8 @@
             max-width: auto;
             padding: 16px;
             overflow-y: scroll;
-            height: calc(100vh - 0px);
+            min-height: 100vh;
+            height: fit-content;
 
             .icono-close-seguidos-seguidores {
                 width: 100%;

@@ -28,6 +28,7 @@ const Home: React.FC = () => {
       await obtenerSeguidores();
       await getMisSeguidos();
     };
+    
     fetchData();
   }, [getCookieLogueo, getTweetsByID, limit]);
 

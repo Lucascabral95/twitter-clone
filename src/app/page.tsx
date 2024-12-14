@@ -39,7 +39,7 @@ const Home: React.FC = () => {
               </div>
               <div className="tenes-cuenta">
                 <div className="texto">
-                  <p> ¿Ya tenés una cuenta?</p>
+                  <p> ¿Ya tenés una cuenta? </p>
                 </div>
                 {isOpenRegister && <Register setIsOpenRegister={setIsOpenRegister} setIsOpenLogin={setIsOpenLogin} />}
                 <div className="boton-inicio-sesion">

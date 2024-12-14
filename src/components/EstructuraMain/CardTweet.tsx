@@ -7,6 +7,7 @@ moment.locale("es");
 import useStore from '@/zustand';
 import Link from 'next/link';
 import { Toaster } from 'react-hot-toast';
+import Image from 'next/image';
 
 interface IPosteos {
     contenido: string;
@@ -24,10 +25,11 @@ interface IPosteos {
 }
 
 interface CardTweetProps {
-    posteos: IPosteos[]
+    posteos: IPosteos[];
+    loading: boolean
 }
 
-const CardTweet: React.FC<CardTweetProps> = ({ posteos }) => {
+const CardTweet: React.FC<CardTweetProps> = ({ posteos, loading }) => {
     const { limit, posteosTotales } = useStore();
     const [posteosAMostrar, setPosteosAMostrar] = useState<number>(20);
     const [cantidadPaginas, setCantidadPaginas] = useState<number>(0);
@@ -73,16 +75,24 @@ const CardTweet: React.FC<CardTweetProps> = ({ posteos }) => {
                 </Link>
             ))}
 
-            {posteos.length === 0
-                ?
-                <p> No hay posteos </p>
-                :
-                <div className="contenedor-boton-ver-mas">
-                    {posteosTotales > 0 && cantidadPaginas > paginaActual && (
-                        <button className='boton-ver-mas' onClick={() => { setPaginaActual(paginaActual + 1); setPosteosAMostrar(posteosAMostrar + limit) }}> Ver más </button>
-                    )}
-                </div>
-            }
+            {!loading && (
+                posteos.length === 0
+                    ?
+                    <div className="sin-posteos">
+                        <div className="texto">
+                            <p> No hay contenido que mostrar </p>
+                        </div>
+                        <div className="imagen-espera">
+                            <Image className="imagen" src="/img/cat-wait.webp" alt="Espera" width={120} height={120} />
+                        </div>
+                    </div>
+                    :
+                    <div className="contenedor-boton-ver-mas">
+                        {posteosTotales > 0 && cantidadPaginas > paginaActual && (
+                            <button className='boton-ver-mas' onClick={() => { setPaginaActual(paginaActual + 1); setPosteosAMostrar(posteosAMostrar + limit) }}> Ver más </button>
+                        )}
+                    </div>
+            )}
 
             <Toaster />
 

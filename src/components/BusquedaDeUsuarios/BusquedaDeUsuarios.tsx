@@ -11,7 +11,7 @@ interface BusquedaProps {
         id: number,
         email: string,
         nombre: string
-    } []
+    }[]
 }
 
 interface Seguidor {
@@ -81,6 +81,12 @@ const BusquedaDeUsuarios: React.FC<BusquedaProps> = ({ usuarios }) => {
                         </div>
                     </div>
                 ))}
+
+                {usuarios?.length === 0 &&
+                    <div className="sin-seguidos-seguidores">
+                        <p> Sin seguidores ni seguidos </p>
+                    </div>
+                }
 
                 <Toaster />
 

@@ -160,17 +160,18 @@ const useStore = create<StoreState>((set, get) => ({
     addTweet: async (posteo): Promise<void> => {
         set({ loading: true });
         await get().getCookieLogueo();
-
         const { datosLogueo } = get();
+
         if (!datosLogueo) {
             set({ error: true, loading: false });
             console.error('No se encontraron datos de logueo');
             return;
         }
+
         try {
             const response = await axios.get('/api/posteo');
             const filtro = response.data.result.filter((posteo: Posteos) => posteo.creador_id === datosLogueo.id);
-            set({ posteos: [...filtro, posteo], loading: false });
+            set({ posteos: [...filtro], loading: false });
         } catch (error) {
             if (error instanceof AxiosError) {
                 set({ error: true, loading: false });
@@ -253,7 +254,7 @@ const useStore = create<StoreState>((set, get) => ({
 
         return null;
     },
-    
+
     obtenerResultadosDeBusqueda: async (response: Dat): Promise<void> => {
         try {
             const { busqueda, tipoDeBusqueda } = response;

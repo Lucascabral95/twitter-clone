@@ -15,7 +15,7 @@ const Register: React.FC<RegisterProps> = ({ setIsOpenLogin }) => {
   const router = useRouter();
   const [errorEmail, setErrorEmail] = useState<string>("");
   const [errorPassword, setErrorPassword] = useState<string>("");
-
+  const [loading, setLoading] = useState<boolean>(false);
 
   const crearCuenta = async (event: React.FormEvent<HTMLFormElement>, formData: FormData) => {
     event.preventDefault();
@@ -34,8 +34,10 @@ const Register: React.FC<RegisterProps> = ({ setIsOpenLogin }) => {
       if (error instanceof AxiosError) {
         if (error.response && (error.response.status === 404)) {
           setErrorEmail(error.response.data.error);
+          setLoading(false);
         } else if (error.response && (error.response.status === 401)) {
           setErrorPassword(error.response.data.error);
+          setLoading(false);
         }
       } else {
         console.error('Error desconocido:', error);
@@ -70,7 +72,8 @@ const Register: React.FC<RegisterProps> = ({ setIsOpenLogin }) => {
           <div className="medio-titulo">
             <h3> Iniciá sesión </h3>
           </div>
-          <form className="formulario" onSubmit={(event) => crearCuenta(event, new FormData(event.currentTarget))} >
+          {/* <form className="formulario" onSubmit={(event) => crearCuenta(event, new FormData(event.currentTarget))} > */}
+          <form className="formulario" onSubmit={(event) => {crearCuenta(event, new FormData(event.currentTarget)); setLoading(true)}} >
             <div className="formulario-interno">
               <div className="contenedor-input" style={{ border: errorEmail ? "1px solid red" : "1px solid #71767B" }}>
                 <input type="email" name="email" placeholder="Correo electronico" required
@@ -99,7 +102,9 @@ const Register: React.FC<RegisterProps> = ({ setIsOpenLogin }) => {
                 </div>
               }
               <div className="contenedor-creacion-cuenta">
-                <button type="submit"> Iniciar sesión </button>
+                <button type="submit">
+                  {loading ? "Autenticando..." : "Iniciar sesión"}
+                </button>
               </div>
             </div>
           </form>
