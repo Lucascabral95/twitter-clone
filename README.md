@@ -18,13 +18,12 @@ Implementación completa de un clon de Twitter que permite a los usuarios crear 
 ## ⚙️ Características Principales:
 
 - **Publicaciones y Reposts**: Los usuarios pueden publicar posteos con texto y luego compartir contenido de otros usuarios mediante reposts. Cada post incluye una sección para interactuar con comentarios y "me gusta".
-- **Almacenamiento de Datos en MongoDB**: Los datos de cada usuario, como su perfil, las fotos subidas y las interacciones (me gusta, reposts), se almacenan de manera persistente en MongoDB, asegurando que toda la información esté organizada y fácilmente accesible.
+- **Base de Datos Serverless**: Almacenamiento persistente y escalable con Neon Serverless PostgreSQL, ideal para manejar grandes cantidades de datos de usuarios y publicaciones. Los datos de cada usuario, como su perfil, las fotos subidas y las interacciones (me gusta, reposts), se almacenan de manera estructurada en Neon Serverless PostgreSQL, asegurando que toda la información esté organizada, accesible y que cumpla con las demandas de escalabilidad.
 - **Sistema de Seguidores**:Los usuarios pueden seguir y dejar de seguir a otros, lo que les permite ver publicaciones exclusivas de las personas que siguen. Cada perfil muestra un apartado de seguidores y seguidos.
 - **Perfiles de Usuario**: Cada usuario tiene un perfil personal que muestra sus publicaciones, reposts y detalles de su información personal, brindando una experiencia personalizada.
 - **Interacción en Comentarios**: Además de los posteos, los usuarios pueden comentar en cada publicación y dar "me gusta" a los comentarios de otros, fomentando una interacción activa en la plataforma.
 - **Autenticación Segura**: Implementada mediante cookies con JSON Web Tokens (JWT) utilizando jose. Esto garantiza un inicio de sesión confiable y seguro.
 - **Estado Global con Zustand**: Gestión eficiente de estados dentro de la aplicación, asegurando fluidez en la experiencia del usuario.
-- **Base de Datos Serverless**: Almacenamiento persistente y escalable con Neon Serverless PostgreSQL, ideal para manejar grandes cantidades de datos de usuarios y publicaciones.
 
 ## 📄 Conclusión:
 
