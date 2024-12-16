@@ -1,4 +1,4 @@
-# Snapoo Blog
+# Twitter Clone
 
 ## Instalación
 
