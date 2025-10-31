@@ -1,126 +1,116 @@
-"use client";
-import React, { useEffect, useState } from "react";
-import "./Navbar.scss";
-import Image from "next/image";
-import Link from "next/link";
-import axios, { AxiosError } from "axios";
-import { usePathname } from "next/navigation";
-import { HiMagnifyingGlass } from "react-icons/hi2";
-import { IoMdClose } from "react-icons/io";
-import ListaBusqueda from "../ListaBusqueda/ListaBusqueda";
-import useStore from "@/zustand";
-import Avvvatars from "avvvatars-react";
+'use client'
 
-interface IArrayDeBusqueda { 
-  id: number;
-  nombre: string;
-  email: string;
-  password: string;
-  fecha_creacion: string;
-  identificador: string
-}
+import React, { useEffect, useState, useCallback, useMemo } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
+import axios from 'axios'
+import { usePathname } from 'next/navigation'
+import { HiMagnifyingGlass } from 'react-icons/hi2'
+import { IoMdClose } from 'react-icons/io'
+import Avvvatars from 'avvvatars-react'
+
+import ListaBusqueda from '../ListaBusqueda/ListaBusqueda'
+import useStore from '@/zustand'
+import './Navbar.scss'
+import { useBusquedaUsuarios, useDebounce } from '@/presentation/hooks'
 
 const Header: React.FC = () => {
-  const pathname = usePathname();
-  const [inputBusqueda, setInputBusqueda] = useState<string>("");
-  const [arrayDeBusqueda, setArrayDeBusqueda] = useState<IArrayDeBusqueda[]>([]);
-  const { obtenerDatosDeCookie } = useStore();
-  const [image, setImage] = useState<string>("");
+  const pathname = usePathname()
+  const { obtenerDatosDeCookie } = useStore()
+
+  const [inputBusqueda, setInputBusqueda] = useState<string>('')
+  const [email, setEmail] = useState<string>('')
+  const [mounted, setMounted] = useState(false)
+
+  const debouncedInput = useDebounce(inputBusqueda, 300)
+
+  const axiosInstance = useMemo(() => axios.create(), [])
+
+  const { usuarios, buscar } = useBusquedaUsuarios(axiosInstance)
 
   useEffect(() => {
-    const getBusqueda = async () => {
-      try {
-        const results = await axios.get(`/api/busqueda`);
-
-        if (results.status === 200) {
-          // setData(results.data.result);
-        }
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          if (error.response) {
-            console.log(error.response.data.error)
-          } else {
-            console.log(error)
-          }
-        }
-      }
+    const initUser = async () => {
+      const response = await obtenerDatosDeCookie()
+      setEmail(response?.email || '')
+      setMounted(true)
     }
 
-    getBusqueda();
-  }, [inputBusqueda])
+    initUser()
+  }, [obtenerDatosDeCookie])
 
   useEffect(() => {
-    const buscarUsuarios = async () => {
-      try {
-        const results = await axios.get(`/api/usuario`)
+    buscar(debouncedInput)
+  }, [debouncedInput, buscar])
 
-        if (results.status === 200) {
-          const filtro = await results.data.result.filter((user: IArrayDeBusqueda) => user.email.toLowerCase().includes(inputBusqueda.toLowerCase())
-            || user.nombre.toLowerCase().includes(inputBusqueda.toLowerCase()));
-          setArrayDeBusqueda(filtro);
-        }
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          if (error.response) {
-            console.log(error.response.data.error)
-          } else {
-            console.log(error)
-          }
-        }
-      }
-    }
-
-    buscarUsuarios();
-  }, [inputBusqueda])
-
-  useEffect(() => {
-    const getData = async () => {
-      const response = await obtenerDatosDeCookie();
-      setImage(response?.email as string);
-    }
-
-    getData();
+  const handleLimpiar = useCallback(() => {
+    setInputBusqueda('')
   }, [])
 
-  return (
-    <>
-      {pathname !== "/" &&
-        <nav className="header">
-          <div className="contenedor-header">
-            <Link href="/feed" className="imagen-logo">
-              <Image className="imagen" src="/img/twitter.svg" alt="Logo" width={32} height={32} />
-            </Link>
-            <div className="contenedor-de-busquedas">
-              <div className="contenedor-de-busqueda">
-                <div className="lupa">
-                  <HiMagnifyingGlass className="icon" />
-                </div>
-                <div className="input">
-                  <input type="text" placeholder="Buscar usuario..." value={inputBusqueda} onChange={(e) => setInputBusqueda(e.target.value)} />
-                </div>
-                {inputBusqueda !== "" &&
-                  <div className="lupa icono-de-close" style={{ cursor: "pointer" }} onClick={() => setInputBusqueda("")}>
-                    <IoMdClose className="icon" />
-                  </div>
-                }
-              </div>
-              <Link href="/feed/search" className="boton-de-busqueda-navbar">
-                <HiMagnifyingGlass className="icon" />
-              </Link>
-              {inputBusqueda !== "" &&
-                <ListaBusqueda datos={arrayDeBusqueda} palabra={inputBusqueda} cerrarBusqueda={() => setInputBusqueda("")} />
-              }
-            </div>
-            <Link href="/home" className="nombre">
-              {image &&
-                <Avvvatars value={image} size={32} style="shape" />
-              }
-            </Link>
-          </div>
-        </nav >
-      }
-    </>
-  );
-};
+  if (!mounted || pathname === '/') {
+    return null
+  }
 
-export default Header;
+  const mostrarBusqueda = inputBusqueda.trim().length > 0
+
+  return (
+    <nav className='header'>
+      <div className='contenedor-header'>
+        <Link href='/feed' className='imagen-logo'>
+          <Image
+            className='imagen'
+            src='/img/twitter.svg'
+            alt='Logo'
+            width={32}
+            height={32}
+            priority
+          />
+        </Link>
+
+        <div className='contenedor-de-busquedas'>
+          <div className='contenedor-de-busqueda'>
+            <div className='lupa'>
+              <HiMagnifyingGlass className='icon' />
+            </div>
+            <div className='input'>
+              <input
+                type='text'
+                placeholder='Buscar usuario...'
+                value={inputBusqueda}
+                onChange={(e) => setInputBusqueda(e.target.value)}
+                aria-label='Buscar usuarios'
+              />
+            </div>
+            {mostrarBusqueda && (
+              <button
+                className='lupa icono-de-close'
+                onClick={handleLimpiar}
+                aria-label='Limpiar búsqueda'
+                type='button'
+              >
+                <IoMdClose className='icon' />
+              </button>
+            )}
+          </div>
+
+          <Link href='/feed/search' className='boton-de-busqueda-navbar'>
+            <HiMagnifyingGlass className='icon' />
+          </Link>
+
+          {mostrarBusqueda && (
+            <ListaBusqueda
+              datos={usuarios}
+              palabra={inputBusqueda}
+              cerrarBusqueda={handleLimpiar}
+            />
+          )}
+        </div>
+
+        <Link href='/home' className='nombre'>
+          {email && <Avvvatars value={email} size={32} style='shape' />}
+        </Link>
+      </div>
+    </nav>
+  )
+}
+
+export default Header

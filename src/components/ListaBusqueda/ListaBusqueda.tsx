@@ -1,9 +1,10 @@
 import React from 'react'
-import "./ListaBusqueda.scss"
+import Link from 'next/link';
 import { HiMagnifyingGlass } from "react-icons/hi2";
 import Avvvatars from 'avvvatars-react';
-import Link from 'next/link';
 import { motion } from 'motion/react';
+
+import "./ListaBusqueda.scss"
 
 interface Usuario {
     id: number;

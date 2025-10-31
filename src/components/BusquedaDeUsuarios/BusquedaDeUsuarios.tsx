@@ -1,10 +1,11 @@
 "use client"
 import React, { useEffect } from 'react'
-import "./BusquedaDeUsuarios.scss"
 import Avvvatars from 'avvvatars-react'
 import { FaTwitter } from "react-icons/fa";
-import useStore from '@/zustand';
 import { Toaster } from 'react-hot-toast';
+
+import useStore from '@/zustand';
+import "./BusquedaDeUsuarios.scss"
 
 interface BusquedaProps {
     usuarios: {

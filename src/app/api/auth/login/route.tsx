@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
       },
       process.env.JWT_SECRET as string,
       {
-        expiresIn: "1y",
+        expiresIn: "1y"
       }
     );
 

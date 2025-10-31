@@ -1,8 +1,9 @@
 "use client"
 import React from 'react'
-import './SeguidosSeguidores.scss'
 import { IoMdClose } from "react-icons/io";
+
 import BusquedaDeUsuarios from '../BusquedaDeUsuarios/BusquedaDeUsuarios';
+import './SeguidosSeguidores.scss'
 
 interface IMisSeguidos {
     email: string;

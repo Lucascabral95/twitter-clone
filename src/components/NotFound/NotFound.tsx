@@ -1,6 +1,7 @@
-import Image from "next/image";
-import "./NotFound.scss";
 import React from 'react'
+import Image from "next/image";
+
+import "./NotFound.scss";
 
 interface NotFoundProps {
     error: string
