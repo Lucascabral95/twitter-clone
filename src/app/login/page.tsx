@@ -1,55 +1,36 @@
-"use client";
-import React from "react";
-import axios from "axios";
-import { useRouter } from "next/navigation";
+'use client';
 
-const Home: React.FC = () => {
-  const router = useRouter();
+import { useLogin } from '@/presentation/hooks';
+import React from 'react';
 
-  const acceso = async (formData: FormData) => {
-    try {
-      const email = formData.get("email");
-      const password = formData.get("password");
-
-      const response = await axios.post(
-        "/api/auth/login",
-        {
-          email: email,
-          password: password,
-        }
-      );
-
-      if (response.status === 200) {
-        router.push("/adentro");
-      }
-
-      console.log(response.data.result);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+const LoginPage: React.FC = () => {
+  const { handleLogin, isLoading } = useLogin();
 
   return (
     <div>
-      <h1> Home login </h1>
+      <h1>Home login</h1>
 
-      <form action={acceso} style={{ color: "red" }}>
+      <form action={handleLogin} style={{ color: 'red' }}>
         <input
           type="email"
           name="email"
           placeholder="Ingresa tu email"
+          disabled={isLoading}
           required
         />
         <input
           type="password"
           name="password"
-          placeholder="Ingresa tu contraseña"
+          placeholder="Ingresa tu contraseña"
+          disabled={isLoading}
           required
         />
-        <button type="submit"> Login </button>
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? 'Iniciando sesión...' : 'Login'}
+        </button>
       </form>
     </div>
   );
 };
 
-export default Home;
+export default LoginPage;

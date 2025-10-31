@@ -1,28 +1,22 @@
-"use client"
-import React, { useEffect } from 'react'
-import "./Feed.scss"
-import CardTweet from '@/components/EstructuraMain/CardTweet'
-import useStore from '@/zustand'
-import PosteoFeed from '@/components/PosteoFeed/PosteoFeed'
+'use client';
+
+import React from 'react';
+import CardTweet from '@/components/EstructuraMain/CardTweet';
+import PosteoFeed from '@/components/PosteoFeed/PosteoFeed';
+import { useFeed } from '@/presentation/hooks';
+import './Feed.scss';
 
 const Feed: React.FC = () => {
-    const { limit, posteos, getAllTweets } = useStore();
+  const { posteos } = useFeed();
 
-    useEffect(() => {
-        getAllTweets();
-    }, [getAllTweets, limit])
+  return (
+    <div className="feed" style={{ marginTop: '46px' }}>
+      <div className="contenedor-feed">
+        <PosteoFeed />
+        <CardTweet posteos={posteos} />
+      </div>
+    </div>
+  );
+};
 
-    return (
-        <div className='feed' style={{ marginTop: "46px" }}>
-            <div className='contenedor-feed'>
-
-                <PosteoFeed />
-
-                <CardTweet posteos={posteos} />
-
-            </div>
-        </div>
-    )
-}
-
-export default Feed
+export default Feed;

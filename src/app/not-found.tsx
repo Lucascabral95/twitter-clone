@@ -1,4 +1,5 @@
 import React from 'react'
+
 import NotFound from '@/components/NotFound/NotFound';
 import "./App.scss";
 

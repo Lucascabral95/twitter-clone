@@ -3,18 +3,8 @@ import React from 'react'
 import { IoMdClose } from "react-icons/io";
 
 import BusquedaDeUsuarios from '../BusquedaDeUsuarios/BusquedaDeUsuarios';
+import { IMisSeguidos } from '@/infrastructure/interfaces';
 import './SeguidosSeguidores.scss'
-
-interface IMisSeguidos {
-    email: string;
-    fecha_creacion: string;
-    id: number;
-    id_a_seguir: number;
-    id_mio: number;
-    id_seguimiento: number;
-    identificador: string;
-    nombre: string;
-}
 
 interface ISeguidosSeguidoresProps {
     setIsOpenSeguidosSeguidores: React.Dispatch<React.SetStateAction<boolean>>
