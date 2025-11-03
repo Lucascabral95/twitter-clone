@@ -13,22 +13,6 @@ export const usePostDetail = () => {
   const [error, setError] = useState(false);
   const [detalleError, setDetalleError] = useState('');
 
-//   useEffect(() => {
-//     const fetchPostDetail = async () => {
-//       if (!id) return;
-
-//       const result = await postDetailService.getPostById(id);
-//       if (result.success) {
-//         setDataPosteo(result.data);
-//       } else {
-//         setError(true);
-//         setDetalleError(result.error);
-//       }
-//       setLoading(false);
-//     };
-
-//     fetchPostDetail();
-//   }, [id]);
 useEffect(() => {
   const fetchPostDetail = async () => {
     if (!id) return;

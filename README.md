@@ -1,48 +1,332 @@
+<p align="center">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/6/64/Logo_of_Twitter.svg" alt="Twitter Clone" width="180"/>
+</p>
+
 # Twitter Clone
+
+## Descripción general
+
+**Twitter Clone** es una red social moderna desarrollada con [Next.js 14](https://nextjs.org/), [React 18](https://react.dev/), [TypeScript](https://www.typescriptlang.org/) y un backend serverless sobre [Neon PostgreSQL](https://neon.tech/). La aplicación replica la experiencia de Twitter con publicaciones en tiempo real, sistema de seguidores, reposts y gestión de comments, apoyada en una arquitectura modular con estado global controlado por [Zustand](https://github.com/pmndrs/zustand). Incluye autenticación segura basada en JWT, servicios desacoplados y una suite de pruebas que garantizan la calidad del código.
+
+---
+
+## ⚙️ Características Principales
+
+- **Autenticación y Sesiones Seguras:** Registro y login mediante endpoints Next.js con cookies firmadas por JWT (jose), persistiendo la sesión del usuario y sus credenciales.
+- **Gestión de Publicaciones:** Creación, lectura y actualización dinámica de posteos con contador de likes, soporte para reposts y control de límites paginados.
+- **Sistema de Seguidores:** Seguimiento bidireccional con verificación de amistad, listado de seguidores/mis seguidos y acciones para seguir/dejar de seguir.
+- **Timeline Personalizado:** Feed con artículos propios y de usuarios seguidos, refresco automático mediante `change` flag y actualizaciones reactivas en el store.
+- **Búsqueda Inteligente:** Motor de búsqueda unificado que filtra publicaciones y usuarios, con soporte para keywords parciales y filtros dinámicos.
+- **Perfiles Dinámicos:** Páginas dedicadas a cada usuario con su actividad completa, datos personales, estadísticas y publicaciones recientes.
+- **Comentarios e Interacciones:** Detalle de post con comentarios anidados, likes en tiempo real y utilidades para repostear contenido.
+- **UI Responsive y Animada:** Interfaces diseñadas con SCSS modular, componentes reutilizables y animaciones suaves gracias a `motion/react`.
+- **Pruebas Robustas:** Cobertura de hooks y componentes críticos con Jest + React Testing Library, enfocadas en servicios, formularios y flujos de datos.
+- **Arquitectura Limpia:** Separación entre capas de presentación, infraestructura y dominio; servicios desacoplados y tipado consistente con TypeScript y Zod.
+
+---
+
+# 🧪 Guía de Pruebas End-to-End con Jest
+
+Esta guía describe cómo ejecutar la batería completa de pruebas unitarias e integraciones ligeras que validan el comportamiento del **Twitter Clone**.
+
+---
+
+## 📦 Dependencias de Testing
+
+| Herramienta                | Uso principal                                                |
+|---------------------------|--------------------------------------------------------------|
+| **Jest 30**               | Framework de testing para JavaScript/TypeScript              |
+| **React Testing Library** | Renderizado y aserciones específicas de componentes React    |
+| **@testing-library/jest-dom** | Matchers adicionales para DOM                           |
+| **jest-environment-jsdom**| Emulación de entorno DOM para pruebas de hooks y componentes |
+
+---
+
+## ▶️ Ejecución Rápida
+
+```bash
+npm test          # Ejecuta la suite completa
+npm run test:watch # Modo watch para desarrollo
+npm run test:coverage # Genera reporte de cobertura
+```
+
+Cada suite se enfoca en los hooks principales (`useFeed`, `usePostForm`, `useHomeData`, `useUserData`, `usePostDetail`, `useSearch`) y en componentes críticos como `PosteoFeed`.
+
+---
+
+## 🔍 Escenarios Validables
+
+- **Autenticación de formularios:** Verifica flujos de login/register y validación con Zod.
+- **Gestión de publicaciones:** Confirma creación de posts, reinicio de formularios y sincronización con el store.
+- **Feed y búsqueda:** Asegura llamadas al backend al montar, paginación por `limit` y relevancia de resultados.
+- **Detalle de post:** Garantiza la carga de información, validación de seguidores y manejo de errores del servicio.
+- **Hooks personalizados:** Comprueba side-effects, dependencias y estabilidad de referencias externas.
+
+Para simular servicios HTTP se mockean los módulos de infraestructura y el store global de Zustand, desacoplando las pruebas del backend real.
+
+---
+
+## 🚀 Tecnologías Utilizadas
+
+- **Framework:** Next.js 14, React 18, TypeScript 5
+- **Gestión de Estado:** Zustand 5, React Context para modales
+- **Estilos:** SCSS modular, fuentes personalizadas y assets SVG
+- **Validación:** Zod para esquemas de formularios
+- **Autenticación:** JWT + jose, cookies HTTP only
+- **HTTP Client:** Axios con manejo centralizado de errores AxiosError
+- **Persistencia:** Neon Serverless PostgreSQL (via HTTP API)
+- **UI & Animaciones:** motion/react, react-icons, avvvatars-react
+- **Notificaciones:** react-hot-toast
+- **Testing:** Jest, React Testing Library, jest-dom, user-event
+
+---
+
+## Tabla de Contenidos
+
+- [Instalación](#instalación)
+- [Uso](#uso)
+- [Variables de entorno](#variables-de-entorno)
+- [Estructura del proyecto](#estructura-del-proyecto)
+- [Arquitectura](#arquitectura)
+- [Rutas de la Aplicación](#rutas-de-la-aplicación)
+- [Gestión de Estado](#gestión-de-estado)
+- [Hooks Personalizados](#hooks-personalizados)
+- [Servicios](#servicios)
+- [Pruebas](#pruebas)
+- [Contribuciones](#contribuciones)
+- [Licencia](#licencia)
+- [Contacto](#contacto)
+
+---
 
 ## Instalación
 
-Instalar Twitter Clone con npm
+1. **Clonar el repositorio**
+
+   ```bash
+   git clone https://github.com/Lucascabral95/twitter-clone.git
+   cd twitter-clone
+   ```
+
+2. **Instalar dependencias**
+
+   ```bash
+   npm install
+   ```
+
+3. **Configurar variables de entorno**
+
+   Duplicá el archivo `.env.example` (si no existe, crealo manualmente) y completá los valores correspondientes:
+
+   ```env
+   JWT_SECRET=tu_secreto
+   DATABASE_URL=postgresql://usuario:password@host/neondb?sslmode=require
+   ORIGINAL_URL=http://localhost:3000
+   ```
+
+4. **Levantar el entorno de desarrollo**
+
+   ```bash
+   npm run dev
+   ```
+
+   La aplicación estará disponible en `http://localhost:3000`.
+
+---
+
+## Uso
+
+- **Modo desarrollo:** `npm run dev`
+- **Build producción:** `npm run build`
+- **Servidor producción:** `npm start`
+- **Analizar errores de lint:** `npm run lint`
+- **Pruebas unitarias:** `npm test`
+
+---
+
+## Variables de entorno
+
+| Variable       | Descripción                                      |
+|----------------|--------------------------------------------------|
+| `JWT_SECRET`   | Clave para firmar y validar JWT                   |
+| `DATABASE_URL` | Cadena de conexión a Neon Serverless PostgreSQL   |
+| `ORIGINAL_URL` | URL base utilizada para redirecciones y cookies   |
+
+---
+
+## Estructura del proyecto
 
 ```bash
-  git clone https://github.com/Lucascabral95/twitter-clone.git
-  cd twitter-clone
-  npm install 
-  npm run dev
+twitter-clone/
+├── src/
+│   ├── app/                   # Rutas Next.js (App Router)
+│   │   ├── api/               # Endpoints serverless (auth, post, user, follows)
+│   │   ├── feed/              # Feed principal y búsqueda
+│   │   ├── home/              # Home autenticado, post detail y perfiles
+│   │   ├── login/             # Ruta de autenticación
+│   │   └── page.tsx           # Landing pública
+│   ├── components/            # UI y widgets reutilizables
+│   ├── infrastructure/        # Servicios, interfaces y constantes
+│   ├── presentation/          # Hooks, layouts y lógica de presentación
+│   ├── utils/                 # Helpers (likes, reposts, formateos)
+│   └── zustand.tsx            # Store global
+├── test/__mocks__/            # Mocks de librerías (Zustand, estilos, avatares)
+├── public/                    # Assets estáticos (logos, imágenes)
+├── jest.config.ts             # Configuración de testing
+├── tsconfig.json              # Configuración TypeScript
+└── next.config.mjs            # Configuración Next.js
 ```
- 
-## 🌟 Descripción
 
-Implementación completa de un clon de Twitter que permite a los usuarios crear perfiles, publicar y compartir contenido, interactuar mediante comentarios, "me gusta" y reposts, y establecer conexiones a través de un sistema de seguidores y seguidos. Diseñado con un enfoque en la funcionalidad, escalabilidad y experiencia del usuario.
+---
 
-## ⚙️ Características Principales:
+## Arquitectura
 
-- **Publicaciones y Reposts**: Los usuarios pueden publicar posteos con texto y luego compartir contenido de otros usuarios mediante reposts. Cada post incluye una sección para interactuar con comentarios y "me gusta".
-- **Base de Datos Serverless**: Almacenamiento persistente y escalable con Neon Serverless PostgreSQL, ideal para manejar grandes cantidades de datos de usuarios y publicaciones. Los datos de cada usuario, como su perfil, las fotos subidas y las interacciones (me gusta, reposts), se almacenan de manera estructurada en Neon Serverless PostgreSQL, asegurando que toda la información esté organizada, accesible y que cumpla con las demandas de escalabilidad.
-- **Sistema de Seguidores**:Los usuarios pueden seguir y dejar de seguir a otros, lo que les permite ver publicaciones exclusivas de las personas que siguen. Cada perfil muestra un apartado de seguidores y seguidos.
-- **Perfiles de Usuario**: Cada usuario tiene un perfil personal que muestra sus publicaciones, reposts y detalles de su información personal, brindando una experiencia personalizada.
-- **Interacción en Comentarios**: Además de los posteos, los usuarios pueden comentar en cada publicación y dar "me gusta" a los comentarios de otros, fomentando una interacción activa en la plataforma.
-- **Autenticación Segura**: Implementada mediante cookies con JSON Web Tokens (JWT) utilizando jose. Esto garantiza un inicio de sesión confiable y seguro.
-- **Estado Global con Zustand**: Gestión eficiente de estados dentro de la aplicación, asegurando fluidez en la experiencia del usuario.
+El proyecto sigue principios de **Clean Architecture** y separación por capas:
 
-## 📄 Conclusión:
+1. **Presentación (`presentation/` + `components/` + `app/`):** Componentes React, hooks y layout responsables de la UI y los eventos del usuario.
+2. **Infraestructura (`infrastructure/`):** Servicios HTTP (axios), contratos TypeScript, validaciones con Zod y constantes compartidas.
+3. **Estado Global (`zustand.tsx`):** Orquestador central con acciones asíncronas, fetch de API y sincronización entre vistas.
+4. **API Routes (`app/api/`):** Endpoints serverless en Next.js que interactúan con la base de datos Neon y exponen lógica de negocio.
 
-- **Clon de Twitter**: Este proyecto refleja mis habilidades avanzadas en desarrollo web, combinando tecnologías modernas con una arquitectura en capas que garantiza un diseño escalable, modular y altamente mantenible. He aplicado principios de abstracción para estructurar componentes y funcionalidades de forma eficiente, logrando una experiencia dinámica y segura para los usuarios. Desde publicaciones interactivas hasta un sistema de seguidores y perfiles personalizados, esta aplicación demuestra mi capacidad para crear soluciones completas, bien organizadas y centradas en el usuario.
+Cada capa se comunica mediante interfaces tipadas y funciones puras, favoreciendo testabilidad y mantenibilidad.
 
-## 🚀 Tecnologías Utilizadas 
+---
 
-- **Next.js**: Framework de React que permite la construcción de aplicaciones web y APIs con funcionalidades de renderizado del lado del servidor.
-- **Neon Serverless PostgreSQL**: Base de datos relacional serverless que permite almacenar información de usuarios, publicaciones y relaciones entre ellos.
-- **SASS**: Para estilos y diseño responsivo, asegurando una buena experiencia en diferentes dispositivos.
-- **Zustand**: Librería para la gestión del estado global, sencilla y eficiente.
-- **JSON Web Tokens (JWT) y jose**: Manejo de autenticación basado en cookies para garantizar la seguridad del usuario.
-- **Zod**: Biblioteca de validación y parsing de esquemas para TypeScript y JavaScript, que permite definir y validar datos con tipos seguros de manera sencilla y eficaz.
-- **TypeScript**: Superset de JavaScript que añade tipado estático y otras funcionalidades avanzadas, mejorando la calidad y el mantenimiento del código en aplicaciones grandes y complejas.
+## Rutas de la Aplicación
+
+### Rutas Públicas
+
+| Ruta              | Componente          | Descripción                                     |
+|-------------------|---------------------|-------------------------------------------------|
+| `/`               | Landing             | Página inicial con modales de login/register    |
+| `/login`          | Login               | Autenticación de usuarios                       |
+| `/not-found`      | NotFound            | Página de error genérica                        |
+
+### Rutas Protegidas
+
+| Ruta                     | Componente           | Descripción                                         |
+|--------------------------|----------------------|-----------------------------------------------------|
+| `/home`                  | Home                 | Dashboard con estadísticas y feed personalizado     |
+| `/home/user/[id]`        | UserID               | Perfil completo del usuario                         |
+| `/home/post/[id]`        | PostDetail           | Detalle extendido del post y comentarios            |
+| `/feed`                  | Feed                 | Timeline general y formulario de publicación        |
+| `/feed/search`           | Search               | Resultados de búsqueda de usuarios/publicaciones    |
+
+Middleware de autenticación (`middleware.ts`) asegura que las rutas protegidas sean accesibles únicamente con sesión válida.
+
+---
+
+## Gestión de Estado
+
+El store global se define en `src/zustand.tsx` usando `create` de Zustand. Se encarga de:
+
+- **Autenticación:** `getCookieLogueo`, `obtenerDatosDeCookie`.
+- **Posts:** `getAllTweets`, `addTweet`, `getTweetsByID`, `getTweetsByIDUser`, `getTweetsOfHome`.
+- **Seguidores:** `getMisSeguidos`, `obtenerSeguidores`, `seguirUsuario`, `eliminarSeguimiento`, `existeEnMiListaDeAmigos`.
+- **Búsqueda:** `obtenerResultadosDeBusqueda` con filtros dinámicos.
+- **Estado UI:** Flags `loading`, `error`, `change`, `limit`, `limitFeed`.
+
+Ejemplo simplificado:
+
+```ts
+const useStore = create<StoreState>((set, get) => ({
+  posteos: [],
+  datosLogueo: {} as Logueo,
+  getAllTweets: async () => {
+    set({ loading: true });
+    const { data } = await axios.get('/api/posteo');
+    set({ posteos: data.result, loading: false });
+  },
+  addTweet: async () => {
+    await get().getCookieLogueo();
+    await get().getAllTweets();
+    set({ change: !get().change });
+  },
+  obtenerResultadosDeBusqueda: async ({ busqueda, tipoDeBusqueda }) => {
+    const endpoint = tipoDeBusqueda === 'usuarios' ? '/api/usuario' : '/api/posteo';
+    const { data } = await axios.get(endpoint);
+    const lower = busqueda.toLowerCase();
+    set({ arrayDeBusqueda: data.result.filter(item =>
+      ['nombre', 'email', 'titulo', 'contenido']
+        .some(key => item[key]?.toLowerCase().includes(lower))
+    ) });
+  },
+}));
+```
+
+---
+
+## Hooks Personalizados
+
+- **`useAuthModals`**: Controla los modales de login y registro en la landing.
+- **`useRegister` / `useLogin`**: Gestionan formularios, validación con Zod y consumo de `authService`.
+- **`useFeed`**: Obtiene posts del timeline y sincroniza con cambios de `limit`.
+- **`usePostForm`**: Maneja el formulario de creación de posteo, reseteo de campos y toast de feedback.
+- **`useHomeData`**: Carga datos personales, seguidores, seguidos y feed del usuario autenticado.
+- **`useSearch`**: Orquesta filtros de búsqueda y actualiza resultados en tiempo real.
+- **`useUserData`**: Recupera información del perfil y publicaciones de un usuario específico.
+- **`usePostDetail`**: Trae el detalle de un post, verifica amistades y gestiona estados de error.
+
+Cada hook se encuentra testeado en `src/presentation/hooks/__tests__` y se integra con el store global y servicios HTTP.
+
+---
+
+## Servicios
+
+Los servicios de infraestructura encapsulan las llamadas a la API:
+
+- **`authService.service.ts`**: Login y registro con manejo de toast y AxiosError.
+- **`postService.service.ts`**: Creación de posts, con respuestas tipadas y manejo de errores.
+- **`postDetailService.service.ts`**: Obtiene detalle completo del post por ID.
+- **`userService.service.ts`**: Recupera información de usuario y relaciones.
+
+Todos retornan objetos con la forma `{ success: boolean; data?: T; error?: string }` para simplificar la lógica de presentación.
+
+---
+
+## Pruebas
+
+La carpeta `src/presentation/hooks/__tests__` incluye suites para cada hook clave y para componentes como `PosteoFeed`.
+
+Puntos destacados:
+
+- Mock dedicado de Zustand en `test/__mocks__/zustand.ts` con helpers `__setMockState` y `__resetMockState`.
+- Mock de servicios (`postService`, `userService`, `postDetailService`) para aislar efectos secundarios.
+- Verificación de side-effects (`toast.success`, `toast.error`), resets de formularios y control de `isLoading`.
+- Cobertura sobre flujos felices y de error, garantizando robustez en escenarios reales.
+
+Ejecutá `npm test` para asegurar que todo se mantiene estable antes de publicar.
+
+---
+
+## Contribuciones
+
+¡Las contribuciones son bienvenidas! Para colaborar:
+
+1. Fork del repositorio y creación de rama (`git checkout -b feature/nueva-feature`).
+2. Implementar cambios con pruebas correspondientes.
+3. Seguir las convenciones de [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `test:`, `docs:`...).
+4. Abrir un Pull Request describiendo los cambios y adjuntando evidencia (capturas/tests).
+
+---
+
+## Licencia
+
+Este proyecto se distribuye bajo la licencia **MIT**. Consultá el archivo `LICENSE` si necesitás más detalles.
+
+---
 
 ## 📬 Contacto
 
-Si tenés alguna pregunta o sugerencia, no dudes en contactarme a través de lucassimple@hotmail.com o https://github.com/Lucascabral95
+- **Autor:** Lucas Cabral
+- **Email:** lucassimple@hotmail.com
+- **LinkedIn:** [lucas-gastón-cabral](https://www.linkedin.com/in/lucas-gastón-cabral/)
+- **Portafolio:** [https://portfolio-web-dev-git-main-lucascabral95s-projects.vercel.app/](https://portfolio-web-dev-git-main-lucascabral95s-projects.vercel.app/)
+- **GitHub:** [@Lucascabral95](https://github.com/Lucascabral95)
 
-### Notas: 
+---
 
-- Añadí secciones como **Tecnologías Utilizadas**, **Descripción**, **Conclusión**, **Características Principales** y **Contacto** para hacer el README más completo.
+<p align="center">
+  Desarrollado con ❤️ por Lucas Cabral
+</p>
+

@@ -105,8 +105,6 @@ const useStore = create<StoreState>((set, get) => ({
     change: false,
     misSeguidos: [],
     seguidores: [],
-
-
     posteosHome: [],
 
     getCookieLogueo: async (): Promise<void> => {
@@ -372,6 +370,7 @@ const useStore = create<StoreState>((set, get) => ({
             }
         }
     },
+
     getMisSeguidos: async (): Promise<void> => {
         try {
             const { data } = await axios.get(`/api/seguimientos/${get().datosLogueo?.id}`);
@@ -387,6 +386,7 @@ const useStore = create<StoreState>((set, get) => ({
             }
         }
     },
+
     obtenerSeguidores: async (): Promise<void> => {
         try {
             const results = await axios.get(`/api/seguimientos/`);
