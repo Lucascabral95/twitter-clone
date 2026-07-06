@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import DAOPosteos from "@/models/DAO/DAOPosteos";
+import { getSessionUser } from "@/infrastructure/auth/session";
 
 interface CustomError {
     error: string;
@@ -28,13 +29,19 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
     try {
-        const { titulo, contenido, creador_id } = await req.json();
+        const user = await getSessionUser();
 
-        if (!titulo || !contenido || !creador_id) {
+        if (!user) {
+            return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+        }
+
+        const { titulo, contenido } = await req.json();
+
+        if (!titulo || !contenido) {
             return NextResponse.json({ result: "Faltan datos" }, { status: 400 });
         }
 
-        const results = await DAOPosteos.createPosteo({ titulo, contenido, creador_id });
+        const results = await DAOPosteos.createPosteo({ titulo, contenido, creador_id: user.id });
 
         if (!results) {
             return NextResponse.json({ result: "Error al crear el posteo" }, { status: 400 });
