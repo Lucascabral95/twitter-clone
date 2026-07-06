@@ -65,15 +65,13 @@ const Home: React.FC = () => {
                   <p>¿Ya tenés una cuenta?</p>
                 </div>
 
-                {isOpenRegister && (
-                  <Register setIsOpenRegister={closeRegister} setIsOpenLogin={openLogin} />
-                )}
+                {isOpenRegister && <Register onClose={closeRegister} />}
 
                 <div className="boton-inicio-sesion">
                   <button onClick={openLogin}>Iniciar sesión</button>
                 </div>
 
-                {isOpenLogin && <Login setIsOpenLogin={closeLogin} />}
+                {isOpenLogin && <Login onClose={closeLogin} />}
               </div>
             </div>
           </div>

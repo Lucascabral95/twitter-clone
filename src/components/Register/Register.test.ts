@@ -1,27 +1,69 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import Register from './Register';
+import { authService } from '@/infrastructure/services/authService.service';
 
-jest.mock('@/presentation/hooks/useRegister', () => ({
-  useRegister: (onSuccess: any, onOpenLogin: any) => ({
-    error: { nombre: undefined, email: undefined, password: undefined },
-    errorSimple: '',
-    isLoading: false,
-    handleRegister: (e: any) => { e.preventDefault(); onSuccess(); onOpenLogin(); },
-  }),
+const push = jest.fn();
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({ push }),
 }));
 
-it('renders and submits register form', () => {
-  const setIsOpenRegister = jest.fn();
-  const setIsOpenLogin = jest.fn();
-  render(React.createElement(Register, { setIsOpenRegister, setIsOpenLogin }));
+jest.mock('@/infrastructure/services/authService.service', () => ({
+  authService: { register: jest.fn() },
+}));
 
-  fireEvent.change(screen.getByPlaceholderText('Nombre y apellido'), { target: { value: 'Lucas' } });
-  fireEvent.change(screen.getByPlaceholderText('Correo electrónico'), { target: { value: 'a@a.com' } });
-  fireEvent.change(screen.getByPlaceholderText('Contraseña'), { target: { value: '12345678' } });
+describe('Register', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
-  fireEvent.submit(screen.getByRole('button', { name: /Crear cuenta|Creando cuenta/ }));
+  it('shows the live password checklist as the user types', () => {
+    render(React.createElement(Register, { onClose: jest.fn() }));
 
-  expect(setIsOpenRegister).toHaveBeenCalledWith(false);
-  expect(setIsOpenLogin).toHaveBeenCalledWith(true);
+    const passwordInput = screen.getByPlaceholderText('Contraseña');
+    fireEvent.change(passwordInput, { target: { value: 'password' } });
+
+    expect(screen.getByText('Al menos 8 caracteres').closest('li')).toHaveClass('cumplida');
+    expect(screen.getByText('Una letra mayúscula').closest('li')).toHaveClass('pendiente');
+  });
+
+  it('submits, auto-logs in and closes the modal on success', async () => {
+    (authService.register as jest.Mock).mockResolvedValue({ success: true });
+    const onClose = jest.fn();
+    render(React.createElement(Register, { onClose }));
+
+    fireEvent.change(screen.getByPlaceholderText('Nombre y apellido'), { target: { value: 'Lucas Cabral' } });
+    fireEvent.change(screen.getByPlaceholderText('Correo electrónico'), { target: { value: 'lucas@test.com' } });
+    fireEvent.change(screen.getByPlaceholderText('Contraseña'), { target: { value: 'Password1' } });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Crear cuenta' }));
+
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(push).toHaveBeenCalledWith('/home');
+  });
+
+  it('closes when clicking outside the modal box', () => {
+    const onClose = jest.fn();
+    render(
+      React.createElement(
+        'div',
+        null,
+        React.createElement(Register, { onClose }),
+        React.createElement('div', { 'data-testid': 'outside' })
+      )
+    );
+
+    fireEvent.mouseDown(screen.getByTestId('outside'));
+
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('closes when pressing Escape', () => {
+    const onClose = jest.fn();
+    render(React.createElement(Register, { onClose }));
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+
+    expect(onClose).toHaveBeenCalled();
+  });
 });

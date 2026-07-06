@@ -5,50 +5,26 @@ import { motion } from 'motion/react';
 import { IoMdClose } from 'react-icons/io';
 
 import { useRegister } from '@/presentation/hooks/useRegister';
+import { useModalDismiss } from '@/presentation/hooks/useModalDismiss';
+import Spinner from '@/components/Spinner/Spinner';
+import PasswordChecklist from '@/components/PasswordChecklist/PasswordChecklist';
 import './Register.scss';
 
 interface RegisterProps {
-  setIsOpenRegister: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsOpenLogin: React.Dispatch<React.SetStateAction<boolean>>;
+  onClose: () => void;
 }
 
-const Register: React.FC<RegisterProps> = ({ setIsOpenRegister, setIsOpenLogin }) => {
-  const { error, errorSimple, isLoading, handleRegister } = useRegister(
-    () => setIsOpenRegister(false),
-    () => setIsOpenLogin(true)
-  );
+const Register: React.FC<RegisterProps> = ({ onClose }) => {
+  const modalRef = useModalDismiss<HTMLDivElement>(onClose);
 
-  const renderFieldError = (fieldName: 'nombre' | 'email' | 'password') => {
-    if (error[fieldName]) {
-      return (
-        <div className="contenedor-texto-de-error">
-          {error[fieldName]?.map((item, index) => (
-            <p className="texto-de-error" key={index}>
-              {item}
-            </p>
-          ))}
-        </div>
-      );
-    }
-    return null;
-  };
+  const {
+    register,
+    onSubmit,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useRegister(onClose);
 
-  const renderFieldHint = (fieldName: 'nombre' | 'email' | 'password') => {
-    const hints = {
-      nombre: '¿Cuál es tu nombre?',
-      email: '¿Cómo es tu correo electrónico?',
-      password: 'Elige una contraseña segura',
-    };
-
-    if (!error[fieldName]) {
-      return (
-        <div className="texto-aclaratorio">
-          <p>{hints[fieldName]}</p>
-        </div>
-      );
-    }
-    return null;
-  };
+  const password = watch('password', '');
 
   return (
     <motion.div
@@ -58,9 +34,9 @@ const Register: React.FC<RegisterProps> = ({ setIsOpenRegister, setIsOpenLogin }
       transition={{ duration: 0.4 }}
       className="register"
     >
-      <div className="contenedor-register">
+      <div className="contenedor-register" ref={modalRef} role="dialog" aria-modal="true">
         <div className="superior">
-          <div className="icono" onClick={() => setIsOpenRegister(false)}>
+          <div className="icono" onClick={onClose}>
             <IoMdClose className="icon" />
           </div>
           <div className="imagen-register">
@@ -74,62 +50,72 @@ const Register: React.FC<RegisterProps> = ({ setIsOpenRegister, setIsOpenLogin }
             <h3>Crear cuenta</h3>
           </div>
 
-          <form className="formulario" onSubmit={handleRegister}>
+          <form className="formulario" onSubmit={onSubmit} noValidate>
             <div className="formulario-interno">
               <div
                 className="contenedor-input"
-                style={{ border: error.nombre ? '1px solid red' : '1px solid #71767b68' }}
+                style={{ border: errors.nombre ? '1px solid red' : '1px solid #71767b68' }}
               >
                 <input
                   type="text"
-                  name="nombre"
                   placeholder="Nombre y apellido"
-                  disabled={isLoading}
-                  required
+                  disabled={isSubmitting}
+                  {...register('nombre')}
                 />
               </div>
-              {renderFieldError('nombre')}
-              {renderFieldHint('nombre')}
+              {errors.nombre ? (
+                <div className="contenedor-texto-de-error">
+                  <p className="texto-de-error">{errors.nombre.message}</p>
+                </div>
+              ) : (
+                <div className="texto-aclaratorio">
+                  <p>¿Cuál es tu nombre?</p>
+                </div>
+              )}
 
               <div
                 className="contenedor-input"
-                style={{ border: error.email || errorSimple ? '1px solid red' : '1px solid #71767b68' }}
+                style={{ border: errors.email ? '1px solid red' : '1px solid #71767b68' }}
               >
                 <input
                   type="email"
-                  name="email"
                   placeholder="Correo electrónico"
-                  disabled={isLoading}
-                  required
+                  disabled={isSubmitting}
+                  {...register('email')}
                 />
               </div>
-              {renderFieldError('email')}
-              {renderFieldHint('email')}
+              {errors.email ? (
+                <div className="contenedor-texto-de-error">
+                  <p className="texto-de-error">{errors.email.message}</p>
+                </div>
+              ) : (
+                <div className="texto-aclaratorio">
+                  <p>¿Cómo es tu correo electrónico?</p>
+                </div>
+              )}
 
               <div
                 className="contenedor-input"
-                style={{ border: error.password ? '1px solid red' : '1px solid #71767b68' }}
+                style={{ border: errors.password ? '1px solid red' : '1px solid #71767b68' }}
               >
                 <input
                   type="password"
-                  name="password"
                   placeholder="Contraseña"
-                  disabled={isLoading}
-                  required
+                  disabled={isSubmitting}
+                  {...register('password')}
                 />
               </div>
-              {renderFieldError('password')}
-              {renderFieldHint('password')}
+              <PasswordChecklist password={password} />
 
-              {errorSimple && (
+              {errors.root && (
                 <div className="contenedor-texto-de-error">
-                  <p className="texto-de-error">{errorSimple}</p>
+                  <p className="texto-de-error">{errors.root.message}</p>
                 </div>
               )}
 
               <div className="contenedor-creacion-cuenta">
-                <button type="submit" disabled={isLoading}>
-                  {isLoading ? 'Creando cuenta...' : 'Crear cuenta'}
+                <button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? <Spinner /> : 'Crear cuenta'}
                 </button>
               </div>
             </div>

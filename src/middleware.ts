@@ -2,7 +2,14 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 
-const PUBLIC_API_PATHS = ["/api/auth/login", "/api/auth/register", "/api/auth/logout"];
+import { ACCESS_COOKIE, getSecretKey } from "@/infrastructure/auth/constants";
+
+const PUBLIC_API_PATHS = [
+  "/api/auth/login",
+  "/api/auth/register",
+  "/api/auth/logout",
+  "/api/auth/refresh",
+];
 
 export async function middleware(request: Request) {
   const { pathname } = new URL(request.url);
@@ -18,15 +25,12 @@ export async function middleware(request: Request) {
       : NextResponse.redirect(new URL("/", request.url));
 
   const cookieStore = cookies();
-  const cookie = cookieStore.get("myToken");
+  const cookie = cookieStore.get(ACCESS_COOKIE);
 
   if (!cookie) return unauthorized();
 
   try {
-    await jwtVerify(
-      cookie.value,
-      new TextEncoder().encode(process.env.JWT_SECRET as string)
-    );
+    await jwtVerify(cookie.value, getSecretKey());
 
     return NextResponse.next();
   } catch {

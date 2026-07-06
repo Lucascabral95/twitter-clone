@@ -1,9 +1,16 @@
 import { NextResponse, NextRequest } from 'next/server';
-import { cookies } from 'next/headers';
 
 import DAOUsuarios from '@/models/DAO/DAOUsuarios';
+import DAORefreshTokens from '@/models/DAO/DAORefreshTokens';
 import { CustomError } from '@/infrastructure/interfaces';
-import { signSession, SESSION_COOKIE, MAX_AGE, SessionPayload } from '@/infrastructure/auth/session';
+import { handleRouteError } from '@/infrastructure/http/handleRouteError';
+import {
+  signSession,
+  generarRefreshToken,
+  setAccessCookie,
+  setRefreshCookie,
+  SessionPayload,
+} from '@/infrastructure/auth/session';
 
 const validateLoginInput = (email: string, password: string) => {
   if (!email || !password) {
@@ -31,24 +38,16 @@ export async function POST(req: NextRequest) {
       fecha_creacion: usuario.fecha_creacion,
     };
 
-    const token = await signSession(payload);
+    const accessToken = await signSession(payload);
+    const { token: refreshToken, tokenHash, expira } = generarRefreshToken();
 
-    cookies().set(SESSION_COOKIE, token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      path: '/',
-      maxAge: MAX_AGE,
-    });
+    await DAORefreshTokens.crear(usuario.id, tokenHash, expira);
+
+    setAccessCookie(accessToken);
+    setRefreshCookie(refreshToken);
 
     return NextResponse.json({ result: 'Acceso permitido' }, { status: 200 });
   } catch (error) {
-    const customError = error as CustomError;
-
-    if (customError?.error && customError?.status) {
-      return NextResponse.json({ error: customError.error }, { status: customError.status });
-    }
-
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return handleRouteError(error);
   }
 }

@@ -1,49 +1,26 @@
-"use client";
-import React, { useState } from "react";
-import "./Register.scss";
-import { IoMdClose } from "react-icons/io";
-import Image from "next/image";
-import axios, { AxiosError } from "axios";
-import { useRouter } from "next/navigation";
-import { motion } from "motion/react";
+'use client';
+import React from 'react';
+import Image from 'next/image';
+import { motion } from 'motion/react';
+import { IoMdClose } from 'react-icons/io';
 
-interface RegisterProps {
-  setIsOpenLogin: React.Dispatch<React.SetStateAction<boolean>>;
+import { useLogin } from '@/presentation/hooks/useLogin';
+import { useModalDismiss } from '@/presentation/hooks/useModalDismiss';
+import Spinner from '@/components/Spinner/Spinner';
+import './Register.scss';
+
+interface LoginProps {
+  onClose: () => void;
 }
 
-const Register: React.FC<RegisterProps> = ({ setIsOpenLogin }) => {
-  const router = useRouter();
-  const [errorEmail, setErrorEmail] = useState<string>("");
-  const [errorPassword, setErrorPassword] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+const Login: React.FC<LoginProps> = ({ onClose }) => {
+  const modalRef = useModalDismiss<HTMLDivElement>(onClose);
 
-  const crearCuenta = async (event: React.FormEvent<HTMLFormElement>, formData: FormData) => {
-    event.preventDefault();
-    const email = formData.get("email");
-    const password = formData.get("password");
-    try {
-      const result = await axios.post("/api/auth/login", {
-        email: email,
-        password: password,
-      });
-
-      if (result.status === 200 || result.status === 201) {
-        router.push("/home");
-      }
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        if (error.response && (error.response.status === 404)) {
-          setErrorEmail(error.response.data.error);
-          setLoading(false);
-        } else if (error.response && (error.response.status === 401)) {
-          setErrorPassword(error.response.data.error);
-          setLoading(false);
-        }
-      } else {
-        console.error('Error desconocido:', error);
-      }
-    }
-  };
+  const {
+    register,
+    onSubmit,
+    formState: { errors, isSubmitting },
+  } = useLogin();
 
   return (
     <motion.div
@@ -51,59 +28,77 @@ const Register: React.FC<RegisterProps> = ({ setIsOpenLogin }) => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.4 }}
-      className="register">
-      <div className="contenedor-register">
+      className="register"
+    >
+      <div className="contenedor-register" ref={modalRef} role="dialog" aria-modal="true">
         <div className="superior">
-          <div className="icono" onClick={() => setIsOpenLogin(false)}>
+          <div className="icono" onClick={onClose}>
             <IoMdClose className="icon" />
           </div>
           <div className="imagen-register">
-            <Image
-              className="imagen"
-              src="/img/twitter.svg"
-              alt="Logo"
-              width={28}
-              height={28}
-            />
+            <Image className="imagen" src="/img/twitter.svg" alt="Logo" width={28} height={28} />
           </div>
           <div className="icono"></div>
         </div>
+
         <div className="medio">
           <div className="medio-titulo">
-            <h3> Iniciá sesión </h3>
+            <h3>Iniciá sesión</h3>
           </div>
-          {/* <form className="formulario" onSubmit={(event) => crearCuenta(event, new FormData(event.currentTarget))} > */}
-          <form className="formulario" onSubmit={(event) => {crearCuenta(event, new FormData(event.currentTarget)); setLoading(true)}} >
+
+          <form className="formulario" onSubmit={onSubmit} noValidate>
             <div className="formulario-interno">
-              <div className="contenedor-input" style={{ border: errorEmail ? "1px solid red" : "1px solid #71767B" }}>
-                <input type="email" name="email" placeholder="Correo electronico" required
+              <div
+                className="contenedor-input"
+                style={{ border: errors.email ? '1px solid red' : '1px solid #71767b68' }}
+              >
+                <input
+                  type="email"
+                  placeholder="Correo electronico"
+                  disabled={isSubmitting}
+                  {...register('email')}
                 />
               </div>
-              {errorEmail ? (
+              {errors.email ? (
                 <div className="contenedor-texto-de-error">
-                  <p className="texto-de-error"> {errorEmail} </p>
+                  <p className="texto-de-error">{errors.email.message}</p>
                 </div>
               ) : (
                 <div className="texto-aclaratorio">
-                  <p> Cómo es tu correo electrónico? </p>
+                  <p>¿Cómo es tu correo electrónico?</p>
                 </div>
               )}
-              <div className="contenedor-input" style={{ border: errorPassword ? "1px solid red" : "1px solid #71767B" }}>
-                <input type="password" name="password" placeholder="Contraseña" required
+
+              <div
+                className="contenedor-input"
+                style={{ border: errors.password ? '1px solid red' : '1px solid #71767b68' }}
+              >
+                <input
+                  type="password"
+                  placeholder="Contraseña"
+                  disabled={isSubmitting}
+                  {...register('password')}
                 />
               </div>
-              {errorPassword ? (
+              {errors.password ? (
                 <div className="contenedor-texto-de-error">
-                  <p className="texto-de-error"> {errorPassword} </p>
+                  <p className="texto-de-error">{errors.password.message}</p>
                 </div>
-              ) :
+              ) : (
                 <div className="texto-aclaratorio">
-                  <p> Elegí una contraseña segura </p>
+                  <p>Elegí una contraseña segura</p>
                 </div>
-              }
+              )}
+
+              {errors.root && (
+                <div className="contenedor-texto-de-error">
+                  <p className="texto-de-error">{errors.root.message}</p>
+                </div>
+              )}
+
               <div className="contenedor-creacion-cuenta">
-                <button type="submit">
-                  {loading ? "Autenticando..." : "Iniciar sesión"}
+                <button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? <Spinner /> : 'Iniciar sesión'}
                 </button>
               </div>
             </div>
@@ -114,4 +109,4 @@ const Register: React.FC<RegisterProps> = ({ setIsOpenLogin }) => {
   );
 };
 
-export default Register;
+export default Login;

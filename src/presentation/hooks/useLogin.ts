@@ -1,32 +1,26 @@
-import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-import { LoginCredentials } from '@/infrastructure/interfaces';
+import { loginSchema, LoginFormData } from '@/infrastructure/validation';
 import { authService } from '@/infrastructure/services/authService.service';
 
 export const useLogin = () => {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const form = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    mode: 'onChange',
+  });
 
-  const handleLogin = useCallback(
-    async (formData: FormData) => {
-      setIsLoading(true);
-      
-      const credentials: LoginCredentials = {
-        email: formData.get('email') as string,
-        password: formData.get('password') as string,
-      };
+  const onSubmit = form.handleSubmit(async data => {
+    const result = await authService.login(data);
 
-      const result = await authService.login(credentials);
-      
-      if (result?.success) {
-        router.push('/adentro');
-      }
-      
-      setIsLoading(false);
-    },
-    [router]
-  );
+    if (result?.success) {
+      router.push('/home');
+    } else {
+      form.setError('root', { message: result?.error ?? 'Error al iniciar sesión' });
+    }
+  });
 
-  return { handleLogin, isLoading };
+  return { ...form, onSubmit };
 };

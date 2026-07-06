@@ -1,37 +1,60 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import axios, { AxiosError } from 'axios';
 import Login from './Login';
+import { authService } from '@/infrastructure/services/authService.service';
 
 const push = jest.fn();
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push }),
-  usePathname: jest.fn(() => '/feed'),
 }));
 
-it('login success redirects to /home', async () => {
-  jest.spyOn(axios, 'post').mockResolvedValue({ status: 200 } as any);
-  const { container } = render(React.createElement(Login, { setIsOpenLogin: jest.fn() }));
+jest.mock('@/infrastructure/services/authService.service', () => ({
+  authService: { login: jest.fn() },
+}));
 
-  fireEvent.change(screen.getByPlaceholderText('Correo electronico'), { target: { value: 'a@a.com' } });
-  fireEvent.change(screen.getByPlaceholderText('Contraseña'), { target: { value: '12345678' } });
-  const form = container.querySelector('form')!;
-  fireEvent.submit(form);
+describe('Login', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
-  await waitFor(() => expect(push).toHaveBeenCalledWith('/home'));
-});
+  it('login success redirects to /home', async () => {
+    (authService.login as jest.Mock).mockResolvedValue({ success: true });
+    render(React.createElement(Login, { onClose: jest.fn() }));
 
-it('login error shows error message for email 404', async () => {
-  const err = new AxiosError('fail', 'ERR_BAD_REQUEST', undefined, undefined, { status: 404, data: { error: 'not found' } } as any);
-  jest.spyOn(axios, 'post').mockRejectedValue(err);
+    fireEvent.change(screen.getByPlaceholderText('Correo electronico'), { target: { value: 'a@a.com' } });
+    fireEvent.change(screen.getByPlaceholderText('Contraseña'), { target: { value: '12345678' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Iniciar sesión' }));
 
-  const { container } = render(React.createElement(Login, { setIsOpenLogin: jest.fn() }));
-  fireEvent.change(screen.getByPlaceholderText('Correo electronico'), { target: { value: 'a@a.com' } });
-  fireEvent.change(screen.getByPlaceholderText('Contraseña'), { target: { value: '12345678' } });
-  const form = container.querySelector('form')!;
-  fireEvent.submit(form);
+    await waitFor(() => expect(push).toHaveBeenCalledWith('/home'));
+  });
 
-  await waitFor(() => {
-    expect(screen.getByText('not found')).toBeInTheDocument();
+  it('login error shows the backend error message', async () => {
+    (authService.login as jest.Mock).mockResolvedValue({ success: false, error: 'not found' });
+    render(React.createElement(Login, { onClose: jest.fn() }));
+
+    fireEvent.change(screen.getByPlaceholderText('Correo electronico'), { target: { value: 'a@a.com' } });
+    fireEvent.change(screen.getByPlaceholderText('Contraseña'), { target: { value: '12345678' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Iniciar sesión' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('not found')).toBeInTheDocument();
+    });
+    expect(push).not.toHaveBeenCalled();
+  });
+
+  it('closes when clicking outside the modal box', () => {
+    const onClose = jest.fn();
+    render(
+      React.createElement(
+        'div',
+        null,
+        React.createElement(Login, { onClose }),
+        React.createElement('div', { 'data-testid': 'outside' })
+      )
+    );
+
+    fireEvent.mouseDown(screen.getByTestId('outside'));
+
+    expect(onClose).toHaveBeenCalled();
   });
 });
