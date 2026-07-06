@@ -27,19 +27,6 @@ interface User {
 }
 
 class daoUsuarios {
-  constructor() {
-    this.initializeDB();
-  }
-
-  async initializeDB(): Promise<void> {
-    try {
-      await db();
-    } catch (error) {
-      console.log(error);
-      throw error as CustomError;
-    }
-  }
-
   async getAllUsers(): Promise<Usuario[]> {
     try {
       const data = await db();

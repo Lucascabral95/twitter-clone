@@ -1,6 +1,7 @@
 import axios, { AxiosError } from 'axios'
 import { create } from 'zustand'
 import toast from 'react-hot-toast';
+import { logger } from '@/infrastructure/logger';
 
 interface Dat {
     busqueda: string;
@@ -114,9 +115,9 @@ const useStore = create<StoreState>((set, get) => ({
             if (error instanceof AxiosError) {
                 set({ error: true });
                 if (error.response) {
-                    console.error('Error en la respuesta:', error.response.data.error);
+                    logger.error('Error en la respuesta:', error.response.data.error);
                 } else {
-                    console.error('Error inesperado:', error);
+                    logger.error('Error inesperado:', error);
                 }
             }
         }
@@ -139,7 +140,7 @@ const useStore = create<StoreState>((set, get) => ({
         const { datosLogueo } = get();
         if (!datosLogueo) {
             set({ error: true, loading: false });
-            console.error('No se encontraron datos de logueo');
+            logger.error('No se encontraron datos de logueo');
             return;
         }
 
@@ -150,9 +151,9 @@ const useStore = create<StoreState>((set, get) => ({
             if (error instanceof AxiosError) {
                 if (error.response) {
                     set({ error: true, loading: false, detalleError: error.response.data.result });
-                    console.error(error.response.data.result);
+                    logger.error(error.response.data.result);
                 } else {
-                    console.error('Unexpected error', error);
+                    logger.error('Unexpected error', error);
                 }
             }
         }
@@ -165,7 +166,7 @@ const useStore = create<StoreState>((set, get) => ({
 
         if (!datosLogueo) {
             set({ error: true, loading: false });
-            console.error('No se encontraron datos de logueo');
+            logger.error('No se encontraron datos de logueo');
             return;
         }
 
@@ -176,9 +177,9 @@ const useStore = create<StoreState>((set, get) => ({
             if (error instanceof AxiosError) {
                 set({ error: true, loading: false });
                 if (error.response) {
-                    console.error(error.response.data.error);
+                    logger.error(error.response.data.error);
                 } else {
-                    console.error('Unexpected error', error);
+                    logger.error('Unexpected error', error);
                 }
             }
         }
@@ -194,9 +195,9 @@ const useStore = create<StoreState>((set, get) => ({
             if (error instanceof AxiosError) {
                 set({ error: true, loading: false });
                 if (error.response) {
-                    console.error(error.response.data.error);
+                    logger.error(error.response.data.error);
                 } else {
-                    console.error('Unexpected error', error);
+                    logger.error('Unexpected error', error);
                 }
             }
         }
@@ -212,9 +213,9 @@ const useStore = create<StoreState>((set, get) => ({
             if (error instanceof AxiosError) {
                 set({ error: true, loading: false });
                 if (error.response) {
-                    console.error(error.response.data.error);
+                    logger.error(error.response.data.error);
                 } else {
-                    console.error('Unexpected error', error);
+                    logger.error('Unexpected error', error);
                 }
             }
         }
@@ -227,9 +228,9 @@ const useStore = create<StoreState>((set, get) => ({
         } catch (error) {
             if (error instanceof AxiosError) {
                 if (error.response) {
-                    console.error(error.response.data.error);
+                    logger.error(error.response.data.error);
                 } else {
-                    console.error('Unexpected error', error);
+                    logger.error('Unexpected error', error);
                 }
             }
         }
@@ -244,9 +245,9 @@ const useStore = create<StoreState>((set, get) => ({
             if (error instanceof AxiosError) {
                 set({ error: true });
                 if (error.response) {
-                    console.error('Error en la respuesta:', error.response.data.error);
+                    logger.error('Error en la respuesta:', error.response.data.error);
                 } else {
-                    console.error('Error inesperado:', error);
+                    logger.error('Error inesperado:', error);
                 }
             }
         }
@@ -271,9 +272,9 @@ const useStore = create<StoreState>((set, get) => ({
         } catch (error) {
             if (error instanceof AxiosError) {
                 const errorMessage = error.response?.data?.error || error.message || "Error desconocido";
-                console.error("Error al obtener resultados de búsqueda:", errorMessage);
+                logger.error("Error al obtener resultados de búsqueda:", errorMessage);
             } else {
-                console.log(error);
+                logger.log(error);
             }
         }
     },
@@ -289,9 +290,9 @@ const useStore = create<StoreState>((set, get) => ({
         } catch (error) {
             if (error instanceof AxiosError) {
                 if (error.response) {
-                    console.error(error.response.data.error);
+                    logger.error(error.response.data.error);
                 } else {
-                    console.error(error);
+                    logger.error(error);
                 }
             }
         }
@@ -304,7 +305,7 @@ const useStore = create<StoreState>((set, get) => ({
             })
 
             if (result.status === 200) {
-                console.log("Usuario seguido")
+                logger.log("Usuario seguido")
                 toast.success("Usuario seguido exitosamente", {
                     position: "top-center",
                     duration: 2000
@@ -316,13 +317,13 @@ const useStore = create<StoreState>((set, get) => ({
         } catch (error) {
             if (error instanceof AxiosError) {
                 if (error.response) {
-                    console.log(error.response.data.error)
+                    logger.log(error.response.data.error)
                     toast.error(error.response.data.error, {
                         position: "top-center",
                         duration: 2000
                     })
                 } else {
-                    console.log(error)
+                    logger.log(error)
                 }
             }
         }
@@ -336,7 +337,7 @@ const useStore = create<StoreState>((set, get) => ({
             })
 
             if (result.status === 200) {
-                console.log("Seguimiento eliminado")
+                logger.log("Seguimiento eliminado")
                 toast.success("Usuario eliminado exitosamente", {
                     position: "top-center",
                     duration: 2000
@@ -348,13 +349,13 @@ const useStore = create<StoreState>((set, get) => ({
         } catch (error) {
             if (error instanceof AxiosError) {
                 if (error.response) {
-                    console.log(error.response.data.error)
+                    logger.log(error.response.data.error)
                     toast.error(error.response.data.error, {
                         position: "top-center",
                         duration: 2000
                     })
                 } else {
-                    console.log(error)
+                    logger.log(error)
                 }
             }
         }
@@ -368,9 +369,9 @@ const useStore = create<StoreState>((set, get) => ({
         } catch (error) {
             if (error instanceof AxiosError) {
                 if (error.response) {
-                    console.log(error.response.data.error)
+                    logger.log(error.response.data.error)
                 } else {
-                    console.log(error.message)
+                    logger.log(error.message)
                 }
             }
         }
@@ -390,9 +391,9 @@ const useStore = create<StoreState>((set, get) => ({
         } catch (error) {
             if (error instanceof AxiosError) {
                 if (error.response) {
-                    console.log(error.response.data.error)
+                    logger.log(error.response.data.error)
                 } else {
-                    console.log(error)
+                    logger.log(error)
                 }
             }
         }
@@ -412,9 +413,9 @@ const useStore = create<StoreState>((set, get) => ({
         } catch (error) {
             if (error instanceof AxiosError) {
                 if (error.response) {
-                    console.log(error.response.data.error)
+                    logger.log(error.response.data.error)
                 } else {
-                    console.log(error)
+                    logger.log(error)
                 }
             }
         }
