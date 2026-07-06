@@ -9,7 +9,10 @@
     "lint": "next lint",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "db:migrate": "node --env-file=.env scripts/migrate.mjs",
+    "db:seed": "node --env-file=.env scripts/seed.mjs",
+    "db:reset": "node --env-file=.env scripts/migrate.mjs --fresh && node --env-file=.env scripts/seed.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
