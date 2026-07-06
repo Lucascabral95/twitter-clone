@@ -15,7 +15,13 @@ const mockState: any = {
   seguidores: [],
   posteosHome: [],
   change: false,
-  
+  hasMoreTweets: false,
+  nextCursorTweets: null,
+  hasMoreTweetsUser: false,
+  nextCursorTweetsUser: null,
+  hasMoreTweetsHome: false,
+  nextCursorTweetsHome: null,
+
   getAllTweets: async () => {},
   addTweet: async () => {},
   getTweetsByID: async () => {},
@@ -30,6 +36,9 @@ const mockState: any = {
   eliminarSeguimiento: async () => {},
   getMisSeguidos: async () => {},
   getTweetsOfHome: async () => {},
+  loadMoreTweets: async () => {},
+  loadMoreTweetsUser: async () => {},
+  loadMoreTweetsHome: async () => {},
 };
 
 export const create = (initializer: any) => {

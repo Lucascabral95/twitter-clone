@@ -26,25 +26,44 @@ interface CreacionPosteo {
     contenido: string;
 }
 
+export interface PosteosPaginados {
+    rows: Posteos[];
+    hasMore: boolean;
+}
+
+export const DEFAULT_POSTEOS_LIMIT = 20;
+
 // Lecturas contra la vista `usuarios_posteos` (join con usuarios), escrituras contra la
 // tabla base `posteos`. Los SELECT son de columnas explícitas: si la vista cambia de forma,
 // esto falla ruidosamente en vez de arrastrar un drift de esquema silencioso.
 class DAOPosteos {
-    async getAllPosteos(): Promise<Posteos[]> {
+    // Paginación keyset sobre posteo_id (desc): se pide `limit + 1` filas para saber
+    // si hay una página siguiente sin una query de COUNT(*) aparte.
+    async getAllPosteos(limit: number = DEFAULT_POSTEOS_LIMIT, cursor?: number): Promise<PosteosPaginados> {
         try {
             const data = await db();
-            const posteos = await data`
-                SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
-                       titulo, contenido, created_at, updated_at, creador_id, likes
-                FROM usuarios_posteos order by posteo_id asc
-            `;
-            return posteos.reverse() as Posteos[];
+            const posteos = cursor
+                ? await data`
+                    SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
+                           titulo, contenido, created_at, updated_at, creador_id, likes
+                    FROM usuarios_posteos where posteo_id < ${cursor} order by posteo_id desc limit ${limit + 1}
+                `
+                : await data`
+                    SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
+                           titulo, contenido, created_at, updated_at, creador_id, likes
+                    FROM usuarios_posteos order by posteo_id desc limit ${limit + 1}
+                `;
+
+            const hasMore = posteos.length > limit;
+            const rows = (hasMore ? posteos.slice(0, limit) : posteos) as Posteos[];
+
+            return { rows, hasMore };
         } catch (error) {
             throw error as CustomError;
         }
     }
 
-    async getPosteosByCreador(creadorId: number): Promise<Posteos[]> {
+    async getPosteosByCreador(creadorId: number, limit: number = DEFAULT_POSTEOS_LIMIT, cursor?: number): Promise<PosteosPaginados> {
         try {
 
             if (isNaN(Number(creadorId))) {
@@ -52,19 +71,28 @@ class DAOPosteos {
             }
 
             const data = await db();
-            const posteos = await data`
-                SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
-                       titulo, contenido, created_at, updated_at, creador_id, likes
-                FROM usuarios_posteos where creador_id = ${creadorId} order by posteo_id desc
-            `;
+            const posteos = cursor
+                ? await data`
+                    SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
+                           titulo, contenido, created_at, updated_at, creador_id, likes
+                    FROM usuarios_posteos where creador_id = ${creadorId} and posteo_id < ${cursor} order by posteo_id desc limit ${limit + 1}
+                `
+                : await data`
+                    SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
+                           titulo, contenido, created_at, updated_at, creador_id, likes
+                    FROM usuarios_posteos where creador_id = ${creadorId} order by posteo_id desc limit ${limit + 1}
+                `;
 
-            return posteos as Posteos[];
+            const hasMore = posteos.length > limit;
+            const rows = (hasMore ? posteos.slice(0, limit) : posteos) as Posteos[];
+
+            return { rows, hasMore };
         } catch (error) {
             throw error as CustomError;
         }
     }
 
-    async searchPosteos(query: string): Promise<Posteos[]> {
+    async searchPosteos(query: string, limit: number = DEFAULT_POSTEOS_LIMIT): Promise<Posteos[]> {
         try {
             const data = await db();
             const like = `%${query}%`;
@@ -73,7 +101,7 @@ class DAOPosteos {
                        titulo, contenido, created_at, updated_at, creador_id, likes
                 FROM usuarios_posteos
                 where titulo ILIKE ${like} or contenido ILIKE ${like} or nombre ILIKE ${like}
-                order by posteo_id desc
+                order by posteo_id desc limit ${limit}
             `;
 
             return posteos as Posteos[];
@@ -96,13 +124,11 @@ class DAOPosteos {
                 FROM usuarios_posteos where posteo_id = ${id}
             `;
 
-            const filteredPosteos = posteo.filter((posteo) => posteo.creador_id === id);
-
-            if (filteredPosteos.length === 0) {
+            if (posteo.length === 0) {
                 throw { error: "El usuario aún no tiene posteos", status: 404 } as CustomError;
             }
 
-            return filteredPosteos[0] as Posteos;
+            return posteo[0] as Posteos;
         } catch (error) {
             throw error as CustomError;
         }

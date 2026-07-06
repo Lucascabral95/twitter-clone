@@ -37,13 +37,14 @@ class daoUsuarios {
     }
   }
 
-  async searchUsuarios(query: string): Promise<Usuario[]> {
+  async searchUsuarios(query: string, limit: number = 20): Promise<Usuario[]> {
     try {
       const data = await db();
       const like = `%${query}%`;
       const users = await data`
         select id, nombre, email, identificador, fecha_creacion from usuarios
         where nombre ILIKE ${like} or email ILIKE ${like}
+        limit ${limit}
       `;
       return users as Usuario[];
     } catch (error) {
@@ -75,7 +76,7 @@ class daoUsuarios {
     try {
       const data = await db();
 
-      const existingUser = await data`select * from usuarios where email = ${user.email}`;
+      const existingUser = await data`select 1 from usuarios where email = ${user.email} limit 1`;
 
       if (existingUser.length > 0) {
         throw { error: "El usuario ya se encuentra registrado", status: 404 } as CustomError;

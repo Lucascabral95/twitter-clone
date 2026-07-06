@@ -1,8 +1,4 @@
-import { neon } from "@neondatabase/serverless";
-
-const db = async () => {
-    const sql = neon(process.env.DATABASE_URL);
-    return sql;
-}
-
-export default db;
+// Compat shim: la implementación real vive en `./db.ts` (Pool con reintentos,
+// health check y graceful shutdown). Se mantiene este archivo para no tocar
+// los ~9 sitios que importan `@/services/neon`.
+export { default } from "./db";

@@ -7,13 +7,13 @@ import { useFeed } from '@/presentation/hooks';
 import './Feed.scss';
 
 const Feed: React.FC = () => {
-  const { posteos } = useFeed();
+  const { posteos, hasMore, loadMore } = useFeed();
 
   return (
     <div className="feed" style={{ marginTop: '46px' }}>
       <div className="contenedor-feed">
         <PosteoFeed />
-        <CardTweet posteos={posteos} />
+        <CardTweet posteos={posteos} hasMore={hasMore} onLoadMore={loadMore} />
       </div>
     </div>
   );

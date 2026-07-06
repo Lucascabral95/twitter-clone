@@ -1,24 +1,45 @@
 import { NextResponse, NextRequest } from "next/server";
-import DAOPosteos from "@/models/DAO/DAOPosteos";
+import DAOPosteos, { DEFAULT_POSTEOS_LIMIT } from "@/models/DAO/DAOPosteos";
 import { getSessionUser } from "@/infrastructure/auth/session";
 import { handleRouteError } from "@/infrastructure/http/handleRouteError";
+
+const MAX_POSTEOS_LIMIT = 50;
+
+function parseLimit(raw: string | null): number {
+    if (!raw) return DEFAULT_POSTEOS_LIMIT;
+    const parsed = Number(raw);
+    if (!Number.isFinite(parsed) || parsed <= 0) return DEFAULT_POSTEOS_LIMIT;
+    return Math.min(parsed, MAX_POSTEOS_LIMIT);
+}
+
+function parseCursor(raw: string | null): number | undefined {
+    if (!raw) return undefined;
+    const parsed = Number(raw);
+    return Number.isFinite(parsed) ? parsed : undefined;
+}
 
 export async function GET(req: NextRequest) {
     try {
         const creadorId = req.nextUrl.searchParams.get("creador_id");
         const q = req.nextUrl.searchParams.get("q");
+        const limit = parseLimit(req.nextUrl.searchParams.get("limit"));
+        const cursor = parseCursor(req.nextUrl.searchParams.get("cursor"));
 
-        const results = q
-            ? await DAOPosteos.searchPosteos(q)
-            : creadorId
-                ? await DAOPosteos.getPosteosByCreador(Number(creadorId))
-                : await DAOPosteos.getAllPosteos();
-
-        if (!results) {
-            return NextResponse.json({ result: "Error al obtener los posteos" }, { status: 400 });
+        if (q) {
+            const results = await DAOPosteos.searchPosteos(q, limit);
+            return NextResponse.json({ result: results }, { status: 200 });
         }
 
-        return NextResponse.json({ result: results }, { status: 200 });
+        const { rows, hasMore } = creadorId
+            ? await DAOPosteos.getPosteosByCreador(Number(creadorId), limit, cursor)
+            : await DAOPosteos.getAllPosteos(limit, cursor);
+
+        const nextCursor = hasMore ? rows[rows.length - 1].posteo_id : null;
+
+        return NextResponse.json(
+            { result: rows, pagination: { limit, nextCursor, hasMore } },
+            { status: 200 }
+        );
     } catch (error) {
         return handleRouteError(error);
     }

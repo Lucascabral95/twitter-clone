@@ -52,8 +52,38 @@ describe('/api/posteo route', () => {
 
       expect(response.status).toBe(200);
       expect(body.result).toEqual(fixedRows);
-      const [strings] = mockSql.mock.calls[0];
-      expect(strings.join('')).toContain('order by posteo_id asc');
+      expect(body.pagination).toEqual({ limit: 20, nextCursor: null, hasMore: false });
+      const [strings, ...values] = mockSql.mock.calls[0];
+      expect(strings.join('')).toContain('order by posteo_id desc');
+      expect(values).toContain(21); // limit + 1
+    });
+
+    it('paginates with cursor and reports hasMore/nextCursor when there is a next page', async () => {
+      const page = Array.from({ length: 3 }, (_, i) => ({ ...fixedRows[0], posteo_id: 10 - i }));
+      mockSql.mockResolvedValueOnce(page);
+
+      const req = new NextRequest('http://localhost/api/posteo?limit=2&cursor=15');
+
+      const response = await GET(req);
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(body.result).toHaveLength(2);
+      expect(body.pagination).toEqual({ limit: 2, nextCursor: 9, hasMore: true });
+      const [strings, ...values] = mockSql.mock.calls[0];
+      expect(strings.join('')).toContain('posteo_id <');
+      expect(values).toContain(15);
+      expect(values).toContain(3); // limit + 1
+    });
+
+    it('clamps limit to the maximum allowed', async () => {
+      const req = new NextRequest('http://localhost/api/posteo?limit=9999');
+
+      const response = await GET(req);
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(body.pagination.limit).toBe(50);
     });
 
     it('filters by creador_id when present', async () => {

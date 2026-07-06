@@ -22,7 +22,10 @@ class DAOReposteos {
     async getAllReposteos(): Promise<Reposteos[]> {
         try {
             const data = await db();
-            const results = await data`select * from reposteos order by created_at desc returning *`;
+            const results = await data`
+                select id, posteo_id, reposteador_id, created_at
+                from reposteos order by created_at desc
+            `;
             return results as Reposteos[];
         } catch (error) {
             throw error as CustomError;
@@ -37,7 +40,11 @@ class DAOReposteos {
             }
 
             const data = await db();
-            const results = await data`select * from reposteos_usuarios where id = ${id} order by created_at desc`;
+            const results = await data`
+                select id, nombre, email, identificador, reposteo_id, posteo_id,
+                       titulo, contenido, created_at, updated_at, creador_id, likes
+                from reposteos_usuarios where id = ${id} order by created_at desc
+            `;
 
             if(results.length === 0) {
                 throw { error: "El usuario aún no realizo ningun reposteo", status: 404 } as CustomError;
