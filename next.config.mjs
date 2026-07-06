@@ -8,6 +8,9 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ["@neondatabase/serverless", "ws"],
   },
+  images: {
+    formats: ["image/avif", "image/webp"],
+  },
   async headers() {
     return [
       {

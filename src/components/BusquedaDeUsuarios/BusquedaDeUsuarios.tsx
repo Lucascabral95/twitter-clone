@@ -20,7 +20,13 @@ interface Seguidor {
 }
 
 const BusquedaDeUsuarios: React.FC<BusquedaProps> = ({ usuarios }) => {
-    const { datosLogueo, getCookieLogueo, seguirUsuario, eliminarSeguimiento, change, getMisSeguidos, misSeguidos } = useStore();
+    const datosLogueo = useStore((s) => s.datosLogueo);
+    const getCookieLogueo = useStore((s) => s.getCookieLogueo);
+    const seguirUsuario = useStore((s) => s.seguirUsuario);
+    const eliminarSeguimiento = useStore((s) => s.eliminarSeguimiento);
+    const change = useStore((s) => s.change);
+    const getMisSeguidos = useStore((s) => s.getMisSeguidos);
+    const misSeguidos = useStore((s) => s.misSeguidos);
 
     useEffect(() => {
         const getData = async () => {

@@ -8,7 +8,8 @@ const initialState: SearchCriteria = {
 };
 
 export const useSearch = () => {
-  const { obtenerResultadosDeBusqueda, arrayDeBusqueda } = useStore();
+  const obtenerResultadosDeBusqueda = useStore((s) => s.obtenerResultadosDeBusqueda);
+  const arrayDeBusqueda = useStore((s) => s.arrayDeBusqueda);
   const [response, setResponse] = useState<SearchCriteria>(initialState);
 
   useEffect(() => {

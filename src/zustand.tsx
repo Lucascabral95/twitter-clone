@@ -207,22 +207,21 @@ const useStore = create<StoreState>((set, get) => ({
     },
 
     addTweet: async (): Promise<void> => {
-        set({ loading: true });
         await get().getCookieLogueo();
         const { datosLogueo } = get();
 
         if (!datosLogueo) {
-            set({ error: true, loading: false });
+            set({ error: true });
             logger.error('No se encontraron datos de logueo');
             return;
         }
 
         try {
             const response = await axios.get('/api/posteo');
-            set({ posteos: response.data.result, loading: false, change: !get().change });
+            set({ posteos: response.data.result, change: !get().change });
         } catch (error) {
             if (error instanceof AxiosError) {
-                set({ error: true, loading: false });
+                set({ error: true });
                 if (error.response) {
                     logger.error(error.response.data.error);
                 } else {

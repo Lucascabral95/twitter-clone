@@ -16,7 +16,7 @@ import { useBusquedaUsuarios, useDebounce } from '@/presentation/hooks'
 
 const Header: React.FC = () => {
   const pathname = usePathname()
-  const { obtenerDatosDeCookie } = useStore()
+  const obtenerDatosDeCookie = useStore((s) => s.obtenerDatosDeCookie)
 
   const [inputBusqueda, setInputBusqueda] = useState<string>('')
   const [email, setEmail] = useState<string>('')

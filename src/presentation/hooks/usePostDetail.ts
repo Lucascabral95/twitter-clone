@@ -7,7 +7,9 @@ import { postDetailService } from '@/infrastructure/services';
 
 export const usePostDetail = () => {
   const { id } = useParams();
-  const { getCookieLogueo, datosLogueo, existeEnMiListaDeAmigos } = useStore();
+  const getCookieLogueo = useStore((s) => s.getCookieLogueo);
+  const datosLogueo = useStore((s) => s.datosLogueo);
+  const existeEnMiListaDeAmigos = useStore((s) => s.existeEnMiListaDeAmigos);
   const [dataPosteo, setDataPosteo] = useState<IIPosteo>({} as IIPosteo);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);

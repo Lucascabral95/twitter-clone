@@ -5,7 +5,9 @@ import useStore from '@/zustand';
 import { postService } from '@/infrastructure/services';
 
 export const usePostForm = () => {
-  const { getCookieLogueo, datosLogueo, addTweet } = useStore();
+  const getCookieLogueo = useStore((s) => s.getCookieLogueo);
+  const datosLogueo = useStore((s) => s.datosLogueo);
+  const addTweet = useStore((s) => s.addTweet);
   const [titulo, setTitulo] = useState(0);
   const [contenido, setContenido] = useState(0);
   const [isLoading, setIsLoading] = useState(false);

@@ -2,8 +2,7 @@
 import "./Header.scss"
 import React, { useEffect, useState } from 'react'
 import useStore from "@/zustand"
-import moment from 'moment';
-moment.locale('es');
+import { formatearFecha } from '@/utils/formatearFecha';
 import Image from "next/image"
 import Avvvatars from "avvvatars-react"
 import { usePathname } from "next/navigation"
@@ -52,7 +51,12 @@ interface HeaderDinamicoProps {
 
 const HeaderDinamico: React.FC<HeaderDinamicoProps> = ({ id }) => {
     const pathname = usePathname();
-    const { existeEnMiListaDeAmigos, esMiAmigo, datosLogueo, getCookieLogueo, eliminarSeguimiento, seguirUsuario } = useStore();
+    const existeEnMiListaDeAmigos = useStore((s) => s.existeEnMiListaDeAmigos);
+    const esMiAmigo = useStore((s) => s.esMiAmigo);
+    const datosLogueo = useStore((s) => s.datosLogueo);
+    const getCookieLogueo = useStore((s) => s.getCookieLogueo);
+    const eliminarSeguimiento = useStore((s) => s.eliminarSeguimiento);
+    const seguirUsuario = useStore((s) => s.seguirUsuario);
     const [isOpenSeguidosSeguidores, setIsOpenSeguidosSeguidores] = useState<boolean>(false);
     const [dataUser, setDataUser] = useState<DataUser>({} as DataUser);
     const [misDatosPersonales, setMisDatosPersonales] = useState<MisDatosPersonales>({} as MisDatosPersonales);
@@ -232,7 +236,7 @@ const HeaderDinamico: React.FC<HeaderDinamicoProps> = ({ id }) => {
                                 <FaBirthdayCake className="icon" />
                             </div>
                             <div className="texto">
-                                <p> {moment(misDatosPersonales?.cumpleanos).locale('es').format('l')} </p>
+                                <p> {formatearFecha(misDatosPersonales?.cumpleanos, 'l')} </p>
                             </div>
                         </div>
                         <div className="car">
@@ -240,7 +244,7 @@ const HeaderDinamico: React.FC<HeaderDinamicoProps> = ({ id }) => {
                                 <FaRegCalendarAlt className="icon" />
                             </div>
                             <div className="texto">
-                                <p> Unido el {moment(dataUser?.fecha_creacion).format("l")} </p>
+                                <p> Unido el {formatearFecha(dataUser?.fecha_creacion, 'l')} </p>
                             </div>
                         </div>
                     </div>

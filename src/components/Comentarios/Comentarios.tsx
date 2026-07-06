@@ -4,9 +4,7 @@ import axios, { AxiosError } from 'axios';
 import Avvvatars from "avvvatars-react";
 import useStore from '@/zustand';
 import { FaHeart } from 'react-icons/fa';
-import moment from "moment";
-import "moment/locale/es";
-moment.locale("es");
+import { formatearFecha } from "@/utils/formatearFecha";
 import { Toaster } from 'react-hot-toast';
 import { comentar, darLike } from '@/utils/functions/Comentarios';
 import Link from 'next/link';
@@ -61,7 +59,8 @@ interface DatosLogueo {
 }
 
 const Comentarios: React.FC<{ dataPosteo: IPosteo }> = ({ dataPosteo }) => {
-    const { datosLogueo, getCookieLogueo } = useStore();
+    const datosLogueo = useStore((s) => s.datosLogueo);
+    const getCookieLogueo = useStore((s) => s.getCookieLogueo);
     const [comentario, setComentario] = useState<number>(0);
     const [contenido, setContenido] = useState<string>("");
     const [arrayComentarios, setArrayComentarios] = useState<IArrayComentarios[]>([]);
@@ -129,7 +128,7 @@ const Comentarios: React.FC<{ dataPosteo: IPosteo }> = ({ dataPosteo }) => {
                                         <p> {item?.nombre ? item?.nombre : datosLogueo?.nombre} </p>
                                     </Link>
                                     <Link href={`/home/user/${item?.creador_id}`} className="email-y-fecha">
-                                        <p> {item?.email ? item?.email : datosLogueo?.email} - {moment(item?.comentario_created_at).locale('es').format('LLL')} </p>
+                                        <p> {item?.email ? item?.email : datosLogueo?.email} - {formatearFecha(item?.comentario_created_at, 'LLL')} </p>
                                     </Link>
                                     <div className="solo-email">
                                         <p> {item?.email ? item?.email : datosLogueo?.email} </p>
@@ -148,7 +147,7 @@ const Comentarios: React.FC<{ dataPosteo: IPosteo }> = ({ dataPosteo }) => {
                                         </div>
                                     </div>
                                     <div className="fecha">
-                                        <p> {moment(item?.comentario_created_at).locale('es').format('lll')} </p>
+                                        <p> {formatearFecha(item?.comentario_created_at, 'lll')} </p>
                                     </div>
                                 </div>
                             </div>

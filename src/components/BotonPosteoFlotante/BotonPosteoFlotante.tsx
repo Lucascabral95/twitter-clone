@@ -7,7 +7,8 @@ import useStore from '@/zustand';
 
 const BotonPosteoFlotante = () => {
     const [isOpenPosteo, setIsOpenPosteo] = useState<boolean>(false);
-    const { getCookieLogueo, datosLogueo } = useStore();
+    const getCookieLogueo = useStore((s) => s.getCookieLogueo);
+    const datosLogueo = useStore((s) => s.datosLogueo);
 
     useEffect(() => {
         const getData = async () => {

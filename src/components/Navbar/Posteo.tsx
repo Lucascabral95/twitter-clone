@@ -13,7 +13,7 @@ interface PosteoProps {
 }
 
 const Posteo: React.FC<PosteoProps> = ({ setIsOpenPosteo, creador_id, email }) => {
-    const { addTweet } = useStore();
+    const addTweet = useStore((s) => s.addTweet);
     const [titulo, setTitulo] = useState<number>(0);
     const [contenido, setContenido] = useState<number>(0);
 

@@ -1,9 +1,7 @@
 'use client';
 import React from 'react';
 import Link from 'next/link';
-import moment from 'moment';
-moment.locale('es');
-import 'moment/locale/es';
+import { formatearFecha } from '@/utils/formatearFecha';
 import { Toaster } from 'react-hot-toast';
 import { IoMdHeart } from 'react-icons/io';
 import { FiArrowLeft } from 'react-icons/fi';
@@ -21,7 +19,9 @@ import './PostDetail.scss';
 
 const PostDetail: React.FC = () => {
   const { dataPosteo, loading, error, detalleError, datosLogueo } = usePostDetail();
-  const { eliminarSeguimiento, seguirUsuario, esMiAmigo } = useStore();
+  const eliminarSeguimiento = useStore((s) => s.eliminarSeguimiento);
+  const seguirUsuario = useStore((s) => s.seguirUsuario);
+  const esMiAmigo = useStore((s) => s.esMiAmigo);
 
   if (loading) {
     return <Loading />;
@@ -83,7 +83,7 @@ const PostDetail: React.FC = () => {
               </div>
               <div className="fecha-posteo">
                 <div className="fecha">
-                  <p>{moment(dataPosteo?.created_at).locale('es').format('LLL')}</p>
+                  <p>{formatearFecha(dataPosteo?.created_at, 'LLL')}</p>
                 </div>
                 <div className="like">
                   <p>{dataPosteo?.likes}</p>

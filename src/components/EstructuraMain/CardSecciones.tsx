@@ -31,7 +31,11 @@ interface CardSeccionesProps {
 }
 
 const CardSecciones: React.FC<CardSeccionesProps> = ({ id, publicaciones, hasMorePublicaciones, onLoadMorePublicaciones }) => {
-    const { loading, limit, getTweetsByID, misSeguidos, getMisSeguidos } = useStore();
+    const loading = useStore((s) => s.loading);
+    const limit = useStore((s) => s.limit);
+    const getTweetsByID = useStore((s) => s.getTweetsByID);
+    const misSeguidos = useStore((s) => s.misSeguidos);
+    const getMisSeguidos = useStore((s) => s.getMisSeguidos);
     const [seccionActual, setSeccionActual] = useState<string>("Inicio");
     const [arrayDeReposteos, setArrayDeReposteos] = useState([]);
 
