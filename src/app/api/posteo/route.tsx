@@ -21,6 +21,7 @@ function parseCursor(raw: string | null): number | undefined {
 export async function GET(req: NextRequest) {
     try {
         const creadorId = req.nextUrl.searchParams.get("creador_id");
+        const siguiendoDe = req.nextUrl.searchParams.get("siguiendoDe");
         const q = req.nextUrl.searchParams.get("q");
         const limit = parseLimit(req.nextUrl.searchParams.get("limit"));
         const cursor = parseCursor(req.nextUrl.searchParams.get("cursor"));
@@ -30,7 +31,9 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ result: results }, { status: 200 });
         }
 
-        const { rows, hasMore } = creadorId
+        const { rows, hasMore } = siguiendoDe
+            ? await DAOPosteos.getFeedDeSeguidos(Number(siguiendoDe), limit, cursor)
+            : creadorId
             ? await DAOPosteos.getPosteosByCreador(Number(creadorId), limit, cursor)
             : await DAOPosteos.getAllPosteos(limit, cursor);
 

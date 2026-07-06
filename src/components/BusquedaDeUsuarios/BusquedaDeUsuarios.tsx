@@ -67,9 +67,11 @@ const BusquedaDeUsuarios: React.FC<BusquedaProps> = ({ usuarios }) => {
                                 aria-label={esMiPropioPerfil ? "Mi perfil" : yaLoSigo ? "Dejar de seguir" : "Seguir"}
                                 onClick={() => {
                                     if (esMiPropioPerfil) return;
-                                    yaLoSigo
-                                        ? eliminarSeguimiento(Number(datosLogueo?.id), Number(item?.id))
-                                        : seguirUsuario(Number(datosLogueo?.id), Number(item?.id));
+                                    if (yaLoSigo) {
+                                        eliminarSeguimiento(Number(datosLogueo?.id), Number(item?.id));
+                                    } else {
+                                        seguirUsuario(Number(datosLogueo?.id), Number(item?.id));
+                                    }
                                 }}
                             >
                                 <div className="boton-para-seguir">

@@ -9,6 +9,8 @@ interface PosteoCreado {
     updated_at: string;
     creador_id: number;
     likes: number;
+    comentarios_count: number;
+    reposteos_count: number;
 }
 
 export const postearComentario = async (

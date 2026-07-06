@@ -1,5 +1,5 @@
 import React from 'react'
-import { FaHeart } from "react-icons/fa";
+import { FaHeart, FaRegComment, FaRetweet } from "react-icons/fa";
 import Avvvatars from "avvvatars-react";
 import { formatearFecha } from "@/utils/formatearFecha";
 import Link from 'next/link';
@@ -20,6 +20,8 @@ interface IPosteos {
     posteo_id: number;
     titulo: string;
     updated_at: string;
+    comentarios_count?: number;
+    reposteos_count?: number;
 }
 
 interface CardTweetProps {
@@ -61,9 +63,23 @@ const CardTweetItem: React.FC<{ item: IPosteos }> = ({ item }) => {
                     </div>
                 </Link>
                 <div className="contenedor-like">
-                    <p> {item?.likes} </p>
-                    <div className="icono">
-                        <FaHeart className='icon' />
+                    <div className="metrica metrica-comentarios">
+                        <p> {item?.comentarios_count ?? 0} </p>
+                        <div className="icono">
+                            <FaRegComment className='icon' />
+                        </div>
+                    </div>
+                    <div className="metrica metrica-reposteos">
+                        <p> {item?.reposteos_count ?? 0} </p>
+                        <div className="icono">
+                            <FaRetweet className='icon' />
+                        </div>
+                    </div>
+                    <div className="metrica metrica-likes">
+                        <p> {item?.likes} </p>
+                        <div className="icono">
+                            <FaHeart className='icon' />
+                        </div>
                     </div>
                 </div>
             </div>

@@ -1,4 +1,5 @@
 import db from "@/services/neon";
+import DAOPosteos from "@/models/DAO/DAOPosteos";
 
 interface CustomError {
     error: string;
@@ -93,6 +94,8 @@ class DAOComentarios {
             if (newComment.length === 0) {
                 throw { error: "Error al crear el comentario", status: 400 } as CustomError;
             }
+
+            await DAOPosteos.incrementarComentariosCount(comment.id_del_posteo);
 
             return newComment[0] as Comentarios;
         } catch (error) {

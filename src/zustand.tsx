@@ -31,6 +31,8 @@ interface Posteos {
     updated_at: string;
     creador_id: number;
     likes: number;
+    comentarios_count: number;
+    reposteos_count: number;
 }
 
 // Fila cruda que devuelve `POST /api/posteo` (tabla `posteos`), sin el join con
@@ -44,6 +46,8 @@ interface PosteoCreado {
     updated_at: string;
     creador_id: number;
     likes: number;
+    comentarios_count: number;
+    reposteos_count: number;
 }
 
 interface DatosPersonales {
@@ -243,6 +247,8 @@ const useStore = create<StoreState>((set, get) => ({
             updated_at: nuevoPosteo.updated_at,
             creador_id: nuevoPosteo.creador_id,
             likes: nuevoPosteo.likes,
+            comentarios_count: nuevoPosteo.comentarios_count,
+            reposteos_count: nuevoPosteo.reposteos_count,
         };
 
         set({
@@ -505,7 +511,7 @@ const useStore = create<StoreState>((set, get) => ({
             await get().getCookieLogueo();
             const { datosLogueo, limitFeed } = get();
 
-            const results = await axios.get(`/api/posteo?creador_id=${Number(datosLogueo?.id)}&limit=${limitFeed}`);
+            const results = await axios.get(`/api/posteo?siguiendoDe=${Number(datosLogueo?.id)}&limit=${limitFeed}`);
 
             if (results.status === 200) {
                 const pagination: Pagination | undefined = results.data.pagination;
@@ -532,7 +538,7 @@ const useStore = create<StoreState>((set, get) => ({
         if (!hasMoreTweetsHome || nextCursorTweetsHome === null) return;
 
         try {
-            const results = await axios.get(`/api/posteo?creador_id=${Number(datosLogueo?.id)}&limit=${limitFeed}&cursor=${nextCursorTweetsHome}`);
+            const results = await axios.get(`/api/posteo?siguiendoDe=${Number(datosLogueo?.id)}&limit=${limitFeed}&cursor=${nextCursorTweetsHome}`);
 
             if (results.status === 200) {
                 const pagination: Pagination | undefined = results.data.pagination;

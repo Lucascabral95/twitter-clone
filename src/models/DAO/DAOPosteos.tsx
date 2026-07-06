@@ -18,6 +18,8 @@ interface Posteos {
     updated_at: string;
     creador_id: number;
     likes: number;
+    comentarios_count: number;
+    reposteos_count: number;
 }
 
 interface CreacionPosteo {
@@ -45,12 +47,14 @@ class DAOPosteos {
             const posteos = cursor
                 ? await data`
                     SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
-                           titulo, contenido, created_at, updated_at, creador_id, likes
+                           titulo, contenido, created_at, updated_at, creador_id, likes,
+                           comentarios_count, reposteos_count
                     FROM usuarios_posteos where posteo_id < ${cursor} order by posteo_id desc limit ${limit + 1}
                 `
                 : await data`
                     SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
-                           titulo, contenido, created_at, updated_at, creador_id, likes
+                           titulo, contenido, created_at, updated_at, creador_id, likes,
+                           comentarios_count, reposteos_count
                     FROM usuarios_posteos order by posteo_id desc limit ${limit + 1}
                 `;
 
@@ -74,13 +78,53 @@ class DAOPosteos {
             const posteos = cursor
                 ? await data`
                     SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
-                           titulo, contenido, created_at, updated_at, creador_id, likes
+                           titulo, contenido, created_at, updated_at, creador_id, likes,
+                           comentarios_count, reposteos_count
                     FROM usuarios_posteos where creador_id = ${creadorId} and posteo_id < ${cursor} order by posteo_id desc limit ${limit + 1}
                 `
                 : await data`
                     SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
-                           titulo, contenido, created_at, updated_at, creador_id, likes
+                           titulo, contenido, created_at, updated_at, creador_id, likes,
+                           comentarios_count, reposteos_count
                     FROM usuarios_posteos where creador_id = ${creadorId} order by posteo_id desc limit ${limit + 1}
+                `;
+
+            const hasMore = posteos.length > limit;
+            const rows = (hasMore ? posteos.slice(0, limit) : posteos) as Posteos[];
+
+            return { rows, hasMore };
+        } catch (error) {
+            throw error as CustomError;
+        }
+    }
+
+    // Feed "Siguiendo": posteos de los usuarios a los que `miId` sigue (tabla `seguimientos`),
+    // no los propios. Mismo paginado keyset que el resto de los listados.
+    async getFeedDeSeguidos(miId: number, limit: number = DEFAULT_POSTEOS_LIMIT, cursor?: number): Promise<PosteosPaginados> {
+        try {
+
+            if (isNaN(Number(miId))) {
+                throw { error: "ID debe ser numeral.", status: 400 } as CustomError;
+            }
+
+            const data = await db();
+            const posteos = cursor
+                ? await data`
+                    SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
+                           titulo, contenido, created_at, updated_at, creador_id, likes,
+                           comentarios_count, reposteos_count
+                    FROM usuarios_posteos
+                    where creador_id in (select id_a_seguir from seguimientos where id_mio = ${miId})
+                      and posteo_id < ${cursor}
+                    order by posteo_id desc limit ${limit + 1}
+                `
+                : await data`
+                    SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
+                           titulo, contenido, created_at, updated_at, creador_id, likes,
+                           comentarios_count, reposteos_count
+                    FROM usuarios_posteos
+                    where creador_id in (select id_a_seguir from seguimientos where id_mio = ${miId})
+                    order by posteo_id desc limit ${limit + 1}
                 `;
 
             const hasMore = posteos.length > limit;
@@ -98,7 +142,8 @@ class DAOPosteos {
             const like = `%${query}%`;
             const posteos = await data`
                 SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
-                       titulo, contenido, created_at, updated_at, creador_id, likes
+                       titulo, contenido, created_at, updated_at, creador_id, likes,
+                       comentarios_count, reposteos_count
                 FROM usuarios_posteos
                 where titulo ILIKE ${like} or contenido ILIKE ${like} or nombre ILIKE ${like}
                 order by posteo_id desc limit ${limit}
@@ -120,7 +165,8 @@ class DAOPosteos {
             const data = await db();
             const posteo = await data`
                 SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
-                       titulo, contenido, created_at, updated_at, creador_id, likes
+                       titulo, contenido, created_at, updated_at, creador_id, likes,
+                       comentarios_count, reposteos_count
                 FROM usuarios_posteos where posteo_id = ${id}
             `;
 
@@ -144,7 +190,8 @@ class DAOPosteos {
             const data = await db();
             const posteo = await data`
                 SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
-                       titulo, contenido, created_at, updated_at, creador_id, likes
+                       titulo, contenido, created_at, updated_at, creador_id, likes,
+                       comentarios_count, reposteos_count
                 FROM usuarios_posteos where posteo_id = ${id}
             `;
 
@@ -192,6 +239,33 @@ class DAOPosteos {
             }
 
             return posteo[0] as Posteos;
+        } catch (error) {
+            throw error as CustomError;
+        }
+    }
+
+    async incrementarComentariosCount(idDelPosteo: number): Promise<void> {
+        try {
+            const data = await db();
+            await data`update posteos set comentarios_count = comentarios_count + 1 where id = ${idDelPosteo}`;
+        } catch (error) {
+            throw error as CustomError;
+        }
+    }
+
+    async incrementarReposteosCount(posteoId: number): Promise<void> {
+        try {
+            const data = await db();
+            await data`update posteos set reposteos_count = reposteos_count + 1 where id = ${posteoId}`;
+        } catch (error) {
+            throw error as CustomError;
+        }
+    }
+
+    async decrementarReposteosCount(posteoId: number): Promise<void> {
+        try {
+            const data = await db();
+            await data`update posteos set reposteos_count = greatest(reposteos_count - 1, 0) where id = ${posteoId}`;
         } catch (error) {
             throw error as CustomError;
         }

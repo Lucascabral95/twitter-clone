@@ -177,6 +177,16 @@
                 align-items: center;
                 justify-content: flex-end;
 
+                .metrica {
+                    display: flex;
+                    align-items: center;
+                    margin: 0 0 0 16px;
+
+                    &:first-child {
+                        margin: 0;
+                    }
+                }
+
                 p {
                     color: var(--color-gris);
                     font-size: 15px;
@@ -193,13 +203,21 @@
                         color: var(--color-gris);
                         font-size: 16px;
                     }
+                }
 
-                    &:hover {
-                        .icon {
-                            transition: 0.2s ease-in-out;
-                            color: red;
-                        }
-                    }
+                .metrica-comentarios .icono:hover .icon {
+                    transition: 0.2s ease-in-out;
+                    color: var(--color-llamativo);
+                }
+
+                .metrica-reposteos .icono:hover .icon {
+                    transition: 0.2s ease-in-out;
+                    color: #17bf63;
+                }
+
+                .metrica-likes .icono:hover .icon {
+                    transition: 0.2s ease-in-out;
+                    color: red;
                 }
             }
         }

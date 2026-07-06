@@ -86,6 +86,10 @@ const PostDetail: React.FC = () => {
                 <div className="fecha">
                   <p>{formatearFecha(dataPosteo?.created_at, 'LLL')}</p>
                 </div>
+                <div className="stats-posteo">
+                  <span>{dataPosteo?.comentarios_count ?? 0} respuestas</span>
+                  <span>{dataPosteo?.reposteos_count ?? 0} reposteos</span>
+                </div>
                 <button type="button" className="like" aria-label="Dar like a este posteo" onClick={handleLike}>
                   <span>{dataPosteo?.likes}</span>
                   <IoMdHeart className="icon" />

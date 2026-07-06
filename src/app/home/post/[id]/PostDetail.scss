@@ -197,6 +197,17 @@
                         }
                     }
 
+                    .stats-posteo {
+                        display: flex;
+                        align-items: center;
+                        gap: 16px;
+
+                        span {
+                            color: var(--color-gris);
+                            font-size: 15px;
+                        }
+                    }
+
                     .like {
                         display: flex;
                         align-items: center;

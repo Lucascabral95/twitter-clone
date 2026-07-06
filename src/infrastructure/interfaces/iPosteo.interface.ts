@@ -13,4 +13,6 @@ export interface IIPosteo {
     updated_at: string;
     comentario_created_at: string;
     posteo_contenido: string;
+    comentarios_count?: number;
+    reposteos_count?: number;
 }
