@@ -1,0 +1,85 @@
+@keyframes skeleton-pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.45;
+    }
+}
+
+.skeleton-card-tweet-lista {
+    width: 100%;
+    padding: 0 68px;
+}
+
+.skeleton-card-tweet {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    border-radius: 10px;
+    padding: 16px;
+    margin: 0 0 20px 0;
+    background-color: rgba(255, 255, 255, 0.1);
+
+    .skeleton-foto-card {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        background-color: rgba(255, 255, 255, 0.15);
+        animation: skeleton-pulse 1.4s ease-in-out infinite;
+    }
+
+    .skeleton-contenido-card {
+        width: calc(100% - 50px);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .skeleton-nombre-fecha {
+        display: flex;
+        align-items: center;
+        margin: 0 0 12px 0;
+    }
+
+    .skeleton-bar {
+        border-radius: 6px;
+        background-color: rgba(255, 255, 255, 0.15);
+        animation: skeleton-pulse 1.4s ease-in-out infinite;
+    }
+
+    .skeleton-nombre {
+        width: 96px;
+        height: 12px;
+    }
+
+    .skeleton-fecha {
+        width: 64px;
+        height: 10px;
+        margin: 0 0 0 8px;
+    }
+
+    .skeleton-titulo {
+        width: 70%;
+        height: 18px;
+        margin: 0 0 10px 0;
+    }
+
+    .skeleton-contenido {
+        width: 100%;
+        height: 14px;
+        margin: 0 0 16px 0;
+    }
+
+    .skeleton-like {
+        width: 40px;
+        height: 12px;
+        align-self: flex-end;
+    }
+}
+
+@media (max-width: 480px) {
+    .skeleton-card-tweet-lista {
+        padding: 0 16px;
+    }
+}

@@ -4,6 +4,8 @@ import Avvvatars from "avvvatars-react";
 import { formatearFecha } from "@/utils/formatearFecha";
 import Link from 'next/link';
 import { Toaster } from 'react-hot-toast';
+import { motion } from 'motion/react';
+import { useInfiniteScroll } from '@/presentation/hooks/useInfiniteScroll';
 
 interface IPosteos {
     contenido: string;
@@ -28,7 +30,12 @@ interface CardTweetProps {
 
 const CardTweetItem: React.FC<{ item: IPosteos }> = ({ item }) => {
     return (
-        <Link href={`/home/post/${item?.posteo_id}`} className='contenedor-card-tweet' prefetch={false}>
+        <motion.article
+            className='contenedor-card-tweet'
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+        >
             <Link href={`/home/user/${item?.id}`} className="foto-card" prefetch={false}>
                 <Avvvatars value={item?.email} size={40} style="shape" />
             </Link>
@@ -41,16 +48,18 @@ const CardTweetItem: React.FC<{ item: IPosteos }> = ({ item }) => {
                         <p>{formatearFecha(item?.created_at, 'LL')}</p>
                     </div>
                 </div>
-                <div className="titulo">
-                    <div className="titulo-titulo">
-                        <p> {item?.titulo} </p>
+                <Link href={`/home/post/${item?.posteo_id}`} className="cuerpo-post-link" prefetch={false}>
+                    <div className="titulo">
+                        <div className="titulo-titulo">
+                            <p> {item?.titulo} </p>
+                        </div>
                     </div>
-                </div>
-                <div className="contenido">
-                    <div className="contenido-contenido">
-                        <p> {item?.contenido} </p>
+                    <div className="contenido">
+                        <div className="contenido-contenido">
+                            <p> {item?.contenido} </p>
+                        </div>
                     </div>
-                </div>
+                </Link>
                 <div className="contenedor-like">
                     <p> {item?.likes} </p>
                     <div className="icono">
@@ -58,13 +67,18 @@ const CardTweetItem: React.FC<{ item: IPosteos }> = ({ item }) => {
                     </div>
                 </div>
             </div>
-        </Link>
+        </motion.article>
     )
 }
 
 const MemoizedCardTweetItem = React.memo(CardTweetItem);
 
 const CardTweet: React.FC<CardTweetProps> = ({ posteos, hasMore = false, onLoadMore }) => {
+    const sentinelRef = useInfiniteScroll({
+        hasMore,
+        onLoadMore: onLoadMore ?? (() => {}),
+    });
+
     return (
         <div className='card-tweet'>
             {posteos?.map((item: IPosteos) => (
@@ -77,7 +91,10 @@ const CardTweet: React.FC<CardTweetProps> = ({ posteos, hasMore = false, onLoadM
                 :
                 <div className="contenedor-boton-ver-mas">
                     {hasMore && onLoadMore && (
-                        <button className='boton-ver-mas' onClick={onLoadMore}> Ver más </button>
+                        <>
+                            <div ref={sentinelRef} aria-hidden="true" />
+                            <button className='boton-ver-mas' onClick={onLoadMore}> Ver más </button>
+                        </>
                     )}
                 </div>
             }

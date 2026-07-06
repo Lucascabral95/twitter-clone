@@ -1,10 +1,11 @@
 import axios, { AxiosError } from 'axios';
 import { IIPosteo } from '@/infrastructure/interfaces';
+import { withNetworkRetry } from '@/infrastructure/http/withNetworkRetry';
 
 export const postDetailService = {
   async getPostById(id: string | string[]) {
     try {
-      const response = await axios.get(`/api/post/${id}`);
+      const response = await withNetworkRetry(() => axios.get(`/api/post/${id}`));
 
       if (response.status === 200 && response.data?.result?.[0]) {
         return { success: true, data: response.data.result[0] as IIPosteo };

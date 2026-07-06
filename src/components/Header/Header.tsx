@@ -98,7 +98,10 @@ const Header: React.FC<TMisDatos> = ({ dataUser, misDatosPersonales, seguidores 
                             <Avvvatars size={92.3} style="shape" value={dataUser?.email} />
                         </div>
                         <div className="follow">
-                            <div className="boton-de-follow"
+                            <button
+                                type="button"
+                                className="boton-de-follow"
+                                aria-label={pathname === "/home" ? "Mi cuenta" : esMiAmigo ? "Dejar de seguir" : "Seguir"}
                                 onClick={pathname === "/home" ? () => { } :
                                     esMiAmigo ? () => eliminarSeguimiento(datosLogueo?.id as number, dataUser?.id) : () => seguirUsuario(datosLogueo?.id as number, dataUser?.id)}>
                                 <div className="texto">
@@ -117,7 +120,7 @@ const Header: React.FC<TMisDatos> = ({ dataUser, misDatosPersonales, seguidores 
                                 <div className="icono">
                                     <FaTwitter className="icon" />
                                 </div>
-                            </div>
+                            </button>
                         </div>
                     </div>
                     <div className="nombre-de-usuario">
@@ -158,12 +161,12 @@ const Header: React.FC<TMisDatos> = ({ dataUser, misDatosPersonales, seguidores 
                         </div>
                     </div>
                     <div className="seguidos-seguidores">
-                        <div className="seg" onClick={() => { setIsOpenSeguidosSeguidores(true); setSeguidosOSeguidores("seguidos") }}>
+                        <button type="button" className="seg" onClick={() => { setIsOpenSeguidosSeguidores(true); setSeguidosOSeguidores("seguidos") }}>
                             <p> {misSeguidos.length || 0} seguido(s) </p>
-                        </div>
-                        <div className="seg seg-seguidores" onClick={() => { setIsOpenSeguidosSeguidores(true); setSeguidosOSeguidores("seguidores") }}>
+                        </button>
+                        <button type="button" className="seg seg-seguidores" onClick={() => { setIsOpenSeguidosSeguidores(true); setSeguidosOSeguidores("seguidores") }}>
                             <p> {seguidores?.length || 0} seguidor(es) </p>
-                        </div>
+                        </button>
                     </div>
                 </div>
 

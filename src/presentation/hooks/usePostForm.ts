@@ -31,7 +31,7 @@ export const usePostForm = () => {
       setIsLoading(false);
 
       if (result.success) {
-        addTweet();
+        addTweet(result.data.result);
         form.reset();
         setTitulo(0);
         setContenido(0);

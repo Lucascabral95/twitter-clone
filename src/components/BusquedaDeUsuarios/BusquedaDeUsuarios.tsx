@@ -41,53 +41,51 @@ const BusquedaDeUsuarios: React.FC<BusquedaProps> = ({ usuarios }) => {
         <div className='busqueda-de-usuarios'>
             <div className='contenedor-busqueda-de-usuarios'>
 
-                {usuarios?.map((item, index: number) => (
-                    <div key={index} className="contenedor-de-usuarios">
-                        <div className="imagen-nombre-email">
-                            <div className="imagen">
-                                <Avvvatars value={item?.email} style="shape" size={40} />
-                            </div>
-                            <div className="nombre-y-email">
-                                <div className="nombre">
-                                    <p> {item?.nombre} </p>
+                {usuarios?.map((item, index: number) => {
+                    const esMiPropioPerfil = Number(datosLogueo?.id) === Number(item?.id);
+                    const yaLoSigo = misSeguidos.some((seguidor: Seguidor) => Number(seguidor.id_a_seguir) === Number(item?.id));
+
+                    return (
+                        <div key={index} className="contenedor-de-usuarios">
+                            <div className="imagen-nombre-email">
+                                <div className="imagen">
+                                    <Avvvatars value={item?.email} style="shape" size={40} />
                                 </div>
-                                <div className="email">
-                                    <p> {item?.email} </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="follow"
-                            onClick={() =>
-                                Number(datosLogueo?.id) === Number(item?.id)
-                                    ? () => { }
-                                    : misSeguidos.some((seguidor: Seguidor) => Number(seguidor.id_a_seguir) === Number(item?.id))
-                                        ? eliminarSeguimiento(Number(datosLogueo?.id), Number(item?.id))
-                                        : seguirUsuario(Number(datosLogueo?.id), Number(item?.id))} >
-                            <div className="boton-para-seguir">
-                                <div className="bot">
-                                    <p>
-                                        {
-                                            datosLogueo?.id === item?.id
-                                                ? "Mi perfil"
-                                                :
-                                                misSeguidos.some((seguidor: Seguidor) => seguidor.id_a_seguir === item?.id)
-                                                    ?
-                                                    "Siguiendo"
-                                                    :
-                                                    "Seguir"
-                                        }
-                                    </p>
-                                </div>
-                                {
-                                    datosLogueo?.id !== item?.id &&
-                                    <div className="icono">
-                                        <FaTwitter className="icon" />
+                                <div className="nombre-y-email">
+                                    <div className="nombre">
+                                        <p> {item?.nombre} </p>
                                     </div>
-                                }
+                                    <div className="email">
+                                        <p> {item?.email} </p>
+                                    </div>
+                                </div>
                             </div>
+                            <button
+                                type="button"
+                                className="follow"
+                                disabled={esMiPropioPerfil}
+                                aria-label={esMiPropioPerfil ? "Mi perfil" : yaLoSigo ? "Dejar de seguir" : "Seguir"}
+                                onClick={() => {
+                                    if (esMiPropioPerfil) return;
+                                    yaLoSigo
+                                        ? eliminarSeguimiento(Number(datosLogueo?.id), Number(item?.id))
+                                        : seguirUsuario(Number(datosLogueo?.id), Number(item?.id));
+                                }}
+                            >
+                                <div className="boton-para-seguir">
+                                    <div className="bot">
+                                        <p>{esMiPropioPerfil ? "Mi perfil" : yaLoSigo ? "Siguiendo" : "Seguir"}</p>
+                                    </div>
+                                    {!esMiPropioPerfil && (
+                                        <div className="icono">
+                                            <FaTwitter className="icon" />
+                                        </div>
+                                    )}
+                                </div>
+                            </button>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
 
                 {usuarios?.length === 0 &&
                     <div className="sin-seguidos-seguidores">

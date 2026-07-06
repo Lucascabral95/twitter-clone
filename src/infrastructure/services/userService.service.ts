@@ -1,10 +1,11 @@
 import axios, { AxiosError } from 'axios';
 import { DataUser } from '../interfaces';
+import { withNetworkRetry } from '../http/withNetworkRetry';
 
 export const userService = {
   async getUserById(id: number) {
     try {
-      const response = await axios.get(`/api/usuario/${id}`);
+      const response = await withNetworkRetry(() => axios.get(`/api/usuario/${id}`));
       if (response.status === 200) {
         return { success: true, data: response.data.result[0] as DataUser };
       }

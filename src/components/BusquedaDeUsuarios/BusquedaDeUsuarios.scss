@@ -58,6 +58,11 @@
                 border: 2px solid var(--color-llamativo);
                 cursor: pointer;
 
+                &:disabled {
+                    cursor: default;
+                    opacity: 0.6;
+                }
+
                 .boton-para-seguir {
                     display: flex;
                     align-items: center;

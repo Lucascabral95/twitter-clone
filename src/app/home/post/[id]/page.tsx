@@ -9,22 +9,21 @@ import Avvvatars from 'avvvatars-react';
 
 import Comentarios from '@/components/Comentarios/Comentarios';
 import NotFound from '@/components/NotFound/NotFound';
-import Loading from '@/components/Loading/Loading';
+import SkeletonTweet from '@/components/Skeleton/SkeletonTweet';
 import useStore from '@/zustand';
-import { darkLike } from '@/utils/functions/Posteos';
 import { repostearPosteo } from '@/utils/functions/Reposteos';
 import { DatosLogueo } from '@/infrastructure/interfaces';
 import { usePostDetail } from '@/presentation/hooks/usePostDetail';
 import './PostDetail.scss';
 
 const PostDetail: React.FC = () => {
-  const { dataPosteo, loading, error, detalleError, datosLogueo } = usePostDetail();
+  const { dataPosteo, loading, error, detalleError, datosLogueo, handleLike } = usePostDetail();
   const eliminarSeguimiento = useStore((s) => s.eliminarSeguimiento);
   const seguirUsuario = useStore((s) => s.seguirUsuario);
   const esMiAmigo = useStore((s) => s.esMiAmigo);
 
   if (loading) {
-    return <Loading />;
+    return <SkeletonTweet count={1} />;
   }
 
   return (
@@ -36,15 +35,15 @@ const PostDetail: React.FC = () => {
           <div className="detalle-del-posteo">
             <div className="parte-superior">
               <div className="back-posteo">
-                <div className="icono" onClick={() => window.history.back()}>
+                <button type="button" className="icono" aria-label="Volver" onClick={() => window.history.back()}>
                   <FiArrowLeft className="icon" />
-                </div>
+                </button>
                 <div className="texto-posteo">
                   <p>Posteo</p>
                 </div>
               </div>
-              <div className="repostear" onClick={() => repostearPosteo(dataPosteo?.posteo_id, datosLogueo as DatosLogueo)}>
-                <button>Repostear</button>
+              <div className="repostear">
+                <button type="button" onClick={() => repostearPosteo(dataPosteo?.posteo_id, datosLogueo as DatosLogueo)}>Repostear</button>
               </div>
             </div>
 
@@ -61,15 +60,17 @@ const PostDetail: React.FC = () => {
                     <p>{dataPosteo?.email}</p>
                   </Link>
                 </div>
-                <div
-                  className="boton-follow"
-                  onClick={
-                    esMiAmigo
-                      ? () => eliminarSeguimiento(dataPosteo?.creador_id as number, datosLogueo?.id as number)
-                      : () => seguirUsuario(dataPosteo?.creador_id, datosLogueo?.id as number)
-                  }
-                >
-                  <button>{esMiAmigo ? 'Dejar de seguir' : 'Seguir'}</button>
+                <div className="boton-follow">
+                  <button
+                    type="button"
+                    onClick={
+                      esMiAmigo
+                        ? () => eliminarSeguimiento(dataPosteo?.creador_id as number, datosLogueo?.id as number)
+                        : () => seguirUsuario(dataPosteo?.creador_id, datosLogueo?.id as number)
+                    }
+                  >
+                    {esMiAmigo ? 'Dejar de seguir' : 'Seguir'}
+                  </button>
                 </div>
               </div>
             </div>
@@ -85,10 +86,10 @@ const PostDetail: React.FC = () => {
                 <div className="fecha">
                   <p>{formatearFecha(dataPosteo?.created_at, 'LLL')}</p>
                 </div>
-                <div className="like">
-                  <p>{dataPosteo?.likes}</p>
-                  <IoMdHeart className="icon" onClick={() => darkLike(dataPosteo?.posteo_id)} />
-                </div>
+                <button type="button" className="like" aria-label="Dar like a este posteo" onClick={handleLike}>
+                  <span>{dataPosteo?.likes}</span>
+                  <IoMdHeart className="icon" />
+                </button>
               </div>
             </div>
 

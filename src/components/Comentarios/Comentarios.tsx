@@ -139,9 +139,14 @@ const Comentarios: React.FC<{ dataPosteo: IPosteo }> = ({ dataPosteo }) => {
                                 </div>
                                 <div className="likes-de-comentario">
                                     <div className="icono-cantidad-likes">
-                                        <div className="icono" onClick={() => darLike(item?.comentario_id, arrayComentarios, setArrayComentarios)}>
+                                        <button
+                                            type="button"
+                                            className="icono"
+                                            aria-label="Dar like a este comentario"
+                                            onClick={() => darLike(item?.comentario_id, arrayComentarios, setArrayComentarios)}
+                                        >
                                             <FaHeart className="icon" />
-                                        </div>
+                                        </button>
                                         <div className="cantidad-likes">
                                             <p> {item?.comentario_likes || 0} </p>
                                         </div>

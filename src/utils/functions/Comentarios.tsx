@@ -91,26 +91,22 @@ export const darLike = async (
     arrayComentarios: IArrayComentarios[],
     setArrayComentarios: React.Dispatch<React.SetStateAction<IArrayComentarios[]>>
 ) => {
-    try {
-        const result = await axios.put(`/api/comentario/${id}`);
-
-        if (result.status === 200) {
-            toast.success(`Like dado con éxito`, {
-                position: "top-center",
-                duration: 2500
-            });
-
-            setArrayComentarios(arrayComentarios.map((item: IArrayComentarios) => {
-                if (item?.comentario_id === id) {
-                    return {
-                        ...item,
-                        comentario_likes: item?.comentario_likes + 1
-                    }
-                }
-                return item;
-            }))
+    const arrayOptimista = arrayComentarios.map((item: IArrayComentarios) => {
+        if (item?.comentario_id === id) {
+            return {
+                ...item,
+                comentario_likes: item?.comentario_likes + 1
+            }
         }
+        return item;
+    });
+    setArrayComentarios(arrayOptimista);
+
+    try {
+        await axios.put(`/api/comentario/${id}`);
     } catch (error) {
+        setArrayComentarios(arrayComentarios);
+
         if (error instanceof AxiosError) {
             if (error.response) {
                 toast.error(error.response.data.error, {

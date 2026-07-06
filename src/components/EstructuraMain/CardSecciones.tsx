@@ -6,6 +6,7 @@ import useStore from '@/zustand'
 import axios, { AxiosError } from 'axios'
 import SobreMi from '../SobreMi/SobreMi'
 import BusquedaDeUsuarios from '../BusquedaDeUsuarios/BusquedaDeUsuarios'
+import SkeletonTweet from '../Skeleton/SkeletonTweet'
 
 interface IPosteos {
     contenido: string;
@@ -71,8 +72,12 @@ const CardSecciones: React.FC<CardSeccionesProps> = ({ id, publicaciones, hasMor
 
     return (
         <div className="main-interior">
-            <div className="main-secciones">
-                <div className="seccion"
+            <div className="main-secciones" role="tablist">
+                <button
+                    type="button"
+                    className="seccion"
+                    role="tab"
+                    aria-selected={seccionActual === "Inicio"}
                     style={{ borderBottom: seccionActual === "Inicio" ? "3px solid var(--color-llamativo)" : "3px solid transparent" }}
                     onClick={() => setSeccionActual("Inicio")}>
                     <div className="seccion-texto">
@@ -80,27 +85,37 @@ const CardSecciones: React.FC<CardSeccionesProps> = ({ id, publicaciones, hasMor
                             Inicio
                         </p>
                     </div>
-                </div>
-                <div className="seccion"
+                </button>
+                <button
+                    type="button"
+                    className="seccion"
+                    role="tab"
+                    aria-selected={seccionActual === "AcercaDe"}
                     style={{ borderBottom: seccionActual === "AcercaDe" ? "3px solid var(--color-llamativo)" : "3px solid transparent" }}
                     onClick={() => setSeccionActual("AcercaDe")}>
                     <div className="seccion-texto">
                         <p style={{ color: seccionActual === "AcercaDe" ? "white" : "var(--color-letra-gris)" }}> Sobre mí </p>
                     </div>
-                </div>
-                <div className="seccion"
+                </button>
+                <button
+                    type="button"
+                    className="seccion"
+                    role="tab"
+                    aria-selected={seccionActual === "Reposteos"}
                     style={{ borderBottom: seccionActual === "Reposteos" ? "3px solid var(--color-llamativo)" : "3px solid transparent" }}
                     onClick={() => setSeccionActual("Reposteos")}>
                     <div className="seccion-texto">
                         <p style={{ color: seccionActual === "Reposteos" ? "white" : "var(--color-letra-gris)" }}> Reposteos </p>
                     </div>
-                </div>
+                </button>
             </div>
 
-            {loading && <p style={{ color: "white" }}> Cargando... </p>}
-
             {seccionActual === "Inicio" ? (
-                <CardTweet posteos={publicaciones} hasMore={hasMorePublicaciones} onLoadMore={onLoadMorePublicaciones} />
+                loading && publicaciones.length === 0 ? (
+                    <SkeletonTweet />
+                ) : (
+                    <CardTweet posteos={publicaciones} hasMore={hasMorePublicaciones} onLoadMore={onLoadMorePublicaciones} />
+                )
             ) : seccionActual === "Seguidores" ? (
                 <BusquedaDeUsuarios usuarios={misSeguidos} />
             ) : seccionActual === "AcercaDe" ? (

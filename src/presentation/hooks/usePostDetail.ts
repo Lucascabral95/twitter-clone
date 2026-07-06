@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import axios, { AxiosError } from 'axios';
+import toast from 'react-hot-toast';
 
 import { IIPosteo } from '@/infrastructure/interfaces';
 import useStore from '@/zustand';
@@ -47,11 +49,36 @@ useEffect(() => {
     fetchUserData();
   }, [getCookieLogueo, datosLogueo?.id, dataPosteo?.creador_id, existeEnMiListaDeAmigos]);
 
+  const handleLike = useCallback(async () => {
+    if (!dataPosteo?.posteo_id) return;
+
+    setDataPosteo((prev) => ({ ...prev, likes: (prev.likes ?? 0) + 1 }));
+
+    try {
+      const { data } = await axios.put(`/api/posteo/${dataPosteo.posteo_id}`);
+      const likesReales = data?.result?.likes;
+
+      if (typeof likesReales === 'number') {
+        setDataPosteo((prev) => ({ ...prev, likes: likesReales }));
+      }
+    } catch (error) {
+      setDataPosteo((prev) => ({ ...prev, likes: Math.max((prev.likes ?? 1) - 1, 0) }));
+
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.error ?? 'Error al dar like', {
+          position: 'top-center',
+          duration: 2500,
+        });
+      }
+    }
+  }, [dataPosteo?.posteo_id]);
+
   return {
     dataPosteo,
     loading,
     error,
     detalleError,
     datosLogueo,
+    handleLike,
   };
 };
