@@ -1,11 +1,11 @@
 import React from 'react'
-import { FaHeart } from "react-icons/fa";
+import { FaHeart, FaRegComment, FaRetweet } from "react-icons/fa";
 import Avvvatars from "avvvatars-react";
-import moment from "moment";
-import "moment/locale/es";
-moment.locale("es");
+import { formatearFecha } from "@/utils/formatearFecha";
 import Link from 'next/link';
 import { Toaster } from 'react-hot-toast';
+import { motion } from 'motion/react';
+import { useInfiniteScroll } from '@/presentation/hooks/useInfiniteScroll';
 
 interface IPosteos {
     contenido: string;
@@ -20,6 +20,8 @@ interface IPosteos {
     posteo_id: number;
     titulo: string;
     updated_at: string;
+    comentarios_count?: number;
+    reposteos_count?: number;
 }
 
 interface CardTweetProps {
@@ -28,41 +30,75 @@ interface CardTweetProps {
     onLoadMore?: () => void;
 }
 
-const CardTweet: React.FC<CardTweetProps> = ({ posteos, hasMore = false, onLoadMore }) => {
+const CardTweetItem: React.FC<{ item: IPosteos }> = ({ item }) => {
     return (
-        <div className='card-tweet'>
-            {posteos?.map((item: IPosteos, index: number) => (
-                <Link href={`/home/post/${item?.posteo_id}`} className='contenedor-card-tweet' key={index}>
-                    <Link href={`/home/user/${item?.id}`} className="foto-card">
-                        <Avvvatars value={item?.email} size={40} style="shape" />
+        <motion.article
+            className='contenedor-card-tweet'
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+        >
+            <Link href={`/home/user/${item?.id}`} className="foto-card" prefetch={false}>
+                <Avvvatars value={item?.email} size={40} style="shape" />
+            </Link>
+            <div className="contenido-card">
+                <div className="nombre-fecha">
+                    <Link href={`/home/user/${item?.id}`} className="nombre" prefetch={false}>
+                        <p> {item?.nombre} </p>
                     </Link>
-                    <div className="contenido-card">
-                        <div className="nombre-fecha">
-                            <Link href={`/home/user/${item?.id}`} className="nombre">
-                                <p> {item?.nombre} </p>
-                            </Link>
-                            <div className="fecha">
-                                <p>{moment(item?.created_at).locale('es').format('LL')}</p>
-                            </div>
+                    <div className="fecha">
+                        <p>{formatearFecha(item?.created_at, 'LL')}</p>
+                    </div>
+                </div>
+                <Link href={`/home/post/${item?.posteo_id}`} className="cuerpo-post-link" prefetch={false}>
+                    <div className="titulo">
+                        <div className="titulo-titulo">
+                            <p> {item?.titulo} </p>
                         </div>
-                        <div className="titulo">
-                            <div className="titulo-titulo">
-                                <p> {item?.titulo} </p>
-                            </div>
-                        </div>
-                        <div className="contenido">
-                            <div className="contenido-contenido">
-                                <p> {item?.contenido} </p>
-                            </div>
-                        </div>
-                        <div className="contenedor-like">
-                            <p> {item?.likes} </p>
-                            <div className="icono">
-                                <FaHeart className='icon' />
-                            </div>
+                    </div>
+                    <div className="contenido">
+                        <div className="contenido-contenido">
+                            <p> {item?.contenido} </p>
                         </div>
                     </div>
                 </Link>
+                <div className="contenedor-like">
+                    <div className="metrica metrica-comentarios">
+                        <p> {item?.comentarios_count ?? 0} </p>
+                        <div className="icono">
+                            <FaRegComment className='icon' />
+                        </div>
+                    </div>
+                    <div className="metrica metrica-reposteos">
+                        <p> {item?.reposteos_count ?? 0} </p>
+                        <div className="icono">
+                            <FaRetweet className='icon' />
+                        </div>
+                    </div>
+                    <div className="metrica metrica-likes">
+                        <p> {item?.likes} </p>
+                        <div className="icono">
+                            <FaHeart className='icon' />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </motion.article>
+    )
+}
+
+const MemoizedCardTweetItem = React.memo(CardTweetItem);
+
+const CardTweet: React.FC<CardTweetProps> = ({ posteos, hasMore = false, onLoadMore }) => {
+    const sentinelRef = useInfiniteScroll({
+        hasMore,
+        onLoadMore: onLoadMore ?? (() => {}),
+    });
+
+    return (
+        <div className='card-tweet'>
+            {posteos?.map((item: IPosteos) => (
+                <MemoizedCardTweetItem key={item.posteo_id} item={item} />
             ))}
 
             {posteos.length === 0
@@ -71,7 +107,10 @@ const CardTweet: React.FC<CardTweetProps> = ({ posteos, hasMore = false, onLoadM
                 :
                 <div className="contenedor-boton-ver-mas">
                     {hasMore && onLoadMore && (
-                        <button className='boton-ver-mas' onClick={onLoadMore}> Ver más </button>
+                        <>
+                            <div ref={sentinelRef} aria-hidden="true" />
+                            <button className='boton-ver-mas' onClick={onLoadMore}> Ver más </button>
+                        </>
                     )}
                 </div>
             }

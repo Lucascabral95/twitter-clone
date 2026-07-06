@@ -7,7 +7,10 @@ describe('DAOPosteos', () => {
   it('obtenerPosteoPorID throws on NaN', async () => {
     await expect(DAOPosteos.obtenerPosteoPorID(Number('x'))).rejects.toMatchObject({ status: 400 });
   });
-  it('addLikePosteo throws on NaN', async () => {
-    await expect(DAOPosteos.addLikePosteo(Number('x'))).rejects.toMatchObject({ status: 400 });
+  it('toggleLike throws on NaN', async () => {
+    await expect(DAOPosteos.toggleLike(Number('x'), 1)).rejects.toMatchObject({ status: 400 });
+  });
+  it('getFeedDeSeguidos throws on NaN', async () => {
+    await expect(DAOPosteos.getFeedDeSeguidos(Number('x'))).rejects.toMatchObject({ status: 400 });
   });
 });

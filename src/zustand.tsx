@@ -8,6 +8,10 @@ interface Dat {
     tipoDeBusqueda: string;
 }
 
+// Cancela la búsqueda anterior cuando llega una nueva: evita que una respuesta lenta
+// y obsoleta pise el resultado de una búsqueda más reciente (carrera de requests).
+let searchAbortController: AbortController | null = null;
+
 interface Logueo {
     id: number;
     email: string;
@@ -31,6 +35,23 @@ interface Posteos {
     updated_at: string;
     creador_id: number;
     likes: number;
+    comentarios_count: number;
+    reposteos_count: number;
+}
+
+// Fila cruda que devuelve `POST /api/posteo` (tabla `posteos`), sin el join con
+// `usuarios` que sí trae la vista `usuarios_posteos`. Se enriquece con `datosLogueo`
+// para poder prependear al feed con la misma forma que `Posteos`.
+interface PosteoCreado {
+    id: number;
+    titulo: string;
+    contenido: string;
+    created_at: string;
+    updated_at: string;
+    creador_id: number;
+    likes: number;
+    comentarios_count: number;
+    reposteos_count: number;
 }
 
 interface DatosPersonales {
@@ -74,7 +95,7 @@ interface StoreState {
     limit: number;
     limitFeed: number;
     getAllTweets: () => Promise<void>;
-    addTweet: () => Promise<void>;
+    addTweet: (nuevoPosteo: PosteoCreado) => Promise<void>;
     getTweetsByID: () => Promise<void>;
     getCookieLogueo: () => Promise<void>;
     getTweetsByIDUser: (id: number) => Promise<void>;
@@ -152,6 +173,7 @@ const useStore = create<StoreState>((set, get) => ({
             set({
                 posteos: response.data.result,
                 loading: false,
+                error: false,
                 posteosTotales: response.data.result.length,
                 nextCursorTweets: pagination?.nextCursor ?? null,
                 hasMoreTweets: pagination?.hasMore ?? false,
@@ -206,30 +228,38 @@ const useStore = create<StoreState>((set, get) => ({
         }
     },
 
-    addTweet: async (): Promise<void> => {
-        set({ loading: true });
+    addTweet: async (nuevoPosteo: PosteoCreado): Promise<void> => {
         await get().getCookieLogueo();
-        const { datosLogueo } = get();
+        const { datosLogueo, posteos, posteosHome } = get();
 
         if (!datosLogueo) {
-            set({ error: true, loading: false });
+            set({ error: true });
             logger.error('No se encontraron datos de logueo');
             return;
         }
 
-        try {
-            const response = await axios.get('/api/posteo');
-            set({ posteos: response.data.result, loading: false, change: !get().change });
-        } catch (error) {
-            if (error instanceof AxiosError) {
-                set({ error: true, loading: false });
-                if (error.response) {
-                    logger.error(error.response.data.error);
-                } else {
-                    logger.error('Unexpected error', error);
-                }
-            }
-        }
+        const posteoEnriquecido: Posteos = {
+            id: datosLogueo.id,
+            nombre: datosLogueo.nombre,
+            email: datosLogueo.email,
+            fecha_creacion: datosLogueo.fecha_creacion,
+            identificador: datosLogueo.identificador,
+            posteo_id: nuevoPosteo.id,
+            titulo: nuevoPosteo.titulo,
+            contenido: nuevoPosteo.contenido,
+            created_at: nuevoPosteo.created_at,
+            updated_at: nuevoPosteo.updated_at,
+            creador_id: nuevoPosteo.creador_id,
+            likes: nuevoPosteo.likes,
+            comentarios_count: nuevoPosteo.comentarios_count,
+            reposteos_count: nuevoPosteo.reposteos_count,
+        };
+
+        set({
+            posteos: [posteoEnriquecido, ...posteos],
+            posteosHome: [posteoEnriquecido, ...posteosHome],
+            change: !get().change,
+        });
     },
 
     addTweetDinamico: async (): Promise<void> => {
@@ -329,6 +359,8 @@ const useStore = create<StoreState>((set, get) => ({
     },
 
     obtenerResultadosDeBusqueda: async (response: Dat): Promise<void> => {
+        searchAbortController?.abort();
+
         try {
             const { busqueda, tipoDeBusqueda } = response;
 
@@ -337,12 +369,18 @@ const useStore = create<StoreState>((set, get) => ({
                 return;
             }
 
+            const controller = new AbortController();
+            searchAbortController = controller;
+
             const endpoint = tipoDeBusqueda === 'usuarios' ? '/api/usuario' : '/api/posteo';
-            const results = await axios.get(`${endpoint}?q=${encodeURIComponent(busqueda)}`);
+            const results = await axios.get(`${endpoint}?q=${encodeURIComponent(busqueda)}`, { signal: controller.signal });
             const data: Posteos[] = results.status === 200 ? (results.data.result || []) : [];
 
             set({ arrayDeBusqueda: data, posteosTotales: data.length });
         } catch (error) {
+            if (axios.isCancel(error)) {
+                return;
+            }
             if (error instanceof AxiosError) {
                 const errorMessage = error.response?.data?.error || error.message || "Error desconocido";
                 logger.error("Error al obtener resultados de búsqueda:", errorMessage);
@@ -372,6 +410,8 @@ const useStore = create<StoreState>((set, get) => ({
     },
 
     seguirUsuario: async (id_mio: number, id_a_seguir: number): Promise<void> => {
+        set({ esMiAmigo: true });
+
         try {
             const result = await axios.post(`/api/seguimientos/${id_mio}`, {
                 id_a_seguir: id_a_seguir
@@ -384,10 +424,12 @@ const useStore = create<StoreState>((set, get) => ({
                     duration: 2000
                 })
 
-                set({ esMiAmigo: true, change: !get().change })
+                set({ change: !get().change })
             }
 
         } catch (error) {
+            set({ esMiAmigo: false });
+
             if (error instanceof AxiosError) {
                 if (error.response) {
                     logger.log(error.response.data.error)
@@ -402,6 +444,8 @@ const useStore = create<StoreState>((set, get) => ({
         }
     },
     eliminarSeguimiento: async (id_mio: number, id_a_seguir: number): Promise<void> => {
+        set({ esMiAmigo: false });
+
         try {
             const result = await axios.delete(`/api/seguimientos/${id_mio}`, {
                 data: {
@@ -416,10 +460,12 @@ const useStore = create<StoreState>((set, get) => ({
                     duration: 2000
                 })
 
-                set({ esMiAmigo: false, change: !get().change })
+                set({ change: !get().change })
             }
 
         } catch (error) {
+            set({ esMiAmigo: true });
+
             if (error instanceof AxiosError) {
                 if (error.response) {
                     logger.log(error.response.data.error)
@@ -477,7 +523,7 @@ const useStore = create<StoreState>((set, get) => ({
             await get().getCookieLogueo();
             const { datosLogueo, limitFeed } = get();
 
-            const results = await axios.get(`/api/posteo?creador_id=${Number(datosLogueo?.id)}&limit=${limitFeed}`);
+            const results = await axios.get(`/api/posteo?siguiendoDe=${Number(datosLogueo?.id)}&limit=${limitFeed}`);
 
             if (results.status === 200) {
                 const pagination: Pagination | undefined = results.data.pagination;
@@ -504,7 +550,7 @@ const useStore = create<StoreState>((set, get) => ({
         if (!hasMoreTweetsHome || nextCursorTweetsHome === null) return;
 
         try {
-            const results = await axios.get(`/api/posteo?creador_id=${Number(datosLogueo?.id)}&limit=${limitFeed}&cursor=${nextCursorTweetsHome}`);
+            const results = await axios.get(`/api/posteo?siguiendoDe=${Number(datosLogueo?.id)}&limit=${limitFeed}&cursor=${nextCursorTweetsHome}`);
 
             if (results.status === 200) {
                 const pagination: Pagination | undefined = results.data.pagination;

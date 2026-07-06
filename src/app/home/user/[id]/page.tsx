@@ -4,14 +4,14 @@ import React from 'react';
 import CardSecciones from '@/components/EstructuraMain/CardSecciones';
 import HeaderDinamico from '@/components/Header/HeaderDinamico';
 import NotFound from '@/components/NotFound/NotFound';
-import Loading from '@/components/Loading/Loading';
+import SkeletonTweet from '@/components/Skeleton/SkeletonTweet';
 import { useUserData } from '@/presentation/hooks';
 
 const UserID: React.FC = () => {
   const { error, loading, posteosUser, userId, hasMoreTweetsUser, loadMoreTweetsUser } = useUserData();
 
   if (loading) {
-    return <Loading />;
+    return <SkeletonTweet />;
   }
 
   return (

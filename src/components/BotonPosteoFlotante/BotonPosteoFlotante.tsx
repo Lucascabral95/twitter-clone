@@ -2,12 +2,14 @@
 import React, { useEffect, useState } from 'react'
 import "./BotonPosteoFlotante.scss"
 import { FiEdit3 } from "react-icons/fi";
+import { AnimatePresence } from 'motion/react';
 import Posteo from '../Navbar/Posteo';
 import useStore from '@/zustand';
 
 const BotonPosteoFlotante = () => {
     const [isOpenPosteo, setIsOpenPosteo] = useState<boolean>(false);
-    const { getCookieLogueo, datosLogueo } = useStore();
+    const getCookieLogueo = useStore((s) => s.getCookieLogueo);
+    const datosLogueo = useStore((s) => s.datosLogueo);
 
     useEffect(() => {
         const getData = async () => {
@@ -22,7 +24,9 @@ const BotonPosteoFlotante = () => {
                 <FiEdit3 className='icon' />
             </button>
 
-            {isOpenPosteo && <Posteo email={String(datosLogueo?.email)} setIsOpenPosteo={setIsOpenPosteo} creador_id={Number(datosLogueo?.id)} />}
+            <AnimatePresence>
+                {isOpenPosteo && <Posteo email={String(datosLogueo?.email)} setIsOpenPosteo={setIsOpenPosteo} creador_id={Number(datosLogueo?.id)} />}
+            </AnimatePresence>
 
         </div>
     )

@@ -29,6 +29,10 @@
                     width: 33.33%;
                     border-bottom: 3px solid transparent;
                     border-top: 3px solid transparent;
+                    border-left: none;
+                    border-right: none;
+                    background: none;
+                    padding: 0;
 
                     .seccion-texto {
                         display: flex;
@@ -124,11 +128,16 @@
                 }
             }
 
+            .cuerpo-post-link {
+                display: contents;
+            }
+
             .titulo {
                 display: flex;
                 align-items: center;
                 margin: 0 0 4px 0;
                 overflow-x: scroll;
+                cursor: pointer;
 
                 &::-webkit-scrollbar {
                     display: none;
@@ -150,6 +159,7 @@
                 display: flex;
                 align-items: center;
                 margin: 0 0 14px 0;
+                cursor: pointer;
 
                 .contenido-contenido {
                     display: flex;
@@ -167,6 +177,16 @@
                 align-items: center;
                 justify-content: flex-end;
 
+                .metrica {
+                    display: flex;
+                    align-items: center;
+                    margin: 0 0 0 16px;
+
+                    &:first-child {
+                        margin: 0;
+                    }
+                }
+
                 p {
                     color: var(--color-gris);
                     font-size: 15px;
@@ -183,13 +203,21 @@
                         color: var(--color-gris);
                         font-size: 16px;
                     }
+                }
 
-                    &:hover {
-                        .icon {
-                            transition: 0.2s ease-in-out;
-                            color: red;
-                        }
-                    }
+                .metrica-comentarios .icono:hover .icon {
+                    transition: 0.2s ease-in-out;
+                    color: var(--color-llamativo);
+                }
+
+                .metrica-reposteos .icono:hover .icon {
+                    transition: 0.2s ease-in-out;
+                    color: #17bf63;
+                }
+
+                .metrica-likes .icono:hover .icon {
+                    transition: 0.2s ease-in-out;
+                    color: red;
                 }
             }
         }

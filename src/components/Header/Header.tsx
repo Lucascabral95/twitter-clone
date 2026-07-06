@@ -6,8 +6,7 @@ import { FaBirthdayCake, FaRegCalendarAlt, FaTwitter } from "react-icons/fa";
 import { RiBearSmileLine } from "react-icons/ri";
 import "./Header.scss";
 import Avvvatars from 'avvvatars-react'
-import moment from 'moment';
-moment.locale('es');
+import { formatearFecha } from '@/utils/formatearFecha';
 import { usePathname } from "next/navigation";
 import useStore from "@/zustand";
 import { Toaster } from 'react-hot-toast';
@@ -55,16 +54,14 @@ type TMisDatos = {
 const Header: React.FC<TMisDatos> = ({ dataUser, misDatosPersonales, seguidores }: TMisDatos) => {
     const pathname = usePathname();
     const [isOpenSeguidosSeguidores, setIsOpenSeguidosSeguidores] = useState<boolean>(false);
-    const {
-        getCookieLogueo,
-        datosLogueo,
-        existeEnMiListaDeAmigos,
-        esMiAmigo,
-        seguirUsuario,
-        eliminarSeguimiento,
-        misSeguidos,
-        obtenerSeguidores
-    } = useStore();
+    const getCookieLogueo = useStore((s) => s.getCookieLogueo);
+    const datosLogueo = useStore((s) => s.datosLogueo);
+    const existeEnMiListaDeAmigos = useStore((s) => s.existeEnMiListaDeAmigos);
+    const esMiAmigo = useStore((s) => s.esMiAmigo);
+    const seguirUsuario = useStore((s) => s.seguirUsuario);
+    const eliminarSeguimiento = useStore((s) => s.eliminarSeguimiento);
+    const misSeguidos = useStore((s) => s.misSeguidos);
+    const obtenerSeguidores = useStore((s) => s.obtenerSeguidores);
     const [seguidosOSeguidores, setSeguidosOSeguidores] = useState<string>("");
 
     useEffect(() => {
@@ -101,7 +98,10 @@ const Header: React.FC<TMisDatos> = ({ dataUser, misDatosPersonales, seguidores 
                             <Avvvatars size={92.3} style="shape" value={dataUser?.email} />
                         </div>
                         <div className="follow">
-                            <div className="boton-de-follow"
+                            <button
+                                type="button"
+                                className="boton-de-follow"
+                                aria-label={pathname === "/home" ? "Mi cuenta" : esMiAmigo ? "Dejar de seguir" : "Seguir"}
                                 onClick={pathname === "/home" ? () => { } :
                                     esMiAmigo ? () => eliminarSeguimiento(datosLogueo?.id as number, dataUser?.id) : () => seguirUsuario(datosLogueo?.id as number, dataUser?.id)}>
                                 <div className="texto">
@@ -120,7 +120,7 @@ const Header: React.FC<TMisDatos> = ({ dataUser, misDatosPersonales, seguidores 
                                 <div className="icono">
                                     <FaTwitter className="icon" />
                                 </div>
-                            </div>
+                            </button>
                         </div>
                     </div>
                     <div className="nombre-de-usuario">
@@ -148,7 +148,7 @@ const Header: React.FC<TMisDatos> = ({ dataUser, misDatosPersonales, seguidores 
                                 <FaBirthdayCake className="icon" />
                             </div>
                             <div className="texto">
-                                <p> {moment(misDatosPersonales?.cumpleanos).locale('es').format('l')} </p>
+                                <p> {formatearFecha(misDatosPersonales?.cumpleanos, 'l')} </p>
                             </div>
                         </div>
                         <div className="car">
@@ -156,17 +156,17 @@ const Header: React.FC<TMisDatos> = ({ dataUser, misDatosPersonales, seguidores 
                                 <FaRegCalendarAlt className="icon" />
                             </div>
                             <div className="texto">
-                                <p> Unido el {moment(dataUser?.fecha_creacion).format("L")} </p>
+                                <p> Unido el {formatearFecha(dataUser?.fecha_creacion, 'L')} </p>
                             </div>
                         </div>
                     </div>
                     <div className="seguidos-seguidores">
-                        <div className="seg" onClick={() => { setIsOpenSeguidosSeguidores(true); setSeguidosOSeguidores("seguidos") }}>
+                        <button type="button" className="seg" onClick={() => { setIsOpenSeguidosSeguidores(true); setSeguidosOSeguidores("seguidos") }}>
                             <p> {misSeguidos.length || 0} seguido(s) </p>
-                        </div>
-                        <div className="seg seg-seguidores" onClick={() => { setIsOpenSeguidosSeguidores(true); setSeguidosOSeguidores("seguidores") }}>
+                        </button>
+                        <button type="button" className="seg seg-seguidores" onClick={() => { setIsOpenSeguidosSeguidores(true); setSeguidosOSeguidores("seguidores") }}>
                             <p> {seguidores?.length || 0} seguidor(es) </p>
-                        </div>
+                        </button>
                     </div>
                 </div>
 

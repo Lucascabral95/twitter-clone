@@ -4,7 +4,8 @@ import Navbar from './Navbar';
 
 jest.mock('@/presentation/hooks', () => ({
   useDebounce: (v: any) => v,
-  useBusquedaUsuarios: () => ({ usuarios: [{ id:1, email:'a@a.com', nombre:'Lucas' }], buscar: jest.fn() })
+  useBusquedaUsuarios: () => ({ usuarios: [{ id:1, email:'a@a.com', nombre:'Lucas' }], buscar: jest.fn() }),
+  useNotificationsBadge: () => ({ noLeidas: 0, refrescar: jest.fn() })
 }));
 
 it('renders search input and results', async () => {

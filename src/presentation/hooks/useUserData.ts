@@ -6,7 +6,10 @@ import { userService } from '@/infrastructure/services';
 
 export const useUserData = () => {
   const { id } = useParams();
-  const { getTweetsByIDUser, posteosUser, hasMoreTweetsUser, loadMoreTweetsUser } = useStore();
+  const getTweetsByIDUser = useStore((s) => s.getTweetsByIDUser);
+  const posteosUser = useStore((s) => s.posteosUser);
+  const hasMoreTweetsUser = useStore((s) => s.hasMoreTweetsUser);
+  const loadMoreTweetsUser = useStore((s) => s.loadMoreTweetsUser);
   const [dataUser, setDataUser] = useState<DataUser>({} as DataUser);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);

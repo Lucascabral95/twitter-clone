@@ -97,6 +97,17 @@ describe('/api/posteo route', () => {
       expect(values).toContain(42);
     });
 
+    it('filters by feed de seguidos when siguiendoDe is present, taking precedence over creador_id', async () => {
+      const req = new NextRequest('http://localhost/api/posteo?siguiendoDe=7&creador_id=42');
+
+      const response = await GET(req);
+
+      expect(response.status).toBe(200);
+      const [strings, ...values] = mockSql.mock.calls[0];
+      expect(strings.join('')).toContain('creador_id in (select id_a_seguir from seguimientos where id_mio =');
+      expect(values).toContain(7);
+    });
+
     it('searches by q when present, taking precedence over creador_id', async () => {
       const req = new NextRequest('http://localhost/api/posteo?q=hola&creador_id=42');
 

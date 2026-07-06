@@ -1,4 +1,5 @@
 import db from "@/services/neon";
+import DAOPosteos from "@/models/DAO/DAOPosteos";
 
 interface CustomError {
     error: string;
@@ -64,7 +65,9 @@ class DAOReposteos {
             if(results.length === 0) {
                 throw { error: "Error al crear el reposteo", status: 400 } as CustomError;
             }
-            
+
+            await DAOPosteos.incrementarReposteosCount(reposteo.posteo_id);
+
             return results[0] as Reposteos;
         } catch (error) {
             throw error as CustomError;
@@ -84,6 +87,8 @@ class DAOReposteos {
             if(results.length === 0) {
                 throw { error: "El usuario aun no realizo ningun reposteo", status: 404 } as CustomError;
             }
+
+            await DAOPosteos.decrementarReposteosCount(results[0].posteo_id);
 
             return results;
         } catch (error) {
