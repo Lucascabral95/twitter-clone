@@ -38,6 +38,7 @@ interface IArrayComentarios {
     posteo_updated_at: string;
     titulo: string;
     usuario_id: number;
+    parent_id: number | null;
 }
 
 interface IDatosLogueo {
@@ -57,7 +58,8 @@ export const comentar = async (
     setArrayComentarios: React.Dispatch<React.SetStateAction<IArrayComentarios[]>>,
     contenido: string,
     setContenido: React.Dispatch<React.SetStateAction<string>>,
-    datosLogueo: IDatosLogueo
+    datosLogueo: IDatosLogueo,
+    parentId: number | null = null
 ) => {
     event.preventDefault();
 
@@ -65,14 +67,40 @@ export const comentar = async (
         const results = await axios.post(`/api/comentario/${dataPosteo?.id}`, {
             emisor_id: datosLogueo?.id,
             id_del_posteo: dataPosteo?.posteo_id,
-            contenido: contenido
+            contenido: contenido,
+            parent_id: parentId
         });
 
-
         if (results.status === 200) {
-            console.log(results.data.result);
+            // La respuesta trae la fila cruda de `comentarios` (sin el join con `usuarios`
+            // que sí tiene la vista `comentarios_de_posteos_new`); se enriquece con
+            // `datosLogueo`/`dataPosteo` para que calce con la forma de IArrayComentarios.
+            const nuevo = results.data.result;
+            const comentarioEnriquecido: IArrayComentarios = {
+                comentario_id: nuevo.id,
+                comentario_contenido: nuevo.contenido,
+                comentario_created_at: nuevo.created_at,
+                comentario_updated_at: nuevo.updated_at,
+                comentario_likes: nuevo.likes,
+                parent_id: nuevo.parent_id ?? null,
+                emisor_id: nuevo.emisor_id,
+                id_del_posteo: nuevo.id_del_posteo,
+                usuario_id: datosLogueo?.id,
+                nombre: datosLogueo?.nombre,
+                email: datosLogueo?.email,
+                identificador: datosLogueo?.identificador,
+                fecha_creacion: datosLogueo?.fecha_creacion,
+                creador_id: dataPosteo?.creador_id,
+                titulo: dataPosteo?.titulo,
+                posteo_contenido: dataPosteo?.contenido,
+                posteo_created_at: dataPosteo?.created_at,
+                posteo_updated_at: dataPosteo?.updated_at,
+                posteo_id: dataPosteo?.posteo_id,
+                posteo_likes: dataPosteo?.likes,
+            };
+
             setContenido("");
-            setArrayComentarios([results.data.result, ...arrayComentarios]);
+            setArrayComentarios([comentarioEnriquecido, ...arrayComentarios]);
         }
 
     } catch (error) {

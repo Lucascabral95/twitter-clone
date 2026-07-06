@@ -180,6 +180,57 @@
                     }
                 }
 
+                .form-editar-posteo {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+
+                    input,
+                    textarea {
+                        background-color: rgba(255, 255, 255, 0.05);
+                        border: 1px solid rgba(255, 255, 255, 0.15);
+                        border-radius: 8px;
+                        color: var(--letra-titular);
+                        font-size: 15px;
+                        padding: 8px 10px;
+
+                        &:focus {
+                            outline: none;
+                            border-color: var(--color-llamativo);
+                        }
+                    }
+
+                    textarea {
+                        min-height: 80px;
+                        resize: vertical;
+                    }
+
+                    .acciones-editar {
+                        display: flex;
+                        justify-content: flex-end;
+                        gap: 8px;
+
+                        button {
+                            border-radius: 16px;
+                            border: none;
+                            padding: 6px 16px;
+                            font-weight: 600;
+                            cursor: pointer;
+                        }
+
+                        button[type="submit"] {
+                            background-color: var(--letra-titular);
+                            color: var(--fondo-negro);
+                        }
+
+                        button[type="button"] {
+                            background-color: transparent;
+                            border: 0.5px solid rgba(255, 255, 255, 0.346);
+                            color: var(--letra-titular);
+                        }
+                    }
+                }
+
                 .fecha-posteo {
                     display: flex;
                     align-items: center;
@@ -230,6 +281,13 @@
                         &:hover {
                             .icon {
                                 transition: 0.2s ease-in-out;
+                                color: red;
+                            }
+                        }
+
+                        &.likeado {
+                            span,
+                            .icon {
                                 color: red;
                             }
                         }
@@ -460,6 +518,78 @@
                                     font-size: 15px;
                                 }
                             }
+                        }
+                    }
+                }
+
+                .hilo-comentario {
+                    width: 100%;
+
+                    .acciones-hilo {
+                        width: 100%;
+                        display: flex;
+                        justify-content: flex-end;
+                        margin: 0 0 8px 0;
+
+                        .boton-responder {
+                            background: none;
+                            border: none;
+                            color: var(--color-gris);
+                            font-size: 13px;
+                            font-weight: 600;
+                            cursor: pointer;
+                            padding: 0;
+
+                            &:hover {
+                                color: var(--letra-titular);
+                            }
+                        }
+                    }
+
+                    .form-respuesta {
+                        width: 100%;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 8px;
+                        margin: 0 0 16px 0;
+
+                        textarea {
+                            width: 100%;
+                            min-height: 60px;
+                            background-color: rgba(255, 255, 255, 0.05);
+                            border: 1px solid rgba(255, 255, 255, 0.15);
+                            border-radius: 8px;
+                            color: var(--letra-titular);
+                            font-size: 14px;
+                            padding: 8px 10px;
+                            resize: vertical;
+
+                            &:focus {
+                                outline: none;
+                                border-color: var(--color-llamativo);
+                            }
+                        }
+
+                        button {
+                            align-self: flex-end;
+                            background-color: var(--letra-titular);
+                            color: var(--fondo-negro);
+                            font-weight: 600;
+                            font-size: 13px;
+                            padding: 4px 14px;
+                            border: none;
+                            border-radius: 16px;
+                            cursor: pointer;
+                        }
+                    }
+
+                    .respuestas-de-comentario {
+                        width: 100%;
+                        padding: 0 0 0 32px;
+                        border-left: 2px solid rgba(255, 255, 255, 0.1);
+
+                        .comentarios-de-publicacion {
+                            width: 100%;
                         }
                     }
                 }

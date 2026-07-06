@@ -1,9 +1,10 @@
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { formatearFecha } from '@/utils/formatearFecha';
 import { Toaster } from 'react-hot-toast';
-import { IoMdHeart } from 'react-icons/io';
+import { IoMdHeart, IoMdHeartEmpty } from 'react-icons/io';
 import { FiArrowLeft } from 'react-icons/fi';
 import Avvvatars from 'avvvatars-react';
 
@@ -17,14 +18,39 @@ import { usePostDetail } from '@/presentation/hooks/usePostDetail';
 import './PostDetail.scss';
 
 const PostDetail: React.FC = () => {
-  const { dataPosteo, loading, error, detalleError, datosLogueo, handleLike } = usePostDetail();
+  const { dataPosteo, loading, error, detalleError, datosLogueo, handleLike, handleUpdate, handleDelete } = usePostDetail();
   const eliminarSeguimiento = useStore((s) => s.eliminarSeguimiento);
   const seguirUsuario = useStore((s) => s.seguirUsuario);
   const esMiAmigo = useStore((s) => s.esMiAmigo);
+  const router = useRouter();
+
+  const [editando, setEditando] = useState(false);
+  const [tituloEdit, setTituloEdit] = useState('');
+  const [contenidoEdit, setContenidoEdit] = useState('');
 
   if (loading) {
     return <SkeletonTweet count={1} />;
   }
+
+  const esPropio = Boolean(datosLogueo?.id) && datosLogueo?.id === dataPosteo?.creador_id;
+
+  const iniciarEdicion = () => {
+    setTituloEdit(dataPosteo?.titulo ?? '');
+    setContenidoEdit(dataPosteo?.posteo_contenido ?? '');
+    setEditando(true);
+  };
+
+  const guardarEdicion = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const ok = await handleUpdate(tituloEdit, contenidoEdit);
+    if (ok) setEditando(false);
+  };
+
+  const borrarPosteo = async () => {
+    if (!window.confirm('¿Borrar este posteo? Esta acción no se puede deshacer.')) return;
+    const ok = await handleDelete();
+    if (ok) router.push('/feed');
+  };
 
   return (
     <section className="post-de-detail">
@@ -43,6 +69,12 @@ const PostDetail: React.FC = () => {
                 </div>
               </div>
               <div className="repostear">
+                {esPropio && (
+                  <>
+                    <button type="button" onClick={iniciarEdicion}>Editar</button>
+                    <button type="button" onClick={borrarPosteo}>Borrar</button>
+                  </>
+                )}
                 <button type="button" onClick={() => repostearPosteo(dataPosteo?.posteo_id, datosLogueo as DatosLogueo)}>Repostear</button>
               </div>
             </div>
@@ -76,12 +108,36 @@ const PostDetail: React.FC = () => {
             </div>
 
             <div className="parte-inferior">
-              <div className="texto-titulo">
-                <h4>{dataPosteo?.titulo}</h4>
-              </div>
-              <div className="texto-contenido">
-                <p>{dataPosteo?.posteo_contenido}</p>
-              </div>
+              {editando ? (
+                <form className="form-editar-posteo" onSubmit={guardarEdicion}>
+                  <input
+                    type="text"
+                    value={tituloEdit}
+                    onChange={(e) => setTituloEdit(e.target.value)}
+                    maxLength={100}
+                    required
+                  />
+                  <textarea
+                    value={contenidoEdit}
+                    onChange={(e) => setContenidoEdit(e.target.value)}
+                    maxLength={300}
+                    required
+                  />
+                  <div className="acciones-editar">
+                    <button type="button" onClick={() => setEditando(false)}>Cancelar</button>
+                    <button type="submit">Guardar</button>
+                  </div>
+                </form>
+              ) : (
+                <>
+                  <div className="texto-titulo">
+                    <h4>{dataPosteo?.titulo}</h4>
+                  </div>
+                  <div className="texto-contenido">
+                    <p>{dataPosteo?.posteo_contenido}</p>
+                  </div>
+                </>
+              )}
               <div className="fecha-posteo">
                 <div className="fecha">
                   <p>{formatearFecha(dataPosteo?.created_at, 'LLL')}</p>
@@ -90,9 +146,14 @@ const PostDetail: React.FC = () => {
                   <span>{dataPosteo?.comentarios_count ?? 0} respuestas</span>
                   <span>{dataPosteo?.reposteos_count ?? 0} reposteos</span>
                 </div>
-                <button type="button" className="like" aria-label="Dar like a este posteo" onClick={handleLike}>
+                <button
+                  type="button"
+                  className={`like${dataPosteo?.ya_likeado ? ' likeado' : ''}`}
+                  aria-label={dataPosteo?.ya_likeado ? 'Quitar like' : 'Dar like a este posteo'}
+                  onClick={handleLike}
+                >
                   <span>{dataPosteo?.likes}</span>
-                  <IoMdHeart className="icon" />
+                  {dataPosteo?.ya_likeado ? <IoMdHeart className="icon" /> : <IoMdHeartEmpty className="icon" />}
                 </button>
               </div>
             </div>

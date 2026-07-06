@@ -12,6 +12,44 @@
         justify-content: space-between;
         padding: 0 $padding-header;
 
+        .boton-notificaciones {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px;
+            border-radius: 8px;
+            margin: 0 8px 0 0;
+
+            .icon {
+                color: var(--letra-titular);
+                font-size: 24px;
+            }
+
+            .badge-no-leidas {
+                position: absolute;
+                top: 0;
+                right: 0;
+                min-width: 16px;
+                height: 16px;
+                padding: 0 3px;
+                border-radius: 8px;
+                background-color: var(--color-llamativo);
+                color: white;
+                font-size: 10px;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                line-height: 1;
+            }
+
+            &:hover {
+                transition: 0.2s;
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+        }
+
         .nombre {
             display: flex;
             align-items: center;

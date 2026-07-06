@@ -6,13 +6,13 @@ import Link from 'next/link'
 import axios from 'axios'
 import { usePathname } from 'next/navigation'
 import { HiMagnifyingGlass } from 'react-icons/hi2'
-import { IoMdClose } from 'react-icons/io'
+import { IoMdClose, IoMdNotificationsOutline } from 'react-icons/io'
 import Avvvatars from 'avvvatars-react'
 
 import ListaBusqueda from '../ListaBusqueda/ListaBusqueda'
 import useStore from '@/zustand'
 import './Navbar.scss'
-import { useBusquedaUsuarios, useDebounce } from '@/presentation/hooks'
+import { useBusquedaUsuarios, useDebounce, useNotificationsBadge } from '@/presentation/hooks'
 
 const Header: React.FC = () => {
   const pathname = usePathname()
@@ -27,6 +27,7 @@ const Header: React.FC = () => {
   const axiosInstance = useMemo(() => axios.create(), [])
 
   const { usuarios, buscar } = useBusquedaUsuarios(axiosInstance)
+  const { noLeidas } = useNotificationsBadge(mounted && Boolean(email))
 
   useEffect(() => {
     const initUser = async () => {
@@ -104,6 +105,11 @@ const Header: React.FC = () => {
             />
           )}
         </div>
+
+        <Link href='/feed/notificaciones' className='boton-notificaciones' aria-label='Notificaciones'>
+          <IoMdNotificationsOutline className='icon' />
+          {noLeidas > 0 && <span className='badge-no-leidas'>{noLeidas > 9 ? '9+' : noLeidas}</span>}
+        </Link>
 
         <Link href='/home' className='nombre'>
           {email && <Avvvatars value={email} size={32} style='shape' />}

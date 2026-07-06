@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 
 import { IIPosteo } from '@/infrastructure/interfaces';
 import useStore from '@/zustand';
-import { postDetailService } from '@/infrastructure/services';
+import { postDetailService, postService } from '@/infrastructure/services';
 
 export const usePostDetail = () => {
   const { id } = useParams();
@@ -52,17 +52,25 @@ useEffect(() => {
   const handleLike = useCallback(async () => {
     if (!dataPosteo?.posteo_id) return;
 
-    setDataPosteo((prev) => ({ ...prev, likes: (prev.likes ?? 0) + 1 }));
+    const yaLikeadoPrevio = dataPosteo.ya_likeado ?? false;
+
+    setDataPosteo((prev) => ({
+      ...prev,
+      ya_likeado: !yaLikeadoPrevio,
+      likes: (prev.likes ?? 0) + (yaLikeadoPrevio ? -1 : 1),
+    }));
 
     try {
       const { data } = await axios.put(`/api/posteo/${dataPosteo.posteo_id}`);
-      const likesReales = data?.result?.likes;
+      const { liked, likes } = data?.result ?? {};
 
-      if (typeof likesReales === 'number') {
-        setDataPosteo((prev) => ({ ...prev, likes: likesReales }));
-      }
+      setDataPosteo((prev) => ({
+        ...prev,
+        ya_likeado: typeof liked === 'boolean' ? liked : prev.ya_likeado,
+        likes: typeof likes === 'number' ? likes : prev.likes,
+      }));
     } catch (error) {
-      setDataPosteo((prev) => ({ ...prev, likes: Math.max((prev.likes ?? 1) - 1, 0) }));
+      setDataPosteo((prev) => ({ ...prev, ya_likeado: yaLikeadoPrevio, likes: dataPosteo.likes }));
 
       if (error instanceof AxiosError) {
         toast.error(error.response?.data?.error ?? 'Error al dar like', {
@@ -71,6 +79,35 @@ useEffect(() => {
         });
       }
     }
+  }, [dataPosteo?.posteo_id, dataPosteo?.ya_likeado, dataPosteo?.likes]);
+
+  const handleUpdate = useCallback(async (titulo: string, contenido: string) => {
+    if (!dataPosteo?.posteo_id) return false;
+
+    const result = await postService.updatePost(dataPosteo.posteo_id, { titulo, contenido });
+
+    if (result.success) {
+      setDataPosteo((prev) => ({ ...prev, titulo, posteo_contenido: contenido }));
+      toast.success('Posteo actualizado');
+      return true;
+    }
+
+    toast.error(result.error ?? 'Error al editar el posteo');
+    return false;
+  }, [dataPosteo?.posteo_id]);
+
+  const handleDelete = useCallback(async () => {
+    if (!dataPosteo?.posteo_id) return false;
+
+    const result = await postService.deletePost(dataPosteo.posteo_id);
+
+    if (result.success) {
+      toast.success('Posteo borrado');
+      return true;
+    }
+
+    toast.error(result.error ?? 'Error al borrar el posteo');
+    return false;
   }, [dataPosteo?.posteo_id]);
 
   return {
@@ -80,5 +117,7 @@ useEffect(() => {
     detalleError,
     datosLogueo,
     handleLike,
+    handleUpdate,
+    handleDelete,
   };
 };

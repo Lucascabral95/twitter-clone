@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import axios, { AxiosError } from 'axios';
 import Avvvatars from "avvvatars-react";
 import useStore from '@/zustand';
@@ -45,6 +45,7 @@ interface IArrayComentarios {
     posteo_updated_at: string;
     titulo: string;
     usuario_id: number;
+    parent_id: number | null;
     contenido?: string;
 }
 
@@ -58,12 +59,61 @@ interface DatosLogueo {
     identificador: string;
 }
 
+const ComentarioItem: React.FC<{
+    item: IArrayComentarios;
+    datosLogueo: DatosLogueo;
+    arrayComentarios: IArrayComentarios[];
+    setArrayComentarios: React.Dispatch<React.SetStateAction<IArrayComentarios[]>>;
+}> = ({ item, datosLogueo, arrayComentarios, setArrayComentarios }) => (
+    <div className="comentarios-de-publicacion">
+        <Link href={`/home/user/${item?.creador_id}`} className="imagen-de-comentario">
+            <Avvvatars value={item?.email ?? datosLogueo?.email ?? 'default@example.com'} size={40} style="shape" />
+        </Link>
+        <div className="contenido-del-comentario">
+            <div className="nombre-email-fecha">
+                <Link href={`/home/user/${item?.creador_id}`} className="nombre">
+                    <p> {item?.nombre ? item?.nombre : datosLogueo?.nombre} </p>
+                </Link>
+                <Link href={`/home/user/${item?.creador_id}`} className="email-y-fecha">
+                    <p> {item?.email ? item?.email : datosLogueo?.email} - {formatearFecha(item?.comentario_created_at, 'LLL')} </p>
+                </Link>
+                <div className="solo-email">
+                    <p> {item?.email ? item?.email : datosLogueo?.email} </p>
+                </div>
+            </div>
+            <div className="contenido">
+                <p> {item?.comentario_contenido ? item?.comentario_contenido : item?.contenido} </p>
+            </div>
+            <div className="likes-de-comentario">
+                <div className="icono-cantidad-likes">
+                    <button
+                        type="button"
+                        className="icono"
+                        aria-label="Dar like a este comentario"
+                        onClick={() => darLike(item?.comentario_id, arrayComentarios, setArrayComentarios)}
+                    >
+                        <FaHeart className="icon" />
+                    </button>
+                    <div className="cantidad-likes">
+                        <p> {item?.comentario_likes || 0} </p>
+                    </div>
+                </div>
+                <div className="fecha">
+                    <p> {formatearFecha(item?.comentario_created_at, 'lll')} </p>
+                </div>
+            </div>
+        </div>
+    </div>
+);
+
 const Comentarios: React.FC<{ dataPosteo: IPosteo }> = ({ dataPosteo }) => {
     const datosLogueo = useStore((s) => s.datosLogueo);
     const getCookieLogueo = useStore((s) => s.getCookieLogueo);
     const [comentario, setComentario] = useState<number>(0);
     const [contenido, setContenido] = useState<string>("");
     const [arrayComentarios, setArrayComentarios] = useState<IArrayComentarios[]>([]);
+    const [respondiendoA, setRespondiendoA] = useState<number | null>(null);
+    const [contenidoRespuesta, setContenidoRespuesta] = useState<string>("");
 
     useEffect(() => {
         getCookieLogueo();
@@ -93,6 +143,35 @@ const Comentarios: React.FC<{ dataPosteo: IPosteo }> = ({ dataPosteo }) => {
         }
     }, [dataPosteo?.posteo_id])
 
+    const comentariosRaiz = useMemo(
+        () => arrayComentarios.filter((c) => !c.parent_id),
+        [arrayComentarios]
+    );
+
+    const respuestasPorPadre = useMemo(() => {
+        const mapa = new Map<number, IArrayComentarios[]>();
+        arrayComentarios.forEach((c) => {
+            if (!c.parent_id) return;
+            const existentes = mapa.get(c.parent_id) ?? [];
+            mapa.set(c.parent_id, [...existentes, c]);
+        });
+        return mapa;
+    }, [arrayComentarios]);
+
+    const enviarRespuesta = (event: React.FormEvent<HTMLFormElement>, parentId: number) => {
+        comentar(
+            event,
+            dataPosteo,
+            arrayComentarios,
+            setArrayComentarios,
+            contenidoRespuesta,
+            setContenidoRespuesta,
+            datosLogueo as DatosLogueo,
+            parentId
+        );
+        setRespondiendoA(null);
+    };
+
     return (
         <section>
             <div className="parte-comentarios">
@@ -115,47 +194,56 @@ const Comentarios: React.FC<{ dataPosteo: IPosteo }> = ({ dataPosteo }) => {
 
             <Toaster />
 
-            {arrayComentarios && arrayComentarios.length > 0 && (
+            {comentariosRaiz.length > 0 && (
                 <div className="contenedor-comentarios-de-publicacion">
-                    {arrayComentarios?.map((item, index: number) => (
-                        <div className="comentarios-de-publicacion" key={index}>
-                            <Link href={`/home/user/${item?.creador_id}`} className="imagen-de-comentario">
-                                <Avvvatars value={item?.email ?? datosLogueo?.email ?? 'default@example.com'} size={40} style="shape" />
-                            </Link>
-                            <div className="contenido-del-comentario">
-                                <div className="nombre-email-fecha">
-                                    <Link href={`/home/user/${item?.creador_id}`} className="nombre">
-                                        <p> {item?.nombre ? item?.nombre : datosLogueo?.nombre} </p>
-                                    </Link>
-                                    <Link href={`/home/user/${item?.creador_id}`} className="email-y-fecha">
-                                        <p> {item?.email ? item?.email : datosLogueo?.email} - {formatearFecha(item?.comentario_created_at, 'LLL')} </p>
-                                    </Link>
-                                    <div className="solo-email">
-                                        <p> {item?.email ? item?.email : datosLogueo?.email} </p>
-                                    </div>
-                                </div>
-                                <div className="contenido">
-                                    <p> {item?.comentario_contenido ? item?.comentario_contenido : item?.contenido } </p>
-                                </div>
-                                <div className="likes-de-comentario">
-                                    <div className="icono-cantidad-likes">
-                                        <button
-                                            type="button"
-                                            className="icono"
-                                            aria-label="Dar like a este comentario"
-                                            onClick={() => darLike(item?.comentario_id, arrayComentarios, setArrayComentarios)}
-                                        >
-                                            <FaHeart className="icon" />
-                                        </button>
-                                        <div className="cantidad-likes">
-                                            <p> {item?.comentario_likes || 0} </p>
-                                        </div>
-                                    </div>
-                                    <div className="fecha">
-                                        <p> {formatearFecha(item?.comentario_created_at, 'lll')} </p>
-                                    </div>
-                                </div>
+                    {comentariosRaiz.map((item) => (
+                        <div key={item.comentario_id} className="hilo-comentario">
+                            <ComentarioItem
+                                item={item}
+                                datosLogueo={datosLogueo as DatosLogueo}
+                                arrayComentarios={arrayComentarios}
+                                setArrayComentarios={setArrayComentarios}
+                            />
+
+                            <div className="acciones-hilo">
+                                <button
+                                    type="button"
+                                    className="boton-responder"
+                                    onClick={() => setRespondiendoA(respondiendoA === item.comentario_id ? null : item.comentario_id)}
+                                >
+                                    {respondiendoA === item.comentario_id ? 'Cancelar' : 'Responder'}
+                                </button>
                             </div>
+
+                            {respondiendoA === item.comentario_id && (
+                                <form
+                                    className="form-respuesta"
+                                    onSubmit={(event) => enviarRespuesta(event, item.comentario_id)}
+                                >
+                                    <textarea
+                                        value={contenidoRespuesta}
+                                        onChange={(e) => setContenidoRespuesta(e.target.value)}
+                                        maxLength={700}
+                                        placeholder="Escribí tu respuesta..."
+                                        required
+                                    />
+                                    <button type="submit">Responder</button>
+                                </form>
+                            )}
+
+                            {(respuestasPorPadre.get(item.comentario_id) ?? []).length > 0 && (
+                                <div className="respuestas-de-comentario">
+                                    {(respuestasPorPadre.get(item.comentario_id) ?? []).map((respuesta) => (
+                                        <ComentarioItem
+                                            key={respuesta.comentario_id}
+                                            item={respuesta}
+                                            datosLogueo={datosLogueo as DatosLogueo}
+                                            arrayComentarios={arrayComentarios}
+                                            setArrayComentarios={setArrayComentarios}
+                                        />
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>

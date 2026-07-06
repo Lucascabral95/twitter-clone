@@ -1,0 +1,101 @@
+.notificaciones {
+    width: 100%;
+    padding: 32px 0 0 0;
+
+    .contenedor-notificaciones {
+        width: 100%;
+        padding: 0 16px;
+
+        .titulo-notificaciones {
+            color: var(--letra-titular);
+            font-size: 22px;
+            font-weight: bolder;
+            margin: 0 0 16px 0;
+        }
+
+        .estado-notificaciones {
+            color: var(--color-gris);
+            font-size: 15px;
+        }
+
+        .lista-notificaciones {
+            width: 100%;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+
+            .item-notificacion {
+                width: 100%;
+                border-bottom: 0.5px solid rgba(128, 128, 128, 0.355);
+
+                &.no-leida {
+                    background-color: rgba(255, 255, 255, 0.05);
+                }
+
+                .contenido-notificacion {
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    padding: 12px 8px;
+                    gap: 12px;
+
+                    &:hover {
+                        transition: 0.2s ease-in-out;
+                        background-color: rgba(255, 255, 255, 0.07);
+                    }
+
+                    .icono-tipo {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 24px;
+
+                        .icon {
+                            font-size: 20px;
+                        }
+
+                        .icono-like {
+                            color: red;
+                        }
+
+                        .icono-comentario {
+                            color: var(--color-llamativo);
+                        }
+
+                        .icono-reposteo {
+                            color: #17bf63;
+                        }
+
+                        .icono-follow {
+                            color: var(--color-llamativo);
+                        }
+                    }
+
+                    .imagen-actor {
+                        flex-shrink: 0;
+                    }
+
+                    .texto-notificacion {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 2px;
+
+                        p {
+                            color: var(--letra-titular);
+                            font-size: 14.5px;
+
+                            strong {
+                                font-weight: 700;
+                            }
+                        }
+
+                        .fecha-notificacion {
+                            color: var(--color-gris);
+                            font-size: 12.5px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

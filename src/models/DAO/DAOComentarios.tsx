@@ -10,6 +10,7 @@ interface Comentarios {
     id: number;
     emisor_id: number;
     id_del_posteo: number;
+    parent_id: number | null;
     likes: number;
     contenido: string;
     created_at: string;
@@ -20,6 +21,7 @@ interface ComentariosDePosteos {
     comentario_id: number;
     emisor_id: number;
     id_del_posteo: number;
+    parent_id: number | null;
     comentario_likes: number;
     comentario_contenido: string;
     comentario_created_at: string;
@@ -41,7 +43,8 @@ interface ComentariosDePosteos {
 interface CreacionComentario {
     emisor_id: number;
     id_del_posteo: number;
-    contenido: string
+    contenido: string;
+    parent_id?: number | null;
 }
 
 class DAOComentarios {
@@ -68,7 +71,7 @@ class DAOComentarios {
 
             const data = await db();
             const comments = await data`
-                select comentario_id, emisor_id, id_del_posteo, comentario_likes, comentario_contenido,
+                select comentario_id, emisor_id, id_del_posteo, parent_id, comentario_likes, comentario_contenido,
                        comentario_created_at, comentario_updated_at, posteo_id, titulo, posteo_contenido,
                        posteo_created_at, posteo_updated_at, creador_id, posteo_likes, usuario_id,
                        nombre, email, identificador
@@ -88,8 +91,8 @@ class DAOComentarios {
     async createComment(comment: CreacionComentario): Promise<Comentarios> {
         try {
             const data = await db();
-            const newComment = await data`insert into comentarios (emisor_id, id_del_posteo, contenido) 
-            values (${comment.emisor_id}, ${comment.id_del_posteo}, ${comment.contenido}) returning *`;
+            const newComment = await data`insert into comentarios (emisor_id, id_del_posteo, contenido, parent_id)
+            values (${comment.emisor_id}, ${comment.id_del_posteo}, ${comment.contenido}, ${comment.parent_id ?? null}) returning *`;
 
             if (newComment.length === 0) {
                 throw { error: "Error al crear el comentario", status: 400 } as CustomError;

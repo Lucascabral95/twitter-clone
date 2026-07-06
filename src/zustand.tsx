@@ -8,6 +8,10 @@ interface Dat {
     tipoDeBusqueda: string;
 }
 
+// Cancela la búsqueda anterior cuando llega una nueva: evita que una respuesta lenta
+// y obsoleta pise el resultado de una búsqueda más reciente (carrera de requests).
+let searchAbortController: AbortController | null = null;
+
 interface Logueo {
     id: number;
     email: string;
@@ -355,6 +359,8 @@ const useStore = create<StoreState>((set, get) => ({
     },
 
     obtenerResultadosDeBusqueda: async (response: Dat): Promise<void> => {
+        searchAbortController?.abort();
+
         try {
             const { busqueda, tipoDeBusqueda } = response;
 
@@ -363,12 +369,18 @@ const useStore = create<StoreState>((set, get) => ({
                 return;
             }
 
+            const controller = new AbortController();
+            searchAbortController = controller;
+
             const endpoint = tipoDeBusqueda === 'usuarios' ? '/api/usuario' : '/api/posteo';
-            const results = await axios.get(`${endpoint}?q=${encodeURIComponent(busqueda)}`);
+            const results = await axios.get(`${endpoint}?q=${encodeURIComponent(busqueda)}`, { signal: controller.signal });
             const data: Posteos[] = results.status === 200 ? (results.data.result || []) : [];
 
             set({ arrayDeBusqueda: data, posteosTotales: data.length });
         } catch (error) {
+            if (axios.isCancel(error)) {
+                return;
+            }
             if (error instanceof AxiosError) {
                 const errorMessage = error.response?.data?.error || error.message || "Error desconocido";
                 logger.error("Error al obtener resultados de búsqueda:", errorMessage);

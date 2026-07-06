@@ -218,27 +218,82 @@ class DAOPosteos {
     async deletePosteoByID(id: number): Promise<Posteos> {
         try {
             const data = await db();
-            const deletedPosteo = await data`delete from posteos where id = ${id}`;
+            const deletedPosteo = await data`delete from posteos where id = ${id} returning *`;
+
+            if (deletedPosteo.length === 0) {
+                throw { error: "Posteo no encontrado", status: 404 } as CustomError;
+            }
+
             return deletedPosteo[0] as Posteos;
         } catch (error) {
             throw error as CustomError;
         }
     }
 
-    async addLikePosteo(id: number): Promise<Posteos> {
+    async updatePosteo(id: number, cambios: { titulo?: string; contenido?: string }): Promise<Posteos> {
         try {
-
-            if (isNaN(Number(id))) {
-                throw { error: "Error al dar like al posteo", status: 400 } as CustomError;
-            }
             const data = await db();
-            const posteo = await data`update posteos set likes = likes + 1 where id = ${id} returning *`;
+            const updated = await data`
+                update posteos
+                set titulo = coalesce(${cambios.titulo ?? null}, titulo),
+                    contenido = coalesce(${cambios.contenido ?? null}, contenido),
+                    updated_at = now()
+                where id = ${id}
+                returning *
+            `;
 
-            if (posteo.length === 0) {
+            if (updated.length === 0) {
+                throw { error: "Posteo no encontrado", status: 404 } as CustomError;
+            }
+
+            return updated[0] as Posteos;
+        } catch (error) {
+            throw error as CustomError;
+        }
+    }
+
+    // Like idempotente por usuario respaldado por `posteos_likes`: si no existía el par
+    // (usuario, posteo) lo crea y suma; si ya existía, lo borra y resta (unlike). El
+    // conteo denormalizado `posteos.likes` se mantiene en sync en el mismo método.
+    async toggleLike(usuarioId: number, posteoId: number): Promise<{ liked: boolean; likes: number; creador_id: number | null }> {
+        try {
+            if (isNaN(Number(usuarioId)) || isNaN(Number(posteoId))) {
                 throw { error: "Error al dar like al posteo", status: 400 } as CustomError;
             }
 
-            return posteo[0] as Posteos;
+            const data = await db();
+            const inserted = await data`
+                insert into posteos_likes (usuario_id, posteo_id) values (${usuarioId}, ${posteoId})
+                on conflict (usuario_id, posteo_id) do nothing
+                returning *
+            `;
+
+            if (inserted.length > 0) {
+                const posteo = await data`update posteos set likes = likes + 1 where id = ${posteoId} returning likes, creador_id`;
+                return { liked: true, likes: posteo[0]?.likes ?? 0, creador_id: posteo[0]?.creador_id ?? null };
+            }
+
+            await data`delete from posteos_likes where usuario_id = ${usuarioId} and posteo_id = ${posteoId}`;
+            const posteo = await data`update posteos set likes = greatest(likes - 1, 0) where id = ${posteoId} returning likes, creador_id`;
+
+            return { liked: false, likes: posteo[0]?.likes ?? 0, creador_id: posteo[0]?.creador_id ?? null };
+        } catch (error) {
+            throw error as CustomError;
+        }
+    }
+
+    async getPosteoLikeadoPorUsuario(usuarioId: number, posteoId: number): Promise<boolean> {
+        try {
+            if (isNaN(Number(usuarioId)) || isNaN(Number(posteoId))) {
+                return false;
+            }
+
+            const data = await db();
+            const rows = await data`
+                select 1 from posteos_likes where usuario_id = ${usuarioId} and posteo_id = ${posteoId}
+            `;
+
+            return rows.length > 0;
         } catch (error) {
             throw error as CustomError;
         }

@@ -15,4 +15,5 @@ export interface IIPosteo {
     posteo_contenido: string;
     comentarios_count?: number;
     reposteos_count?: number;
+    ya_likeado?: boolean;
 }
