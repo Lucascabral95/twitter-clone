@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
 import DAODatosPersonales from "@/models/DAO/DAODatosPersonales";
-
-interface CustomError {
-    error: string;
-    status: number;
-}
+import { CustomError } from "@/infrastructure/interfaces";
+import { handleRouteError } from "@/infrastructure/http/handleRouteError";
 
 export async function GET(req: Request, { params }: { params: { id: number } }) {
     const { id } = params;
@@ -18,13 +15,7 @@ export async function GET(req: Request, { params }: { params: { id: number } }) 
 
         return NextResponse.json({ result: results }, { status: 200 });
     } catch (error) {
-        const CustomError = error as CustomError;
-
-        if (CustomError && CustomError.error && CustomError.status) {
-            return NextResponse.json({ error: CustomError.error }, { status: CustomError.status });
-        } else {
-            return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-        }
+        return handleRouteError(error);
     }
 }
 
@@ -48,13 +39,7 @@ export async function POST(req: Request, { params }: { params: { id: number } })
 
         return NextResponse.json({ result: results }, { status: 200 });
     } catch (error) {
-        const CustomError = error as CustomError;
-
-        if (CustomError && CustomError.error && CustomError.status) {
-            return NextResponse.json({ error: CustomError.error }, { status: CustomError.status });
-        } else {
-            return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-        }
+        return handleRouteError(error);
     }
 }
 
@@ -78,12 +63,6 @@ export async function PUT(req: Request, { params }: { params: { id: number } }) 
 
         return NextResponse.json({ result: results }, { status: 200 });
     } catch (error) {
-        const CustomError = error as CustomError;
-
-        if (CustomError && CustomError.error && CustomError.status) {
-            return NextResponse.json({ error: CustomError.error }, { status: CustomError.status });
-        } else {
-            return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-        }
+        return handleRouteError(error);
     }
 }

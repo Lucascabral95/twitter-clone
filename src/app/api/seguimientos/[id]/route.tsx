@@ -1,11 +1,7 @@
 import { NextResponse } from "next/server";
 import DAOSeguimientos from "@/models/DAO/DAOSeguimientos";
 import { getSessionUser } from "@/infrastructure/auth/session";
-
-interface CustomError {
-    error: string;
-    status: number;
-}
+import { handleRouteError } from "@/infrastructure/http/handleRouteError";
 
 export async function POST(req: Request) {
     try {
@@ -21,13 +17,7 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ result: results }, { status: 200 });
     } catch (error) {
-        const customError = error as CustomError;
-
-        if (customError && customError.error && customError.status) {
-            return NextResponse.json({ error: customError.error }, { status: customError.status });
-        } else {
-            return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-        }
+        return handleRouteError(error);
     }
 }
 
@@ -38,13 +28,7 @@ export async function GET(req: Request, { params }: { params: { id: number } }) 
 
         return NextResponse.json({ result: results }, { status: 200 });
     } catch (error) {
-        const customError = error as CustomError;
-
-        if (customError && customError.error && customError.status) {
-            return NextResponse.json({ error: customError.error }, { status: customError.status });
-        } else {
-            return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-        }
+        return handleRouteError(error);
     }
 }
 
@@ -62,12 +46,6 @@ export async function DELETE(req: Request) {
 
         return NextResponse.json({ result: results }, { status: 200 });
     } catch (error) {
-        const customError = error as CustomError;
-
-        if (customError && customError.error && customError.status) {
-            return NextResponse.json({ error: customError.error }, { status: customError.status });
-        } else {
-            return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-        }
+        return handleRouteError(error);
     }
 }

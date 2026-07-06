@@ -30,18 +30,6 @@ interface CreacionPosteo {
 // tabla base `posteos`. Los SELECT son de columnas explícitas: si la vista cambia de forma,
 // esto falla ruidosamente en vez de arrastrar un drift de esquema silencioso.
 class DAOPosteos {
-    constructor() {
-        this.initializeDB();
-    }
-
-    async initializeDB(): Promise<void> {
-        try {
-            await db();
-        } catch (error) {
-            throw error as CustomError;
-        }
-    }
-
     async getAllPosteos(): Promise<Posteos[]> {
         try {
             const data = await db();

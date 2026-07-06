@@ -1,10 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import DAOUsuarios from "@/models/DAO/DAOUsuarios";
-
-interface CustomError {
-    error: string;
-    status: number;
-}
+import { handleRouteError } from "@/infrastructure/http/handleRouteError";
 
 export async function GET(req: NextRequest) {
     try {
@@ -13,12 +9,6 @@ export async function GET(req: NextRequest) {
 
         return NextResponse.json({ result: results }, { status: 200 });
     } catch (error) {
-        const customError = error as CustomError;
-
-        if (customError && customError.error && customError.status) {
-            return NextResponse.json({ error: customError.error }, { status: customError.status });
-        } else {
-            return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-        }
+        return handleRouteError(error);
     }
 }
