@@ -7,9 +7,16 @@ interface CustomError {
     status: number;
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
     try {
-        const results = await DAOPosteos.getAllPosteos();
+        const creadorId = req.nextUrl.searchParams.get("creador_id");
+        const q = req.nextUrl.searchParams.get("q");
+
+        const results = q
+            ? await DAOPosteos.searchPosteos(q)
+            : creadorId
+                ? await DAOPosteos.getPosteosByCreador(Number(creadorId))
+                : await DAOPosteos.getAllPosteos();
 
         if (!results) {
             return NextResponse.json({ result: "Error al obtener los posteos" }, { status: 400 });

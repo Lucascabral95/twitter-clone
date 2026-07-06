@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import DAOUsuarios from "@/models/DAO/DAOUsuarios";
 
 interface CustomError {
@@ -6,9 +6,10 @@ interface CustomError {
     status: number;
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
     try {
-        const results = await DAOUsuarios.getAllUsers();
+        const q = req.nextUrl.searchParams.get("q");
+        const results = q ? await DAOUsuarios.searchUsuarios(q) : await DAOUsuarios.getAllUsers();
 
         return NextResponse.json({ result: results }, { status: 200 });
     } catch (error) {
