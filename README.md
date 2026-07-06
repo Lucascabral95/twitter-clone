@@ -86,6 +86,7 @@ Para simular servicios HTTP se mockean los módulos de infraestructura y el stor
 - [Instalación](#instalación)
 - [Uso](#uso)
 - [Variables de entorno](#variables-de-entorno)
+- [Base de datos y migraciones](#base-de-datos-y-migraciones)
 - [Estructura del proyecto](#estructura-del-proyecto)
 - [Arquitectura](#arquitectura)
 - [Rutas de la Aplicación](#rutas-de-la-aplicación)
@@ -124,7 +125,21 @@ Para simular servicios HTTP se mockean los módulos de infraestructura y el stor
    ORIGINAL_URL=http://localhost:3000
    ```
 
-4. **Levantar el entorno de desarrollo**
+4. **Crear el esquema de la base de datos**
+
+   ```bash
+   npm run db:migrate
+   ```
+
+   Ver la sección [Base de datos y migraciones](#base-de-datos-y-migraciones) para más detalle.
+
+5. **(Opcional) Poblar la base con datos de ejemplo**
+
+   ```bash
+   npm run db:seed
+   ```
+
+6. **Levantar el entorno de desarrollo**
 
    ```bash
    npm run dev
@@ -141,6 +156,9 @@ Para simular servicios HTTP se mockean los módulos de infraestructura y el stor
 - **Servidor producción:** `npm start`
 - **Analizar errores de lint:** `npm run lint`
 - **Pruebas unitarias:** `npm test`
+- **Migrar la base de datos:** `npm run db:migrate`
+- **Poblar la base con datos de ejemplo:** `npm run db:seed`
+- **Recrear la base desde cero (destructivo):** `npm run db:reset`
 
 ---
 
@@ -151,6 +169,37 @@ Para simular servicios HTTP se mockean los módulos de infraestructura y el stor
 | `JWT_SECRET`   | Clave para firmar y validar JWT                   |
 | `DATABASE_URL` | Cadena de conexión a Neon Serverless PostgreSQL   |
 | `ORIGINAL_URL` | URL base utilizada para redirecciones y cookies   |
+
+---
+
+## Base de datos y migraciones
+
+El proyecto no usa un ORM ni un framework de migraciones (Prisma, Drizzle, etc.): las consultas son SQL crudo vía `@neondatabase/serverless` en las clases DAO (`src/models/DAO/`). El **esquema completo** vive versionado en `sql/migrations/` y se aplica con scripts propios en `scripts/`, así que cambiar de base de datos (por ejemplo apuntar a una Neon nueva) es tan simple como correr un comando.
+
+### Comandos
+
+```bash
+npm run db:migrate   # Crea las tablas/vistas que falten. Seguro e idempotente: se puede correr las veces que quieras.
+npm run db:seed      # Puebla la base con datos de ejemplo (usuarios, posteos, comentarios, seguimientos, reposteos).
+npm run db:reset     # DESTRUCTIVO: borra todas las tablas conocidas y vuelve a migrar + poblar. Pide confirmación ("yes").
+```
+
+### Cómo funciona
+
+- `sql/migrations/*.sql` son snapshots de esquema numerados (`001_initial_schema.sql`, `002_...`, …), aplicados en orden.
+- `scripts/migrate.mjs` registra cada migración aplicada en una tabla de control `schema_migrations`, así que solo ejecuta las que faltan. Correrlo sobre una base que ya tiene todo no rompe nada (usa `create table if not exists` / `create or replace view`).
+- `scripts/seed.mjs` inserta un dataset de ejemplo (5 usuarios, posteos, comentarios, seguimientos y reposteos) y es seguro de re-ejecutar: si detecta que los usuarios demo ya tienen contenido, no duplica nada.
+- `npm run db:reset` (`migrate.mjs --fresh` + `seed.mjs`) borra **todas** las tablas y vistas conocidas antes de recrear el esquema — pensado para desarrollo local, pide confirmación explícita para evitar borrar datos reales por accidente (usar `--force` para saltarla en CI).
+
+### Cambiar de base de datos
+
+1. Actualizá `DATABASE_URL` en `.env` apuntando a la Neon nueva (o cualquier Postgres compatible).
+2. Corré `npm run db:migrate` — crea las 8 tablas (`usuarios`, `posteos`, `datos_personales`, `comentarios`, `reposteos`, `seguimientos`, `seguidores`, `refresh_tokens`) y las 4 vistas (`usuarios_posteos`, `comentarios_de_posteos_new`, `seguimientos_usuarios`, `reposteos_usuarios`) que usa la app.
+3. (Opcional) Corré `npm run db:seed` para tener usuarios y contenido de prueba de entrada. Credenciales demo: cualquier email `*@seed.local` listado en la salida del comando, contraseña `Password1`.
+
+### Agregar una migración nueva
+
+Sumá un archivo `sql/migrations/00N_descripcion.sql` con sentencias idempotentes (`create table if not exists`, `create or replace view`, `alter table ... add column if not exists`, etc.) y corré `npm run db:migrate`; el runner detecta el archivo nuevo y solo aplica lo que falta.
 
 ---
 
@@ -199,7 +248,6 @@ Cada capa se comunica mediante interfaces tipadas y funciones puras, favoreciend
 | Ruta              | Componente          | Descripción                                     |
 |-------------------|---------------------|-------------------------------------------------|
 | `/`               | Landing             | Página inicial con modales de login/register    |
-| `/login`          | Login               | Autenticación de usuarios                       |
 | `/not-found`      | NotFound            | Página de error genérica                        |
 
 ### Rutas Protegidas
