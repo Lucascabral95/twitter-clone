@@ -1,7 +1,15 @@
 import { NextResponse, NextRequest } from "next/server";
 import DAOUsuarios from "@/models/DAO/DAOUsuarios";
+import DAORefreshTokens from "@/models/DAO/DAORefreshTokens";
 import { v4 as uuidv4 } from "uuid";
 import { handleRouteError } from "@/infrastructure/http/handleRouteError";
+import {
+  signSession,
+  generarRefreshToken,
+  setAccessCookie,
+  setRefreshCookie,
+  SessionPayload,
+} from "@/infrastructure/auth/session";
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,6 +25,22 @@ export async function POST(req: NextRequest) {
       password: password,
       identificador: uuidv4(),
     });
+
+    const payload: SessionPayload = {
+      id: user.id,
+      nombre: user.nombre,
+      email: user.email,
+      identificador: user.identificador,
+      fecha_creacion: user.fecha_creacion,
+    };
+
+    const accessToken = await signSession(payload);
+    const { token: refreshToken, tokenHash, expira } = generarRefreshToken();
+
+    await DAORefreshTokens.crear(user.id, tokenHash, expira);
+
+    setAccessCookie(accessToken);
+    setRefreshCookie(refreshToken);
 
     return NextResponse.json({ result: user }, { status: 201 });
 

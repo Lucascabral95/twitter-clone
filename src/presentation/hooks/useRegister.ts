@@ -1,58 +1,27 @@
-import { useState, useCallback } from 'react';
-import { registerSchema } from '@/infrastructure/validation/registerSchema';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-import { RegisterCredentials, ValidationErrors } from '@/infrastructure/interfaces';
+import { registerSchema, RegisterFormData } from '@/infrastructure/validation';
 import { authService } from '@/infrastructure/services/authService.service';
 
-export const useRegister = (
-  onSuccess: () => void,
-  onSwitchLogin: () => void
-) => {
-  const [error, setError] = useState<ValidationErrors>({});
-  const [errorSimple, setErrorSimple] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+export const useRegister = (onSuccess: () => void) => {
+  const router = useRouter();
+  const form = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+    mode: 'onChange',
+  });
 
-  const handleRegister = useCallback(
-    async (event: React.FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
-      const formData = new FormData(event.currentTarget);
+  const onSubmit = form.handleSubmit(async data => {
+    const result = await authService.register(data);
 
-      const credentials: RegisterCredentials = {
-        nombre: formData.get('nombre') as string,
-        email: formData.get('email') as string,
-        password: formData.get('password') as string,
-      };
+    if (result?.success) {
+      onSuccess();
+      router.push('/home');
+    } else {
+      form.setError('root', { message: result?.error ?? 'Error al crear la cuenta' });
+    }
+  });
 
-      // Validar con Zod
-      const validation = registerSchema.safeParse(credentials);
-
-      if (!validation.success) {
-        setError(validation.error.flatten().fieldErrors);
-        setErrorSimple(null);
-        return;
-      }
-
-      setError({});
-      setIsLoading(true);
-
-      const result = await authService.register(credentials);
-
-      if (result?.success) {
-        onSuccess();
-        onSwitchLogin();
-      } else {
-        setErrorSimple(result?.error);
-      }
-
-      setIsLoading(false);
-    },
-    [onSuccess, onSwitchLogin]
-  );
-
-  return {
-    error,
-    errorSimple,
-    isLoading,
-    handleRegister,
-  };
+  return { ...form, onSubmit };
 };

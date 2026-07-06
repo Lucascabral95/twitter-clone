@@ -1,9 +1,15 @@
 import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
+import { randomBytes, createHash } from "crypto";
 
-export const SESSION_COOKIE = "myToken";
-export const TOKEN_EXPIRY = "7d";
-export const MAX_AGE = 60 * 60 * 24 * 7;
+import {
+  ACCESS_COOKIE,
+  REFRESH_COOKIE,
+  ACCESS_EXPIRY,
+  ACCESS_MAX_AGE,
+  REFRESH_MAX_AGE,
+  getSecretKey,
+} from "./constants";
 
 export interface SessionPayload {
   id: number;
@@ -13,19 +19,25 @@ export interface SessionPayload {
   fecha_creacion: string;
 }
 
-const getSecretKey = () => new TextEncoder().encode(process.env.JWT_SECRET as string);
+const cookieOptions = (maxAge: number) => ({
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "strict" as const,
+  path: "/",
+  maxAge,
+});
 
 export const signSession = async (payload: SessionPayload): Promise<string> => {
   return new SignJWT({ ...payload })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime(TOKEN_EXPIRY)
+    .setExpirationTime(ACCESS_EXPIRY)
     .sign(getSecretKey());
 };
 
 export const getSessionUser = async (): Promise<SessionPayload | null> => {
   try {
-    const token = cookies().get(SESSION_COOKIE)?.value;
+    const token = cookies().get(ACCESS_COOKIE)?.value;
 
     if (!token) return null;
 
@@ -35,4 +47,28 @@ export const getSessionUser = async (): Promise<SessionPayload | null> => {
   } catch {
     return null;
   }
+};
+
+export const generarRefreshToken = () => {
+  const token = randomBytes(32).toString("hex");
+  const tokenHash = createHash("sha256").update(token).digest("hex");
+  const expira = new Date(Date.now() + REFRESH_MAX_AGE * 1000);
+
+  return { token, tokenHash, expira };
+};
+
+export const hashRefreshToken = (token: string): string =>
+  createHash("sha256").update(token).digest("hex");
+
+export const setAccessCookie = (token: string): void => {
+  cookies().set(ACCESS_COOKIE, token, cookieOptions(ACCESS_MAX_AGE));
+};
+
+export const setRefreshCookie = (token: string): void => {
+  cookies().set(REFRESH_COOKIE, token, cookieOptions(REFRESH_MAX_AGE));
+};
+
+export const clearAuthCookies = (): void => {
+  cookies().delete(ACCESS_COOKIE);
+  cookies().delete(REFRESH_COOKIE);
 };
