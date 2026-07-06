@@ -45,7 +45,10 @@ class DAODatosPersonales {
             }
 
             const data = await db();
-            const datos = await data`select * from datos_personales where usuario_id = ${id}`;
+            const datos = await data`
+                select id, biografia, localizacion, sitio_web, cumpleanos, usuario_id, created_at, updated_at
+                from datos_personales where usuario_id = ${id}
+            `;
 
             if (datos.length === 0) {
                 throw { error: "Sin datos", status: 404 };

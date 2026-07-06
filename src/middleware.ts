@@ -9,6 +9,7 @@ const PUBLIC_API_PATHS = [
   "/api/auth/register",
   "/api/auth/logout",
   "/api/auth/refresh",
+  "/api/health",
 ];
 
 export async function middleware(request: Request) {

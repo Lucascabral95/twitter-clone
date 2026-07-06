@@ -48,9 +48,12 @@ class DAOComentarios {
     async getAllComments(): Promise<Comentarios[]> {
         try {
             const data = await db();
-            const comments = await data`select * from comentarios order by created_at asc`;
+            const comments = await data`
+                select id, emisor_id, id_del_posteo, likes, contenido, created_at, updated_at
+                from comentarios order by created_at asc
+            `;
 
-            return comments as Comentarios[]; 
+            return comments as Comentarios[];
         } catch (error) {
             throw error as CustomError;
         }
@@ -63,13 +66,19 @@ class DAOComentarios {
             }
 
             const data = await db();
-            const comments = await data`select * from comentarios_de_posteos_new where id_del_posteo = ${id} order by comentario_created_at asc`;
+            const comments = await data`
+                select comentario_id, emisor_id, id_del_posteo, comentario_likes, comentario_contenido,
+                       comentario_created_at, comentario_updated_at, posteo_id, titulo, posteo_contenido,
+                       posteo_created_at, posteo_updated_at, creador_id, posteo_likes, usuario_id,
+                       nombre, email, identificador
+                from comentarios_de_posteos_new where id_del_posteo = ${id} order by comentario_created_at desc
+            `;
 
             if (comments.length === 0) {
                 throw { error: "No existen comentarios para este posteo", status: 404 } as CustomError;
             }
 
-            return comments.reverse() as ComentariosDePosteos[];
+            return comments as ComentariosDePosteos[];
         } catch (error) {
             throw error as CustomError;
         }

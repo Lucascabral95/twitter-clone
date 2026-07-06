@@ -8,7 +8,7 @@ import Loading from '@/components/Loading/Loading';
 import { useUserData } from '@/presentation/hooks';
 
 const UserID: React.FC = () => {
-  const { error, loading, posteosUser, userId } = useUserData();
+  const { error, loading, posteosUser, userId, hasMoreTweetsUser, loadMoreTweetsUser } = useUserData();
 
   if (loading) {
     return <Loading />;
@@ -19,7 +19,12 @@ const UserID: React.FC = () => {
       {!error ? (
         <>
           <HeaderDinamico id={userId} />
-          <CardSecciones id={userId} publicaciones={posteosUser} />
+          <CardSecciones
+            id={userId}
+            publicaciones={posteosUser}
+            hasMorePublicaciones={hasMoreTweetsUser}
+            onLoadMorePublicaciones={loadMoreTweetsUser}
+          />
         </>
       ) : (
         <NotFound error={error} />

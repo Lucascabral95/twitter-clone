@@ -1,5 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // `ws` (usado por el Pool de @neondatabase/serverless) rompe su optimización
+  // nativa bufferutil si webpack lo bundlea para las Route Handlers: el require
+  // opcional se resuelve a un stub sin `.mask()` en vez de fallar limpiamente,
+  // y explota recién al enviar el primer frame real. Se lo excluye del bundle
+  // para que use el `require` nativo de Node en runtime.
+  experimental: {
+    serverComponentsExternalPackages: ["@neondatabase/serverless", "ws"],
+  },
   async headers() {
     return [
       {

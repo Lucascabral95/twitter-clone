@@ -170,11 +170,27 @@ Para simular servicios HTTP se mockean los módulos de infraestructura y el stor
 | `DATABASE_URL` | Cadena de conexión a Neon Serverless PostgreSQL   |
 | `ORIGINAL_URL` | URL base utilizada para redirecciones y cookies   |
 
+Variables opcionales del pool de conexiones (`src/services/db.ts`), todas con default sano si no se definen:
+
+| Variable               | Default | Descripción                                              |
+|------------------------|---------|-----------------------------------------------------------|
+| `DB_POOL_MAX`          | `10`    | Máximo de conexiones simultáneas en el pool                |
+| `DB_IDLE_TIMEOUT_MS`   | `30000` | Ms que una conexión ociosa espera antes de cerrarse         |
+| `DB_CONN_TIMEOUT_MS`   | `5000`  | Ms de espera para obtener una conexión antes de fallar      |
+| `DB_MAX_USES`          | `7500`  | Queries máximas por conexión antes de reciclarla            |
+| `DB_RETRY_ATTEMPTS`    | `3`     | Reintentos ante errores transitorios de conexión            |
+| `DB_RETRY_BASE_MS`     | `100`   | Delay base del backoff exponencial (con jitter)             |
+| `DB_RETRY_MAX_MS`      | `2000`  | Tope del delay entre reintentos                             |
+
 ---
 
 ## Base de datos y migraciones
 
-El proyecto no usa un ORM ni un framework de migraciones (Prisma, Drizzle, etc.): las consultas son SQL crudo vía `@neondatabase/serverless` en las clases DAO (`src/models/DAO/`). El **esquema completo** vive versionado en `sql/migrations/` y se aplica con scripts propios en `scripts/`, así que cambiar de base de datos (por ejemplo apuntar a una Neon nueva) es tan simple como correr un comando.
+El proyecto no usa un ORM ni un framework de migraciones (Prisma, Drizzle, etc.): las consultas son SQL crudo en las clases DAO (`src/models/DAO/`). El **esquema completo** vive versionado en `sql/migrations/` y se aplica con scripts propios en `scripts/`, así que cambiar de base de datos (por ejemplo apuntar a una Neon nueva) es tan simple como correr un comando.
+
+### Pool de conexiones
+
+`src/services/db.ts` mantiene un `Pool` de `@neondatabase/serverless` (WebSocket, no el driver HTTP) cacheado en `globalThis` — una sola instancia por proceso, con reintentos con backoff exponencial + jitter ante errores transitorios de conexión (nunca ante violaciones de constraint o errores de sintaxis), health check (`GET /api/health`, público) y graceful shutdown en `SIGTERM`/`SIGINT` (`pool.end()` antes de salir). Los DAO no cambian: siguen llamando `const data = await db(); await data\`select ...\`` — el shim tagged-template preserva ese contrato. `scripts/migrate.mjs` y `scripts/seed.mjs` intencionalmente siguen usando el driver HTTP `neon()` (son procesos one-shot que abren y cierran; el pool no aporta ahí).
 
 ### Comandos
 

@@ -11,18 +11,17 @@ class DAOSeguimientos {
   async createSeguimiento(idMio: number, idASeguir: number) {
     try {
 
-      const data = await db()
-      const fullSeguimiento = await data`select * from seguimientos where id_mio = ${idMio} and id_a_seguir = ${idASeguir}`;
-
-      if (fullSeguimiento.length > 0) {
-        throw { error: "Ya seguís a este usuario", status: 400 } as CustomError;
-      }
-
       if (isNaN(Number(idMio)) || isNaN(Number(idASeguir))) throw { error: "No se pudo seguir al usuario", status: 400 } as CustomError;
-      const result = await data`insert into seguimientos (id_mio, id_a_seguir) values (${idMio}, ${idASeguir}) returning *`;
+
+      const data = await db();
+      const result = await data`
+        insert into seguimientos (id_mio, id_a_seguir) values (${idMio}, ${idASeguir})
+        on conflict (id_mio, id_a_seguir) do nothing
+        returning *
+      `;
 
       if (!result || result.length === 0) {
-        throw { error: "No se pudo realizar el seguimiento", status: 404 } as CustomError;
+        throw { error: "Ya seguís a este usuario", status: 400 } as CustomError;
       }
 
       return result[0];
@@ -39,7 +38,10 @@ class DAOSeguimientos {
       }
 
       const data = await db();
-      const seguimientos = await data`select * from seguimientos_usuarios where id_mio = ${id}`;
+      const seguimientos = await data`
+        select id_seguimiento, id_mio, id_a_seguir, id, nombre, email, identificador, fecha_creacion
+        from seguimientos_usuarios where id_mio = ${id}
+      `;
 
       return seguimientos;
     } catch (error) {
@@ -55,7 +57,10 @@ class DAOSeguimientos {
       }
 
       const data = await db();
-      const seguimientos = await data`select * from seguimientos_usuarios where id_a_seguir = ${id}`;
+      const seguimientos = await data`
+        select id_seguimiento, id_mio, id_a_seguir, id, nombre, email, identificador, fecha_creacion
+        from seguimientos_usuarios where id_a_seguir = ${id}
+      `;
 
       return seguimientos;
     } catch (error) {
@@ -82,7 +87,10 @@ class DAOSeguimientos {
   async getSeguimientosFull() {
     try {
       const data = await db();
-      const seguimientos = await data`select * from seguimientos_usuarios`;
+      const seguimientos = await data`
+        select id_seguimiento, id_mio, id_a_seguir, id, nombre, email, identificador, fecha_creacion
+        from seguimientos_usuarios
+      `;
 
       return seguimientos;
     } catch (error) {

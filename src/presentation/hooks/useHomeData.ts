@@ -19,6 +19,8 @@ export const useHomeData = () => {
     posteosHome,
     getTweetsOfHome,
     change,
+    hasMoreTweetsHome,
+    loadMoreTweetsHome,
   } = useStore();
 
   useEffect(() => {
@@ -48,5 +50,7 @@ export const useHomeData = () => {
     misSeguidos,
     seguidores,
     posteosHome,
+    hasMoreTweetsHome,
+    loadMoreTweetsHome,
   };
 };

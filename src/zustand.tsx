@@ -55,6 +55,12 @@ interface SeguidosYSeguidores {
     fecha_creacion: string;
 }
 
+interface Pagination {
+    limit: number;
+    nextCursor: number | null;
+    hasMore: boolean;
+}
+
 interface StoreState {
     posteos: Posteos[];
     posteosUser: Posteos[];
@@ -87,6 +93,15 @@ interface StoreState {
     obtenerSeguidores: () => Promise<void>;
     posteosHome: Posteos[];
     getTweetsOfHome: () => Promise<void>;
+    hasMoreTweets: boolean;
+    nextCursorTweets: number | null;
+    loadMoreTweets: () => Promise<void>;
+    hasMoreTweetsUser: boolean;
+    nextCursorTweetsUser: number | null;
+    loadMoreTweetsUser: (id: number) => Promise<void>;
+    hasMoreTweetsHome: boolean;
+    nextCursorTweetsHome: number | null;
+    loadMoreTweetsHome: () => Promise<void>;
 }
 
 const useStore = create<StoreState>((set, get) => ({
@@ -106,6 +121,12 @@ const useStore = create<StoreState>((set, get) => ({
     misSeguidos: [],
     seguidores: [],
     posteosHome: [],
+    hasMoreTweets: false,
+    nextCursorTweets: null,
+    hasMoreTweetsUser: false,
+    nextCursorTweetsUser: null,
+    hasMoreTweetsHome: false,
+    nextCursorTweetsHome: null,
 
     getCookieLogueo: async (): Promise<void> => {
         try {
@@ -126,10 +147,36 @@ const useStore = create<StoreState>((set, get) => ({
     getAllTweets: async (): Promise<void> => {
         set({ loading: true });
         try {
-            const response = await axios.get('/api/posteo');
-            set({ posteos: response.data.result, loading: false, posteosTotales: response.data.result.length });
+            const response = await axios.get(`/api/posteo?limit=${get().limitFeed}`);
+            const pagination: Pagination | undefined = response.data.pagination;
+            set({
+                posteos: response.data.result,
+                loading: false,
+                posteosTotales: response.data.result.length,
+                nextCursorTweets: pagination?.nextCursor ?? null,
+                hasMoreTweets: pagination?.hasMore ?? false,
+            });
         } catch {
             set({ error: true, loading: false });
+        }
+    },
+
+    loadMoreTweets: async (): Promise<void> => {
+        const { nextCursorTweets, hasMoreTweets, limitFeed, posteos } = get();
+        if (!hasMoreTweets || nextCursorTweets === null) return;
+
+        try {
+            const response = await axios.get(`/api/posteo?limit=${limitFeed}&cursor=${nextCursorTweets}`);
+            const pagination: Pagination | undefined = response.data.pagination;
+            set({
+                posteos: [...posteos, ...response.data.result],
+                nextCursorTweets: pagination?.nextCursor ?? null,
+                hasMoreTweets: pagination?.hasMore ?? false,
+            });
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                logger.error('Error al cargar más posteos:', error.response?.data?.error ?? error.message);
+            }
         }
     },
 
@@ -207,8 +254,15 @@ const useStore = create<StoreState>((set, get) => ({
         set({ loading: true });
 
         try {
-            const response = await axios.get(`/api/posteo?creador_id=${Number(id)}`);
-            set({ posteosUser: response.data.result, loading: false, posteosTotales: response.data.result.length });
+            const response = await axios.get(`/api/posteo?creador_id=${Number(id)}&limit=${get().limit}`);
+            const pagination: Pagination | undefined = response.data.pagination;
+            set({
+                posteosUser: response.data.result,
+                loading: false,
+                posteosTotales: response.data.result.length,
+                nextCursorTweetsUser: pagination?.nextCursor ?? null,
+                hasMoreTweetsUser: pagination?.hasMore ?? false,
+            });
         } catch (error) {
             if (error instanceof AxiosError) {
                 set({ error: true, loading: false });
@@ -217,6 +271,25 @@ const useStore = create<StoreState>((set, get) => ({
                 } else {
                     logger.error('Unexpected error', error);
                 }
+            }
+        }
+    },
+
+    loadMoreTweetsUser: async (id: number): Promise<void> => {
+        const { nextCursorTweetsUser, hasMoreTweetsUser, limit, posteosUser } = get();
+        if (!hasMoreTweetsUser || nextCursorTweetsUser === null) return;
+
+        try {
+            const response = await axios.get(`/api/posteo?creador_id=${Number(id)}&limit=${limit}&cursor=${nextCursorTweetsUser}`);
+            const pagination: Pagination | undefined = response.data.pagination;
+            set({
+                posteosUser: [...posteosUser, ...response.data.result],
+                nextCursorTweetsUser: pagination?.nextCursor ?? null,
+                hasMoreTweetsUser: pagination?.hasMore ?? false,
+            });
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                logger.error('Error al cargar más posteos del usuario:', error.response?.data?.error ?? error.message);
             }
         }
     },
@@ -402,12 +475,17 @@ const useStore = create<StoreState>((set, get) => ({
     getTweetsOfHome: async (): Promise<void> => {
         try {
             await get().getCookieLogueo();
-            const { datosLogueo } = get();
+            const { datosLogueo, limitFeed } = get();
 
-            const results = await axios.get(`/api/posteo?creador_id=${Number(datosLogueo?.id)}`);
+            const results = await axios.get(`/api/posteo?creador_id=${Number(datosLogueo?.id)}&limit=${limitFeed}`);
 
             if (results.status === 200) {
-                set({ posteosHome: results.data.result });
+                const pagination: Pagination | undefined = results.data.pagination;
+                set({
+                    posteosHome: results.data.result,
+                    nextCursorTweetsHome: pagination?.nextCursor ?? null,
+                    hasMoreTweetsHome: pagination?.hasMore ?? false,
+                });
             }
 
         } catch (error) {
@@ -417,6 +495,28 @@ const useStore = create<StoreState>((set, get) => ({
                 } else {
                     logger.log(error)
                 }
+            }
+        }
+    },
+
+    loadMoreTweetsHome: async (): Promise<void> => {
+        const { nextCursorTweetsHome, hasMoreTweetsHome, limitFeed, posteosHome, datosLogueo } = get();
+        if (!hasMoreTweetsHome || nextCursorTweetsHome === null) return;
+
+        try {
+            const results = await axios.get(`/api/posteo?creador_id=${Number(datosLogueo?.id)}&limit=${limitFeed}&cursor=${nextCursorTweetsHome}`);
+
+            if (results.status === 200) {
+                const pagination: Pagination | undefined = results.data.pagination;
+                set({
+                    posteosHome: [...posteosHome, ...results.data.result],
+                    nextCursorTweetsHome: pagination?.nextCursor ?? null,
+                    hasMoreTweetsHome: pagination?.hasMore ?? false,
+                });
+            }
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                logger.log(error.response?.data?.error ?? error.message);
             }
         }
     }

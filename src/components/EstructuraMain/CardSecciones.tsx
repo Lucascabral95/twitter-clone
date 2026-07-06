@@ -26,9 +26,11 @@ interface IPosteos {
 interface CardSeccionesProps {
     id: number;
     publicaciones: IPosteos[];
+    hasMorePublicaciones?: boolean;
+    onLoadMorePublicaciones?: () => void;
 }
 
-const CardSecciones: React.FC<CardSeccionesProps> = ({ id, publicaciones }) => {
+const CardSecciones: React.FC<CardSeccionesProps> = ({ id, publicaciones, hasMorePublicaciones, onLoadMorePublicaciones }) => {
     const { loading, limit, getTweetsByID, misSeguidos, getMisSeguidos } = useStore();
     const [seccionActual, setSeccionActual] = useState<string>("Inicio");
     const [arrayDeReposteos, setArrayDeReposteos] = useState([]);
@@ -94,7 +96,7 @@ const CardSecciones: React.FC<CardSeccionesProps> = ({ id, publicaciones }) => {
             {loading && <p style={{ color: "white" }}> Cargando... </p>}
 
             {seccionActual === "Inicio" ? (
-                <CardTweet posteos={publicaciones} />
+                <CardTweet posteos={publicaciones} hasMore={hasMorePublicaciones} onLoadMore={onLoadMorePublicaciones} />
             ) : seccionActual === "Seguidores" ? (
                 <BusquedaDeUsuarios usuarios={misSeguidos} />
             ) : seccionActual === "AcercaDe" ? (

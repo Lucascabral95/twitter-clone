@@ -6,7 +6,7 @@ import CardSecciones from '@/components/EstructuraMain/CardSecciones';
 import { useHomeData } from '@/presentation/hooks';
 
 const Home: React.FC = () => {
-  const { datosLogueo, datosPersonales, misSeguidos, seguidores, posteosHome } = useHomeData();
+  const { datosLogueo, datosPersonales, misSeguidos, seguidores, posteosHome, hasMoreTweetsHome, loadMoreTweetsHome } = useHomeData();
 
   return (
     <div className="home">
@@ -17,7 +17,12 @@ const Home: React.FC = () => {
           seguidos={misSeguidos}
           seguidores={seguidores}
         />
-        <CardSecciones id={Number(datosLogueo?.id)} publicaciones={posteosHome} />
+        <CardSecciones
+          id={Number(datosLogueo?.id)}
+          publicaciones={posteosHome}
+          hasMorePublicaciones={hasMoreTweetsHome}
+          onLoadMorePublicaciones={loadMoreTweetsHome}
+        />
       </div>
     </div>
   );
