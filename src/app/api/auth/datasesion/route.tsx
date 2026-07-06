@@ -1,20 +1,12 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { verify } from "jsonwebtoken";
+import { getSessionUser } from "@/infrastructure/auth/session";
 
 export async function GET() {
-  try {
-    const result = cookies().get("myToken");
+  const user = await getSessionUser();
 
-    if (!result) {
-      return NextResponse.json({ result: "No hay token" }, { status: 401 });
-    }
-
-    const token = result.value.split("=")[1].split(";")[0]
-    const deshasheado = verify(token, process.env.JWT_SECRET as string);
-
-    return NextResponse.json({ result: deshasheado }, { status: 200 });
-  } catch {
-    return NextResponse.json({ result: "Error" }, { status: 500 });
+  if (!user) {
+    return NextResponse.json({ result: "No hay sesion" }, { status: 401 });
   }
+
+  return NextResponse.json({ result: user }, { status: 200 });
 }

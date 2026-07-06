@@ -42,7 +42,11 @@ class DAOPosteos {
     async getAllPosteos(): Promise<Posteos[]> {
         try {
             const data = await db();
-            const posteos = await data`SELECT * FROM usuarios_posteos order by posteo_id asc`;
+            const posteos = await data`
+                SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
+                       titulo, contenido, created_at, updated_at, creador_id, likes
+                FROM usuarios_posteos order by posteo_id asc
+            `;
             return posteos.reverse() as Posteos[];
         } catch (error) {
             throw error as CustomError;
@@ -57,7 +61,11 @@ class DAOPosteos {
             }
 
             const data = await db();
-            const posteo = await data`select * from usuarios_posteos where posteo_id = ${id}`;
+            const posteo = await data`
+                SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
+                       titulo, contenido, created_at, updated_at, creador_id, likes
+                FROM usuarios_posteos where posteo_id = ${id}
+            `;
 
             const filteredPosteos = posteo.filter((posteo) => posteo.creador_id === id);
 
@@ -79,7 +87,11 @@ class DAOPosteos {
             }
 
             const data = await db();
-            const posteo = await data`select * from usuarios_posteos where posteo_id = ${id}`;
+            const posteo = await data`
+                SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
+                       titulo, contenido, created_at, updated_at, creador_id, likes
+                FROM usuarios_posteos where posteo_id = ${id}
+            `;
 
             if (posteo.length === 0) {
                 throw { error: "Posteo no encontrado.", status: 404 } as CustomError;

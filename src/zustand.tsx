@@ -30,7 +30,6 @@ interface Posteos {
     updated_at: string;
     creador_id: number;
     likes: number;
-    password?: string;
 }
 
 interface DatosPersonales {

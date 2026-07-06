@@ -2,26 +2,38 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 
+const PUBLIC_API_PATHS = ["/api/auth/login", "/api/auth/register", "/api/auth/logout"];
+
 export async function middleware(request: Request) {
+  const { pathname } = new URL(request.url);
+  const isApiRoute = pathname.startsWith("/api");
+
+  if (isApiRoute && PUBLIC_API_PATHS.some((path) => pathname.startsWith(path))) {
+    return NextResponse.next();
+  }
+
+  const unauthorized = () =>
+    isApiRoute
+      ? NextResponse.json({ error: "No autorizado" }, { status: 401 })
+      : NextResponse.redirect(new URL("/", request.url));
+
   const cookieStore = cookies();
   const cookie = cookieStore.get("myToken");
-  const cadena = cookie?.value?.split("=")[1]?.split(";")[0] as string;
 
-  if (!cookie) return NextResponse.redirect(new URL("/", request.url));
+  if (!cookie) return unauthorized();
 
   try {
     await jwtVerify(
-      cadena,
+      cookie.value,
       new TextEncoder().encode(process.env.JWT_SECRET as string)
     );
 
     return NextResponse.next();
   } catch {
-    return NextResponse.redirect(new URL("/", request.url));
+    return unauthorized();
   }
 }
 
 export const config = {
-  matcher: ["/home/:path*", "/feed"],
+  matcher: ["/home/:path*", "/feed", "/api/:path*"],
 };
-

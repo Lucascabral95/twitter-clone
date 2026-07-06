@@ -43,7 +43,7 @@ class daoUsuarios {
   async getAllUsers(): Promise<Usuario[]> {
     try {
       const data = await db();
-      const users = await data`select * from usuarios`;
+      const users = await data`select id, nombre, email, identificador, fecha_creacion from usuarios`;
       return users as Usuario[];
     } catch (error) {
       throw error as CustomError;
@@ -58,7 +58,7 @@ class daoUsuarios {
       }
 
       const data = await db();
-      const user = await data`SELECT * FROM usuarios WHERE id = ${id}`;
+      const user = await data`SELECT id, nombre, email, identificador, fecha_creacion FROM usuarios WHERE id = ${id}`;
 
       if (user.length === 0) {
         throw { error: "Usuario no encontrado", status: 404 } as CustomError;
