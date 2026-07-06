@@ -144,9 +144,8 @@ const useStore = create<StoreState>((set, get) => ({
         }
 
         try {
-            const response = await axios.get(`/api/posteo`);
-            const filtro = response.data.result.filter((posteo: Posteos) => posteo.creador_id === datosLogueo.id);
-            set({ posteos: filtro, loading: false, posteosTotales: filtro.length });
+            const response = await axios.get(`/api/posteo?creador_id=${datosLogueo.id}`);
+            set({ posteos: response.data.result, loading: false, posteosTotales: response.data.result.length });
         } catch (error) {
             if (error instanceof AxiosError) {
                 if (error.response) {
@@ -207,9 +206,8 @@ const useStore = create<StoreState>((set, get) => ({
         set({ loading: true });
 
         try {
-            const response = await axios.get(`/api/posteo`);
-            const filtro = response.data.result.filter((posteo: Posteos) => posteo.id === Number(id));
-            set({ posteosUser: filtro, loading: false, posteosTotales: filtro.length });
+            const response = await axios.get(`/api/posteo?creador_id=${Number(id)}`);
+            set({ posteosUser: response.data.result, loading: false, posteosTotales: response.data.result.length });
         } catch (error) {
             if (error instanceof AxiosError) {
                 set({ error: true, loading: false });
@@ -259,25 +257,17 @@ const useStore = create<StoreState>((set, get) => ({
     obtenerResultadosDeBusqueda: async (response: Dat): Promise<void> => {
         try {
             const { busqueda, tipoDeBusqueda } = response;
-            const endpoint = tipoDeBusqueda === 'usuarios' ? '/api/usuario' : '/api/posteo';
-            const propiedadesFiltro = tipoDeBusqueda === 'usuarios' ? ['nombre', 'email'] : ['contenido', 'titulo', 'nombre'];
 
-            const busquedaLower = busqueda.toLowerCase();
-            let filtro: Posteos[] = [];
-
-            const results = await axios.get(endpoint);
-
-            if (results.status === 200) {
-                const data: Posteos[] = results.data.result || [];
-                filtro = data.filter((item: Posteos) =>
-                    propiedadesFiltro.some((prop) => {
-                        const value = item[prop as keyof Posteos];
-                        return value && typeof value === 'string' && value.toLowerCase().includes(busquedaLower);
-                    })
-                );
+            if (!busqueda) {
+                set({ arrayDeBusqueda: [], posteosTotales: 0 });
+                return;
             }
 
-            set({ arrayDeBusqueda: busqueda ? filtro : [], posteosTotales: filtro.length });
+            const endpoint = tipoDeBusqueda === 'usuarios' ? '/api/usuario' : '/api/posteo';
+            const results = await axios.get(`${endpoint}?q=${encodeURIComponent(busqueda)}`);
+            const data: Posteos[] = results.status === 200 ? (results.data.result || []) : [];
+
+            set({ arrayDeBusqueda: data, posteosTotales: data.length });
         } catch (error) {
             if (error instanceof AxiosError) {
                 const errorMessage = error.response?.data?.error || error.message || "Error desconocido";
@@ -388,12 +378,13 @@ const useStore = create<StoreState>((set, get) => ({
 
     obtenerSeguidores: async (): Promise<void> => {
         try {
-            const results = await axios.get(`/api/seguimientos/`);
+            const myId = get().datosLogueo?.id;
+            const results = await axios.get(`/api/seguimientos/seguidores/${myId}`);
 
             if (results.status === 200) {
-                const filtrarPorSeguidores = results.data.result.filter(({ id_a_seguir, id_mio }: { id_a_seguir: number, id_mio: number }) => id_a_seguir === get().datosLogueo?.id && id_mio !== get().datosLogueo?.id);
+                const sinMiMismo = results.data.result.filter(({ id_mio }: { id_mio: number }) => id_mio !== myId);
 
-                set({ seguidores: filtrarPorSeguidores });
+                set({ seguidores: sinMiMismo });
             }
 
         } catch (error) {
@@ -412,11 +403,10 @@ const useStore = create<StoreState>((set, get) => ({
             await get().getCookieLogueo();
             const { datosLogueo } = get();
 
-            const results = await axios.get('/api/posteo');
+            const results = await axios.get(`/api/posteo?creador_id=${Number(datosLogueo?.id)}`);
 
             if (results.status === 200) {
-                const filtro = results.data.result.filter((posteo: Posteos) => posteo.creador_id === Number(datosLogueo?.id));
-                set({ posteosHome: filtro });
+                set({ posteosHome: results.data.result });
             }
 
         } catch (error) {

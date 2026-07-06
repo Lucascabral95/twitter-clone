@@ -50,6 +50,20 @@ class daoUsuarios {
     }
   }
 
+  async searchUsuarios(query: string): Promise<Usuario[]> {
+    try {
+      const data = await db();
+      const like = `%${query}%`;
+      const users = await data`
+        select id, nombre, email, identificador, fecha_creacion from usuarios
+        where nombre ILIKE ${like} or email ILIKE ${like}
+      `;
+      return users as Usuario[];
+    } catch (error) {
+      throw error as CustomError;
+    }
+  }
+
   async getUserByIdentificador(id: number): Promise<Usuario> {
     try {
 
@@ -82,7 +96,7 @@ class daoUsuarios {
 
       user.password = await hash(user.password, 10);
 
-      const newUser = await data`insert into usuarios (nombre, email, password, identificador) values (${user.name}, ${user.email}, ${user.password}, ${user.identificador})`;
+      const newUser = await data`insert into usuarios (nombre, email, password, identificador) values (${user.name}, ${user.email}, ${user.password}, ${user.identificador}) returning id, nombre, email, identificador, fecha_creacion`;
       return newUser[0] as Usuario;
     } catch (error) {
       throw error as CustomError;

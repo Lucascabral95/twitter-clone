@@ -5,6 +5,8 @@ interface CustomError {
   status: number;
 }
 
+// Lecturas contra la vista `seguimientos_usuarios` (join con usuarios), escrituras contra
+// la tabla base `seguimientos`. Ver nota equivalente en DAOPosteos.
 class DAOSeguimientos {
   async createSeguimiento(idMio: number, idASeguir: number) {
     try {

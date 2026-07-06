@@ -26,6 +26,9 @@ interface CreacionPosteo {
     contenido: string;
 }
 
+// Lecturas contra la vista `usuarios_posteos` (join con usuarios), escrituras contra la
+// tabla base `posteos`. Los SELECT son de columnas explícitas: si la vista cambia de forma,
+// esto falla ruidosamente en vez de arrastrar un drift de esquema silencioso.
 class DAOPosteos {
     constructor() {
         this.initializeDB();
@@ -48,6 +51,44 @@ class DAOPosteos {
                 FROM usuarios_posteos order by posteo_id asc
             `;
             return posteos.reverse() as Posteos[];
+        } catch (error) {
+            throw error as CustomError;
+        }
+    }
+
+    async getPosteosByCreador(creadorId: number): Promise<Posteos[]> {
+        try {
+
+            if (isNaN(Number(creadorId))) {
+                throw { error: "ID debe ser numeral.", status: 400 } as CustomError;
+            }
+
+            const data = await db();
+            const posteos = await data`
+                SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
+                       titulo, contenido, created_at, updated_at, creador_id, likes
+                FROM usuarios_posteos where creador_id = ${creadorId} order by posteo_id desc
+            `;
+
+            return posteos as Posteos[];
+        } catch (error) {
+            throw error as CustomError;
+        }
+    }
+
+    async searchPosteos(query: string): Promise<Posteos[]> {
+        try {
+            const data = await db();
+            const like = `%${query}%`;
+            const posteos = await data`
+                SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
+                       titulo, contenido, created_at, updated_at, creador_id, likes
+                FROM usuarios_posteos
+                where titulo ILIKE ${like} or contenido ILIKE ${like} or nombre ILIKE ${like}
+                order by posteo_id desc
+            `;
+
+            return posteos as Posteos[];
         } catch (error) {
             throw error as CustomError;
         }
@@ -130,7 +171,7 @@ class DAOPosteos {
                 throw { error: "Error al dar like al posteo", status: 400 } as CustomError;
             }
             const data = await db();
-            const posteo = await data`update posteos set likes = likes = 1 where id = ${id} returning *`;
+            const posteo = await data`update posteos set likes = likes + 1 where id = ${id} returning *`;
 
             if (posteo.length === 0) {
                 throw { error: "Error al dar like al posteo", status: 400 } as CustomError;

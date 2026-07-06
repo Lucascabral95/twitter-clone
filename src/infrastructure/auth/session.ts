@@ -2,8 +2,8 @@ import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
 
 export const SESSION_COOKIE = "myToken";
-export const TOKEN_EXPIRY = "1y";
-export const MAX_AGE = 60 * 60 * 24 * 365;
+export const TOKEN_EXPIRY = "7d";
+export const MAX_AGE = 60 * 60 * 24 * 7;
 
 export interface SessionPayload {
   id: number;
