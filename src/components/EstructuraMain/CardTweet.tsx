@@ -1,11 +1,14 @@
 import React from 'react'
 import { FaHeart, FaRegComment, FaRetweet } from "react-icons/fa";
 import Avvvatars from "avvvatars-react";
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { formatearFecha } from "@/utils/formatearFecha";
 import Link from 'next/link';
 import { Toaster } from 'react-hot-toast';
 import { motion } from 'motion/react';
 import { useInfiniteScroll } from '@/presentation/hooks/useInfiniteScroll';
+import { cloudinaryLoader } from '@/lib/cloudinaryLoader';
 
 interface IPosteos {
     contenido: string;
@@ -22,6 +25,7 @@ interface IPosteos {
     updated_at: string;
     comentarios_count?: number;
     reposteos_count?: number;
+    imagen_url?: string | null;
 }
 
 interface CardTweetProps {
@@ -30,10 +34,38 @@ interface CardTweetProps {
     onLoadMore?: () => void;
 }
 
+function vieneDeElementoInteractivo(target: EventTarget | null): boolean {
+    return target instanceof Element && Boolean(target.closest('a, button'));
+}
+
 const CardTweetItem: React.FC<{ item: IPosteos }> = ({ item }) => {
+    const router = useRouter();
+    const postHref = `/home/post/${item.posteo_id}`;
+
+    const navegarAlPost = () => {
+        router.push(postHref);
+    };
+
+    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+        if (vieneDeElementoInteractivo(event.target)) return;
+        navegarAlPost();
+    };
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        if (vieneDeElementoInteractivo(event.target)) return;
+        event.preventDefault();
+        navegarAlPost();
+    };
+
     return (
         <motion.article
             className='contenedor-card-tweet'
+            role="link"
+            tabIndex={0}
+            aria-label={`Abrir posteo ${item.titulo}`}
+            onClick={handleClick}
+            onKeyDown={handleKeyDown}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
@@ -50,7 +82,7 @@ const CardTweetItem: React.FC<{ item: IPosteos }> = ({ item }) => {
                         <p>{formatearFecha(item?.created_at, 'LL')}</p>
                     </div>
                 </div>
-                <Link href={`/home/post/${item?.posteo_id}`} className="cuerpo-post-link" prefetch={false}>
+                <Link href={postHref} className="cuerpo-post-link" prefetch={false}>
                     <div className="titulo">
                         <div className="titulo-titulo">
                             <p> {item?.titulo} </p>
@@ -61,6 +93,18 @@ const CardTweetItem: React.FC<{ item: IPosteos }> = ({ item }) => {
                             <p> {item?.contenido} </p>
                         </div>
                     </div>
+                    {item?.imagen_url && (
+                        <div className="imagen-posteo-card">
+                            <Image
+                                loader={cloudinaryLoader}
+                                src={item.imagen_url}
+                                alt=""
+                                width={600}
+                                height={400}
+                                sizes="(max-width: 600px) 100vw, 600px"
+                            />
+                        </div>
+                    )}
                 </Link>
                 <div className="contenedor-like">
                     <div className="metrica metrica-comentarios">

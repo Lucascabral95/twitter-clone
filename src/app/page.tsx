@@ -6,7 +6,6 @@ import Footer from '@/components/Footer/Footer';
 import Register from '@/components/Register/Register';
 import Login from '@/components/Register/Login';
 import { useAuthModals } from '@/presentation/hooks';
-import './App.scss';
 
 const Home: React.FC = () => {
   const { isOpenRegister, isOpenLogin, openRegister, openLogin, closeRegister, closeLogin } = useAuthModals();

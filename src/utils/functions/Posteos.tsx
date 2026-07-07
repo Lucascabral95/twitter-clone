@@ -1,5 +1,6 @@
-import axios, { AxiosError } from "axios"
-import React from "react";
+﻿import React from "react";
+import toast from "react-hot-toast";
+import { postService } from "@/infrastructure/services";
 
 interface PosteoCreado {
     id: number;
@@ -11,6 +12,8 @@ interface PosteoCreado {
     likes: number;
     comentarios_count: number;
     reposteos_count: number;
+    imagen_url: string | null;
+    imagen_public_id: string | null;
 }
 
 export const postearComentario = async (
@@ -18,31 +21,24 @@ export const postearComentario = async (
     formData: FormData,
     setIsOpenPosteo: React.Dispatch<React.SetStateAction<boolean>>,
     addTweet: (posteo: PosteoCreado) => Promise<void>,
-    creador_id: number
-) => {
+    imagen?: { imagen_url: string; imagen_public_id: string } | null
+): Promise<boolean> => {
     event.preventDefault();
-    const titulo: string = formData.get('titulo') as string;
-    const contenido: string = formData.get('contenido') as string;
 
-    try {
-        const results = await axios.post('/api/posteo', {
-            titulo: titulo,
-            contenido: contenido,
-            creador_id: creador_id
-        });
+    const result = await postService.createPost({
+        titulo: formData.get('titulo') as string,
+        contenido: formData.get('contenido') as string,
+        imagen_url: imagen?.imagen_url ?? null,
+        imagen_public_id: imagen?.imagen_public_id ?? null,
+    });
 
-        if (results.status === 200) {
-            setIsOpenPosteo(false);
-            addTweet(results.data.result);
-        }
-
-    } catch (error) {
-        if (error instanceof AxiosError) {
-            if (error.response) {
-                console.log(error.response.data.error)
-            } else {
-                console.log(error)
-            }
-        }
+    if (!result.success) {
+        toast.error(result.error ?? 'Error al crear el posteo');
+        return false;
     }
+
+    setIsOpenPosteo(false);
+    await addTweet(result.data.result);
+    toast.success('Posteo creado');
+    return true;
 }

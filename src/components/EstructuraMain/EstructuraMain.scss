@@ -1,4 +1,4 @@
-.estructura-main-titular {
+﻿.estructura-main-titular {
     width: 100%;
     display: flex;
     justify-content: center;
@@ -70,6 +70,7 @@
         padding: 16px;
         margin: 0 0 20px 0;
         background-color: rgba(255, 255, 255, 0.1);
+        cursor: pointer;
 
         &:hover {
             transition: 0.3s ease-in-out;
@@ -169,6 +170,22 @@
                         color: var(--letra-titular);
                         font-size: 16px;
                     }
+                }
+            }
+
+            .imagen-posteo-card {
+                width: 100%;
+                border-radius: 12px;
+                overflow: hidden;
+                margin: 0 0 14px 0;
+                border: 0.5px solid rgba(128, 128, 128, 0.355);
+
+                img {
+                    width: 100%;
+                    height: auto;
+                    max-height: 400px;
+                    object-fit: cover;
+                    display: block;
                 }
             }
 
@@ -438,3 +455,4 @@
         }
     }
 }
+

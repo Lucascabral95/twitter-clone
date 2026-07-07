@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import "./globals.css";
 import "./App.scss";
 import Navbar from "@/components/Navbar/Navbar";
 import AuthRefreshProvider from "@/presentation/providers/AuthRefreshProvider";

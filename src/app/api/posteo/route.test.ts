@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @jest-environment node
  */
 
@@ -21,7 +21,7 @@ const fixedRows = [
   },
 ];
 
-const mockSql = jest.fn(async (_strings: readonly string[], ..._values: unknown[]) => fixedRows);
+const mockSql = jest.fn(async () => fixedRows);
 
 jest.mock('@/services/neon', () => ({
   __esModule: true,
@@ -39,6 +39,9 @@ const mockGetSessionUser = getSessionUser as jest.Mock;
 
 describe('/api/posteo route', () => {
   beforeEach(() => {
+    process.env.CLOUDINARY_CLOUD_NAME = 'demo';
+    process.env.CLOUDINARY_API_KEY = 'key';
+    process.env.CLOUDINARY_API_SECRET = 'secret';
     mockSql.mockClear();
     mockGetSessionUser.mockReset();
   });
@@ -104,7 +107,9 @@ describe('/api/posteo route', () => {
 
       expect(response.status).toBe(200);
       const [strings, ...values] = mockSql.mock.calls[0];
-      expect(strings.join('')).toContain('creador_id in (select id_a_seguir from seguimientos where id_mio =');
+      const query = strings.join('');
+      expect(query).toContain('creador_id =');
+      expect(query).toContain('creador_id in (select id_a_seguir from seguimientos where id_mio =');
       expect(values).toContain(7);
     });
 
@@ -158,5 +163,110 @@ describe('/api/posteo route', () => {
       expect(values).toContain(99);
       expect(values).not.toContain(1);
     });
+
+    it('accepts a valid Cloudinary image scoped to the session user folder', async () => {
+      mockGetSessionUser.mockResolvedValue({
+        id: 99,
+        email: 'x@x.com',
+        nombre: 'X',
+        identificador: 'uuid',
+        fecha_creacion: '2024-01-01',
+      });
+      const req = new NextRequest('http://localhost/api/posteo', {
+        method: 'POST',
+        body: JSON.stringify({
+          titulo: 't',
+          contenido: 'c',
+          imagen_url: 'https://res.cloudinary.com/demo/image/upload/v1/twitter-clone/posteos/99/abc.webp',
+          imagen_public_id: 'twitter-clone/posteos/99/abc',
+        }),
+      });
+
+      const response = await POST(req);
+
+      expect(response.status).toBe(200);
+      const [, ...values] = mockSql.mock.calls[0];
+      expect(values).toContain('twitter-clone/posteos/99/abc');
+    });
+
+    it('rejects an image whose public_id is outside the session user folder', async () => {
+      mockGetSessionUser.mockResolvedValue({
+        id: 99,
+        email: 'x@x.com',
+        nombre: 'X',
+        identificador: 'uuid',
+        fecha_creacion: '2024-01-01',
+      });
+      const req = new NextRequest('http://localhost/api/posteo', {
+        method: 'POST',
+        body: JSON.stringify({
+          titulo: 't',
+          contenido: 'c',
+          imagen_url: 'https://res.cloudinary.com/demo/image/upload/v1/twitter-clone/posteos/1/abc.webp',
+          imagen_public_id: 'twitter-clone/posteos/1/abc',
+        }),
+      });
+
+      const response = await POST(req);
+      const body = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(body.error).toBe('Imagen invalida');
+      expect(mockSql).not.toHaveBeenCalled();
+    });
+
+    it('rejects an image URL that does not match the public_id', async () => {
+      mockGetSessionUser.mockResolvedValue({
+        id: 99,
+        email: 'x@x.com',
+        nombre: 'X',
+        identificador: 'uuid',
+        fecha_creacion: '2024-01-01',
+      });
+      const req = new NextRequest('http://localhost/api/posteo', {
+        method: 'POST',
+        body: JSON.stringify({
+          titulo: 't',
+          contenido: 'c',
+          imagen_url: 'https://res.cloudinary.com/demo/image/upload/v1/twitter-clone/posteos/99/otro.webp',
+          imagen_public_id: 'twitter-clone/posteos/99/abc',
+        }),
+      });
+
+      const response = await POST(req);
+      const body = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(body.error).toBe('Imagen invalida');
+      expect(mockSql).not.toHaveBeenCalled();
+    });
+
+    it('rejects a non-Cloudinary image host', async () => {
+      mockGetSessionUser.mockResolvedValue({
+        id: 99,
+        email: 'x@x.com',
+        nombre: 'X',
+        identificador: 'uuid',
+        fecha_creacion: '2024-01-01',
+      });
+      const req = new NextRequest('http://localhost/api/posteo', {
+        method: 'POST',
+        body: JSON.stringify({
+          titulo: 't',
+          contenido: 'c',
+          imagen_url: 'https://evil.com/abc.webp',
+          imagen_public_id: 'twitter-clone/posteos/99/abc',
+        }),
+      });
+
+      const response = await POST(req);
+      const body = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(body.error).toBe('Imagen invalida');
+    });
   });
 });
+
+
+

@@ -1,8 +1,9 @@
-import { useState, useCallback, useEffect } from 'react';
+﻿import { useState, useCallback, useEffect } from 'react';
 import toast from 'react-hot-toast';
 
 import useStore from '@/zustand';
 import { postService } from '@/infrastructure/services';
+import { useImageUpload } from './useImageUpload';
 
 export const usePostForm = () => {
   const getCookieLogueo = useStore((s) => s.getCookieLogueo);
@@ -11,6 +12,15 @@ export const usePostForm = () => {
   const [titulo, setTitulo] = useState(0);
   const [contenido, setContenido] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const {
+    preview,
+    subiendo,
+    progreso,
+    error,
+    seleccionarImagen,
+    subir,
+    limpiar,
+  } = useImageUpload();
 
   useEffect(() => {
     getCookieLogueo();
@@ -23,10 +33,20 @@ export const usePostForm = () => {
       const formData = new FormData(form);
 
       setIsLoading(true);
+
+      const imagen = preview ? await subir() : null;
+
+      if (preview && !imagen) {
+        setIsLoading(false);
+        toast.error(error ?? 'No se pudo subir la imagen');
+        return;
+      }
+
       const result = await postService.createPost({
         titulo: formData.get('titulo') as string,
         contenido: formData.get('contenido') as string,
-        creador_id: Number(datosLogueo?.id),
+        imagen_url: imagen?.imagen_url ?? null,
+        imagen_public_id: imagen?.imagen_public_id ?? null,
       });
       setIsLoading(false);
 
@@ -35,12 +55,13 @@ export const usePostForm = () => {
         form.reset();
         setTitulo(0);
         setContenido(0);
+        limpiar();
         toast.success('Posteo creado');
       } else {
-        toast.error(result.error ?? "Error") ;
+        toast.error(result.error ?? 'Error');
       }
     },
-    [datosLogueo?.id, addTweet]
+    [addTweet, preview, subir, error, limpiar]
   );
 
   return {
@@ -51,5 +72,11 @@ export const usePostForm = () => {
     isLoading,
     datosLogueo,
     handleSubmit,
+    imagenPreview: preview,
+    imagenSubiendo: subiendo,
+    imagenProgreso: progreso,
+    imagenError: error,
+    seleccionarImagen,
+    quitarImagen: limpiar,
   };
 };

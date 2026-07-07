@@ -25,6 +25,25 @@ describe('Login', () => {
     fireEvent.change(screen.getByPlaceholderText('Contraseña'), { target: { value: '12345678' } });
     fireEvent.click(screen.getByRole('button', { name: 'Iniciar sesión' }));
 
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent(/Entrando a tu inicio|Verificando tus datos/));
+    await waitFor(() => expect(push).toHaveBeenCalledWith('/home'));
+  });
+
+  it('shows loading feedback while login is pending', async () => {
+    let resolveLogin!: (value: { success: boolean }) => void;
+    (authService.login as jest.Mock).mockImplementation(() => new Promise((resolve) => {
+      resolveLogin = resolve;
+    }));
+    render(React.createElement(Login, { onClose: jest.fn() }));
+
+    fireEvent.change(screen.getByPlaceholderText('Correo electronico'), { target: { value: 'a@a.com' } });
+    fireEvent.change(screen.getByPlaceholderText('Contraseña'), { target: { value: '12345678' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Iniciar sesión' }));
+
+    expect(await screen.findByRole('status')).toHaveTextContent('Verificando tus datos...');
+    expect(screen.getByRole('button', { name: 'Ingresando...' })).toBeDisabled();
+
+    resolveLogin({ success: true });
     await waitFor(() => expect(push).toHaveBeenCalledWith('/home'));
   });
 
@@ -58,3 +77,4 @@ describe('Login', () => {
     expect(onClose).toHaveBeenCalled();
   });
 });
+

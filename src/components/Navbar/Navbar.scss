@@ -312,13 +312,90 @@
                 }
             }
 
+            .preview-imagen-posteo {
+                position: relative;
+                width: 100%;
+                border-radius: 12px;
+                overflow: hidden;
+                margin: 8px 0;
+
+                img {
+                    width: 100%;
+                    height: auto;
+                    max-height: 320px;
+                    object-fit: cover;
+                }
+
+                .quitar-imagen {
+                    position: absolute;
+                    top: 8px;
+                    right: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 28px;
+                    height: 28px;
+                    border: none;
+                    border-radius: 50%;
+                    background-color: rgba(0, 0, 0, 0.6);
+                    color: #fff;
+                    cursor: pointer;
+
+                    .icon {
+                        font-size: 16px;
+                    }
+                }
+
+                .barra-progreso-imagen {
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 3px;
+                    background-color: rgba(255, 255, 255, 0.3);
+
+                    .barra-progreso-imagen-relleno {
+                        height: 100%;
+                        background-color: var(--fondo-celeste-boton);
+                        transition: width 0.2s ease-out;
+                    }
+                }
+            }
+
+            .error-imagen-posteo {
+                color: #f4212e;
+                font-size: 13px;
+                margin: 4px 0;
+            }
+
             .postear {
                 display: flex;
-                justify-content: flex-end;
+                justify-content: space-between;
                 align-items: center;
                 padding: 6px 0 0 0;
                 border-top: 1px solid rgba(128, 128, 128, 0.419);
                 margin: 16px 0 0 0;
+
+                .boton-adjuntar-imagen {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 36px;
+                    height: 36px;
+                    border: none;
+                    border-radius: 50%;
+                    background-color: transparent;
+                    color: var(--fondo-celeste-boton);
+                    cursor: pointer;
+
+                    .icon {
+                        font-size: 20px;
+                    }
+
+                    &:hover {
+                        background-color: rgba(29, 155, 240, 0.1);
+                    }
+                }
 
                 .post {
                     border-radius: 16px;
@@ -632,11 +709,11 @@
     
                 .postear {
                     display: flex;
-                    justify-content: flex-end;
+                    justify-content: space-between;
                     align-items: center;
                     padding: 12px 0 0 0;
                     margin: 16px 0 0 0;
-    
+
                     .post {
                         border-radius: 16px;
                         padding: 4px 16px;

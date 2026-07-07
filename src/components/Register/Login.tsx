@@ -19,8 +19,10 @@ const Login: React.FC<LoginProps> = ({ onClose }) => {
   const {
     register,
     onSubmit,
+    isRedirecting,
     formState: { errors, isSubmitting },
   } = useLogin();
+  const estaProcesando = isSubmitting || isRedirecting;
 
   return (
     <motion.div
@@ -30,15 +32,15 @@ const Login: React.FC<LoginProps> = ({ onClose }) => {
       transition={{ duration: 0.4 }}
       className="register"
     >
-      <div className="contenedor-register" ref={modalRef} role="dialog" aria-modal="true">
+      <div className="contenedor-register" ref={modalRef} role="dialog" aria-modal="true" aria-busy={estaProcesando}>
         <div className="superior">
-          <div className="icono" onClick={onClose}>
+          <button type="button" className="icono" onClick={onClose} aria-label="Cerrar login" disabled={estaProcesando}>
             <IoMdClose className="icon" />
-          </div>
+          </button>
           <div className="imagen-register">
             <Image className="imagen" src="/img/twitter.svg" alt="Logo" width={28} height={28} />
           </div>
-          <div className="icono"></div>
+          <div className="icono" aria-hidden="true"></div>
         </div>
 
         <div className="medio">
@@ -55,7 +57,7 @@ const Login: React.FC<LoginProps> = ({ onClose }) => {
                 <input
                   type="email"
                   placeholder="Correo electronico"
-                  disabled={isSubmitting}
+                  disabled={estaProcesando}
                   {...register('email')}
                 />
               </div>
@@ -76,7 +78,7 @@ const Login: React.FC<LoginProps> = ({ onClose }) => {
                 <input
                   type="password"
                   placeholder="Contraseña"
-                  disabled={isSubmitting}
+                  disabled={estaProcesando}
                   {...register('password')}
                 />
               </div>
@@ -96,9 +98,16 @@ const Login: React.FC<LoginProps> = ({ onClose }) => {
                 </div>
               )}
 
+              {estaProcesando && (
+                <div className="estado-login" role="status" aria-live="polite">
+                  <span aria-hidden="true" className="estado-login-spinner"><Spinner /></span>
+                  <p>{isRedirecting ? 'Entrando a tu inicio...' : 'Verificando tus datos...'}</p>
+                </div>
+              )}
+
               <div className="contenedor-creacion-cuenta">
-                <button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? <Spinner /> : 'Iniciar sesión'}
+                <button type="submit" disabled={estaProcesando} aria-busy={estaProcesando}>
+                  {estaProcesando ? 'Ingresando...' : 'Iniciar sesión'}
                 </button>
               </div>
             </div>
@@ -110,3 +119,4 @@ const Login: React.FC<LoginProps> = ({ onClose }) => {
 };
 
 export default Login;
+

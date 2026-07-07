@@ -1,5 +1,10 @@
-import axios, { AxiosError } from 'axios';
+﻿import axios from 'axios';
 import { CreatePostPayload } from '../interfaces';
+
+function getAxiosErrorMessage(error: unknown, fallback: string): string {
+  const responseData = (error as { response?: { data?: { error?: string; result?: string } } }).response?.data;
+  return responseData?.error || responseData?.result || fallback;
+}
 
 export const postService = {
   async createPost(payload: CreatePostPayload) {
@@ -7,9 +12,7 @@ export const postService = {
       const response = await axios.post('/api/posteo', payload);
       return { success: true, data: response.data };
     } catch (error) {
-      const axiosError = error as AxiosError<{ error: string }>;
-      const errorMessage = axiosError.response?.data?.error || 'Error al crear el posteo';
-      return { success: false, error: errorMessage };
+      return { success: false, error: getAxiosErrorMessage(error, 'Error al crear el posteo') };
     }
   },
 
@@ -18,9 +21,7 @@ export const postService = {
       const response = await axios.patch(`/api/posteo/${id}`, cambios);
       return { success: true, data: response.data };
     } catch (error) {
-      const axiosError = error as AxiosError<{ error: string }>;
-      const errorMessage = axiosError.response?.data?.error || 'Error al editar el posteo';
-      return { success: false, error: errorMessage };
+      return { success: false, error: getAxiosErrorMessage(error, 'Error al editar el posteo') };
     }
   },
 
@@ -29,10 +30,8 @@ export const postService = {
       const response = await axios.delete(`/api/posteo/${id}`);
       return { success: true, data: response.data };
     } catch (error) {
-      const axiosError = error as AxiosError<{ error: string }>;
-      const errorMessage = axiosError.response?.data?.error || 'Error al borrar el posteo';
-      return { success: false, error: errorMessage };
+      return { success: false, error: getAxiosErrorMessage(error, 'Error al borrar el posteo') };
     }
   }
 };
- 
+

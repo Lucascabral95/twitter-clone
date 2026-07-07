@@ -73,7 +73,8 @@ describe('usePostForm', () => {
     expect(postService.createPost).toHaveBeenCalledWith({
       titulo: 'Hola',
       contenido: 'Mundo',
-      creador_id: 9,
+      imagen_url: null,
+      imagen_public_id: null,
     })
 
     expect(addTweet).toHaveBeenCalledTimes(1)
@@ -122,7 +123,8 @@ describe('usePostForm', () => {
     expect(postService.createPost).toHaveBeenCalledWith({
       titulo: 'T',
       contenido: 'C',
-      creador_id: 3,
+      imagen_url: null,
+      imagen_public_id: null,
     })
     expect(addTweet).not.toHaveBeenCalled()
     expect(toast.error).toHaveBeenCalledWith('Falló')
@@ -157,20 +159,23 @@ describe('usePostForm', () => {
     form.appendChild(i2)
     document.body.appendChild(form)
 
-    const submit = async () => {
-      const event = new Event('submit', { bubbles: true, cancelable: true }) as unknown as React.FormEvent<HTMLFormElement>
-      Object.defineProperty(event, 'currentTarget', { value: form })
-      await result.current.handleSubmit(event)
-    }
+    const event = new Event('submit', { bubbles: true, cancelable: true }) as unknown as React.FormEvent<HTMLFormElement>
+    Object.defineProperty(event, 'currentTarget', { value: form })
 
-    const pending = submit()
-    expect(result.current.isLoading).toBe(false)
-
+    let pending!: Promise<void>
     act(() => {
-      resolve({ success: true, data: {} })
+      pending = result.current.handleSubmit(event)
     })
-    await pending
+    expect(result.current.isLoading).toBe(true)
+
+    await act(async () => {
+      resolve({ success: true, data: { result: {} } })
+      await pending
+    })
 
     expect(result.current.isLoading).toBe(false)
   })
 })
+
+
+

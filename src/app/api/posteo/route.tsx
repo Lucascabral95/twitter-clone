@@ -1,9 +1,12 @@
-import { NextResponse, NextRequest } from "next/server";
+﻿import { NextResponse, NextRequest } from "next/server";
 import DAOPosteos, { DEFAULT_POSTEOS_LIMIT } from "@/models/DAO/DAOPosteos";
 import { getSessionUser } from "@/infrastructure/auth/session";
 import { handleRouteError } from "@/infrastructure/http/handleRouteError";
+import { esImagenCloudinaryValida } from "@/services/cloudinary";
 
 const MAX_POSTEOS_LIMIT = 50;
+const TITULO_MAX_LENGTH = 100;
+const CONTENIDO_MAX_LENGTH = 250;
 
 function parseLimit(raw: string | null): number {
     if (!raw) return DEFAULT_POSTEOS_LIMIT;
@@ -56,13 +59,35 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "No autorizado" }, { status: 401 });
         }
 
-        const { titulo, contenido } = await req.json();
+        const { titulo, contenido, imagen_url, imagen_public_id } = await req.json();
+        const tituloNormalizado = typeof titulo === "string" ? titulo.trim() : "";
+        const contenidoNormalizado = typeof contenido === "string" ? contenido.trim() : "";
 
-        if (!titulo || !contenido) {
+        if (!tituloNormalizado || !contenidoNormalizado) {
             return NextResponse.json({ result: "Faltan datos" }, { status: 400 });
         }
 
-        const results = await DAOPosteos.createPosteo({ titulo, contenido, creador_id: user.id });
+        if (tituloNormalizado.length > TITULO_MAX_LENGTH || contenidoNormalizado.length > CONTENIDO_MAX_LENGTH) {
+            return NextResponse.json({ error: "El posteo supera el limite permitido" }, { status: 400 });
+        }
+
+        if (imagen_url || imagen_public_id) {
+            if (
+                typeof imagen_url !== "string" ||
+                typeof imagen_public_id !== "string" ||
+                !esImagenCloudinaryValida(imagen_url, imagen_public_id, user.id)
+            ) {
+                return NextResponse.json({ error: "Imagen invalida" }, { status: 400 });
+            }
+        }
+
+        const results = await DAOPosteos.createPosteo({
+            titulo: tituloNormalizado,
+            contenido: contenidoNormalizado,
+            creador_id: user.id,
+            imagen_url: imagen_url ?? null,
+            imagen_public_id: imagen_public_id ?? null,
+        });
 
         if (!results) {
             return NextResponse.json({ result: "Error al crear el posteo" }, { status: 400 });
