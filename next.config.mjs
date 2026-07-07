@@ -1,15 +1,20 @@
-/** @type {import('next').NextConfig} */
+﻿/** @type {import('next').NextConfig} */
+const cloudinaryCloudName = process.env.CLOUDINARY_CLOUD_NAME || "**";
+
 const nextConfig = {
-  // `ws` (usado por el Pool de @neondatabase/serverless) rompe su optimización
+  // `ws` (usado por el Pool de @neondatabase/serverless) rompe su optimizacion
   // nativa bufferutil si webpack lo bundlea para las Route Handlers: el require
   // opcional se resuelve a un stub sin `.mask()` en vez de fallar limpiamente,
-  // y explota recién al enviar el primer frame real. Se lo excluye del bundle
+  // y explota recien al enviar el primer frame real. Se lo excluye del bundle
   // para que use el `require` nativo de Node en runtime.
   experimental: {
     serverComponentsExternalPackages: ["@neondatabase/serverless", "ws"],
   },
   images: {
     formats: ["image/avif", "image/webp"],
+    remotePatterns: [
+      { protocol: "https", hostname: "res.cloudinary.com", pathname: `/${cloudinaryCloudName}/image/upload/**` },
+    ],
   },
   async headers() {
     return [
@@ -27,4 +32,4 @@ const nextConfig = {
   },
 };
 
-export default nextConfig; 
+export default nextConfig;

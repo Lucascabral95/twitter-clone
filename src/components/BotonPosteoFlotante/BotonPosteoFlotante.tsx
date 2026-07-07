@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 import React, { useEffect, useState } from 'react'
 import "./BotonPosteoFlotante.scss"
 import { FiEdit3 } from "react-icons/fi";
@@ -25,7 +25,7 @@ const BotonPosteoFlotante = () => {
             </button>
 
             <AnimatePresence>
-                {isOpenPosteo && <Posteo email={String(datosLogueo?.email)} setIsOpenPosteo={setIsOpenPosteo} creador_id={Number(datosLogueo?.id)} />}
+                {isOpenPosteo && <Posteo email={String(datosLogueo?.email)} setIsOpenPosteo={setIsOpenPosteo} />}
             </AnimatePresence>
 
         </div>

@@ -1,5 +1,6 @@
-export interface CreatePostPayload {
+﻿export interface CreatePostPayload {
   titulo: string;
   contenido: string;
-  creador_id: number;
+  imagen_url?: string | null;
+  imagen_public_id?: string | null;
 }

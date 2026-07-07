@@ -1,15 +1,33 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import Avvvatars from 'avvvatars-react';
+import Image from 'next/image';
+import { IoMdClose, IoMdImage } from 'react-icons/io';
 import { usePostForm } from '@/presentation/hooks/usePostForm';
+import { cloudinaryLoader } from '@/lib/cloudinaryLoader';
 import './PosteoFeed.scss';
 
 const TITULO_MAX = 100;
 const CONTENIDO_MAX = 250;
 
 const PosteoFeed: React.FC = () => {
-  const { titulo, setTitulo, contenido, setContenido, isLoading, datosLogueo, handleSubmit } = usePostForm();
+  const {
+    titulo,
+    setTitulo,
+    contenido,
+    setContenido,
+    isLoading,
+    datosLogueo,
+    handleSubmit,
+    imagenPreview,
+    imagenSubiendo,
+    imagenProgreso,
+    imagenError,
+    seleccionarImagen,
+    quitarImagen,
+  } = usePostForm();
+  const inputImagenRef = useRef<HTMLInputElement>(null);
 
   return (
     <div className="posteo-feed">
@@ -54,8 +72,51 @@ const PosteoFeed: React.FC = () => {
           </p>
         </div>
 
+        {imagenPreview && (
+          <div className="preview-imagen-posteo">
+            <Image loader={cloudinaryLoader} src={imagenPreview} alt="" width={500} height={300} unoptimized={!imagenPreview.startsWith('http')} />
+            <button
+              type="button"
+              className="quitar-imagen"
+              aria-label="Quitar imagen"
+              onClick={quitarImagen}
+              disabled={imagenSubiendo}
+            >
+              <IoMdClose className="icon" />
+            </button>
+            {imagenSubiendo && (
+              <div className="barra-progreso-imagen">
+                <div className="barra-progreso-imagen-relleno" style={{ width: `${imagenProgreso}%` }} />
+              </div>
+            )}
+          </div>
+        )}
+
+        {imagenError && <p className="error-imagen-posteo">{imagenError}</p>}
+
         <div className="boton-de-posteo-feed">
-          <button type="submit" disabled={isLoading}>
+          <input
+            ref={inputImagenRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            hidden
+            disabled={isLoading}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) seleccionarImagen(file);
+              e.target.value = '';
+            }}
+          />
+          <button
+            type="button"
+            className="boton-adjuntar-imagen"
+            aria-label="Adjuntar imagen"
+            onClick={() => inputImagenRef.current?.click()}
+            disabled={isLoading}
+          >
+            <IoMdImage className="icon" />
+          </button>
+          <button type="submit" disabled={isLoading || imagenSubiendo}>
             {isLoading ? 'Posteando...' : 'Postear'}
           </button>
         </div>

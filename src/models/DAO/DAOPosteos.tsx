@@ -20,12 +20,16 @@ interface Posteos {
     likes: number;
     comentarios_count: number;
     reposteos_count: number;
+    imagen_url: string | null;
+    imagen_public_id: string | null;
 }
 
 interface CreacionPosteo {
     creador_id: number;
     titulo: string;
     contenido: string;
+    imagen_url?: string | null;
+    imagen_public_id?: string | null;
 }
 
 export interface PosteosPaginados {
@@ -48,13 +52,13 @@ class DAOPosteos {
                 ? await data`
                     SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
                            titulo, contenido, created_at, updated_at, creador_id, likes,
-                           comentarios_count, reposteos_count
+                           comentarios_count, reposteos_count, imagen_url, imagen_public_id
                     FROM usuarios_posteos where posteo_id < ${cursor} order by posteo_id desc limit ${limit + 1}
                 `
                 : await data`
                     SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
                            titulo, contenido, created_at, updated_at, creador_id, likes,
-                           comentarios_count, reposteos_count
+                           comentarios_count, reposteos_count, imagen_url, imagen_public_id
                     FROM usuarios_posteos order by posteo_id desc limit ${limit + 1}
                 `;
 
@@ -79,13 +83,13 @@ class DAOPosteos {
                 ? await data`
                     SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
                            titulo, contenido, created_at, updated_at, creador_id, likes,
-                           comentarios_count, reposteos_count
+                           comentarios_count, reposteos_count, imagen_url, imagen_public_id
                     FROM usuarios_posteos where creador_id = ${creadorId} and posteo_id < ${cursor} order by posteo_id desc limit ${limit + 1}
                 `
                 : await data`
                     SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
                            titulo, contenido, created_at, updated_at, creador_id, likes,
-                           comentarios_count, reposteos_count
+                           comentarios_count, reposteos_count, imagen_url, imagen_public_id
                     FROM usuarios_posteos where creador_id = ${creadorId} order by posteo_id desc limit ${limit + 1}
                 `;
 
@@ -98,8 +102,7 @@ class DAOPosteos {
         }
     }
 
-    // Feed "Siguiendo": posteos de los usuarios a los que `miId` sigue (tabla `seguimientos`),
-    // no los propios. Mismo paginado keyset que el resto de los listados.
+    // Feed "Inicio": posteos propios y de usuarios seguidos. Mismo paginado keyset que el resto de los listados.
     async getFeedDeSeguidos(miId: number, limit: number = DEFAULT_POSTEOS_LIMIT, cursor?: number): Promise<PosteosPaginados> {
         try {
 
@@ -112,18 +115,18 @@ class DAOPosteos {
                 ? await data`
                     SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
                            titulo, contenido, created_at, updated_at, creador_id, likes,
-                           comentarios_count, reposteos_count
+                           comentarios_count, reposteos_count, imagen_url, imagen_public_id
                     FROM usuarios_posteos
-                    where creador_id in (select id_a_seguir from seguimientos where id_mio = ${miId})
+                    where (creador_id = ${miId} or creador_id in (select id_a_seguir from seguimientos where id_mio = ${miId}))
                       and posteo_id < ${cursor}
                     order by posteo_id desc limit ${limit + 1}
                 `
                 : await data`
                     SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
                            titulo, contenido, created_at, updated_at, creador_id, likes,
-                           comentarios_count, reposteos_count
+                           comentarios_count, reposteos_count, imagen_url, imagen_public_id
                     FROM usuarios_posteos
-                    where creador_id in (select id_a_seguir from seguimientos where id_mio = ${miId})
+                    where creador_id = ${miId} or creador_id in (select id_a_seguir from seguimientos where id_mio = ${miId})
                     order by posteo_id desc limit ${limit + 1}
                 `;
 
@@ -143,7 +146,7 @@ class DAOPosteos {
             const posteos = await data`
                 SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
                        titulo, contenido, created_at, updated_at, creador_id, likes,
-                       comentarios_count, reposteos_count
+                       comentarios_count, reposteos_count, imagen_url, imagen_public_id
                 FROM usuarios_posteos
                 where titulo ILIKE ${like} or contenido ILIKE ${like} or nombre ILIKE ${like}
                 order by posteo_id desc limit ${limit}
@@ -166,7 +169,7 @@ class DAOPosteos {
             const posteo = await data`
                 SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
                        titulo, contenido, created_at, updated_at, creador_id, likes,
-                       comentarios_count, reposteos_count
+                       comentarios_count, reposteos_count, imagen_url, imagen_public_id
                 FROM usuarios_posteos where posteo_id = ${id}
             `;
 
@@ -191,7 +194,7 @@ class DAOPosteos {
             const posteo = await data`
                 SELECT id, nombre, email, fecha_creacion, identificador, posteo_id,
                        titulo, contenido, created_at, updated_at, creador_id, likes,
-                       comentarios_count, reposteos_count
+                       comentarios_count, reposteos_count, imagen_url, imagen_public_id
                 FROM usuarios_posteos where posteo_id = ${id}
             `;
 
@@ -208,7 +211,11 @@ class DAOPosteos {
     async createPosteo(posteo: CreacionPosteo): Promise<Posteos> {
         try {
             const data = await db();
-            const newPosteo = await data`insert into posteos (titulo, contenido, creador_id) values (${posteo.titulo}, ${posteo.contenido}, ${posteo.creador_id}) returning *`;
+            const newPosteo = await data`
+                insert into posteos (titulo, contenido, creador_id, imagen_url, imagen_public_id)
+                values (${posteo.titulo}, ${posteo.contenido}, ${posteo.creador_id}, ${posteo.imagen_url ?? null}, ${posteo.imagen_public_id ?? null})
+                returning *
+            `;
             return newPosteo[0] as Posteos;
         } catch (error) {
             throw error as CustomError;
@@ -328,3 +335,6 @@ class DAOPosteos {
 }
 
 export default new DAOPosteos();
+
+
+

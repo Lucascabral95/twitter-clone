@@ -37,6 +37,8 @@ interface Posteos {
     likes: number;
     comentarios_count: number;
     reposteos_count: number;
+    imagen_url: string | null;
+    imagen_public_id: string | null;
 }
 
 // Fila cruda que devuelve `POST /api/posteo` (tabla `posteos`), sin el join con
@@ -52,6 +54,8 @@ interface PosteoCreado {
     likes: number;
     comentarios_count: number;
     reposteos_count: number;
+    imagen_url: string | null;
+    imagen_public_id: string | null;
 }
 
 interface DatosPersonales {
@@ -253,6 +257,8 @@ const useStore = create<StoreState>((set, get) => ({
             likes: nuevoPosteo.likes,
             comentarios_count: nuevoPosteo.comentarios_count,
             reposteos_count: nuevoPosteo.reposteos_count,
+            imagen_url: nuevoPosteo.imagen_url,
+            imagen_public_id: nuevoPosteo.imagen_public_id,
         };
 
         set({

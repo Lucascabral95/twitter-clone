@@ -1,12 +1,14 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { formatearFecha } from '@/utils/formatearFecha';
 import { Toaster } from 'react-hot-toast';
-import { IoMdHeart, IoMdHeartEmpty } from 'react-icons/io';
+import { IoMdClose, IoMdHeart, IoMdHeartEmpty } from 'react-icons/io';
 import { FiArrowLeft } from 'react-icons/fi';
 import Avvvatars from 'avvvatars-react';
+import { cloudinaryLoader } from '@/lib/cloudinaryLoader';
 
 import Comentarios from '@/components/Comentarios/Comentarios';
 import NotFound from '@/components/NotFound/NotFound';
@@ -27,6 +29,23 @@ const PostDetail: React.FC = () => {
   const [editando, setEditando] = useState(false);
   const [tituloEdit, setTituloEdit] = useState('');
   const [contenidoEdit, setContenidoEdit] = useState('');
+  const [imagenAbierta, setImagenAbierta] = useState(false);
+
+  useEffect(() => {
+    if (!imagenAbierta) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setImagenAbierta(false);
+    };
+
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [imagenAbierta]);
 
   if (loading) {
     return <SkeletonTweet count={1} />;
@@ -136,6 +155,23 @@ const PostDetail: React.FC = () => {
                   <div className="texto-contenido">
                     <p>{dataPosteo?.posteo_contenido}</p>
                   </div>
+                  {dataPosteo?.imagen_url && (
+                    <button
+                      type="button"
+                      className="imagen-posteo-detalle"
+                      aria-label="Abrir imagen del posteo"
+                      onClick={() => setImagenAbierta(true)}
+                    >
+                      <Image
+                        loader={cloudinaryLoader}
+                        src={dataPosteo.imagen_url}
+                        alt=""
+                        width={900}
+                        height={600}
+                        sizes="(max-width: 700px) 100vw, 700px"
+                      />
+                    </button>
+                  )}
                 </>
               )}
               <div className="fecha-posteo">
@@ -164,6 +200,36 @@ const PostDetail: React.FC = () => {
 
         <Toaster />
       </div>
+
+      {imagenAbierta && dataPosteo?.imagen_url && (
+        <div className="visor-imagen-posteo" role="dialog" aria-modal="true" aria-label="Imagen del posteo">
+          <button
+            type="button"
+            className="cerrar-visor-imagen"
+            aria-label="Cerrar imagen"
+            onClick={() => setImagenAbierta(false)}
+          >
+            <IoMdClose className="icon" />
+          </button>
+          <button
+            type="button"
+            className="visor-imagen-backdrop"
+            aria-label="Cerrar imagen ampliada"
+            onClick={() => setImagenAbierta(false)}
+          />
+          <div className="visor-imagen-contenido">
+            <Image
+              loader={cloudinaryLoader}
+              src={dataPosteo.imagen_url}
+              alt=""
+              width={1400}
+              height={1000}
+              sizes="100vw"
+              priority
+            />
+          </div>
+        </div>
+      )}
     </section>
   );
 };

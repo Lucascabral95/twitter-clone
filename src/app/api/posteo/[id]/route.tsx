@@ -4,6 +4,7 @@ import DAONotificaciones from "@/models/DAO/DAONotificaciones";
 import { getSessionUser } from "@/infrastructure/auth/session";
 import { handleRouteError } from "@/infrastructure/http/handleRouteError";
 import { logger } from "@/infrastructure/logger";
+import cloudinary, { ensureCloudinaryConfigured } from "@/services/cloudinary";
 
 export async function GET(req: NextRequest, { params }: { params: { id: number } }) {
     try {
@@ -89,8 +90,18 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: numbe
 
         const results = await DAOPosteos.deletePosteoByID(Number(id));
 
+        if (results.imagen_public_id) {
+            // Best-effort: si Cloudinary falla en borrar el asset, no debe romper la
+            // respuesta de borrado del posteo (ya fue borrado en la DB).
+            ensureCloudinaryConfigured();
+            cloudinary.uploader.destroy(results.imagen_public_id).catch((err) =>
+                logger.error("Error al borrar imagen de Cloudinary", err)
+            );
+        }
+
         return NextResponse.json({ result: results }, { status: 200 });
     } catch (error) {
         return handleRouteError(error);
     }
 }
+

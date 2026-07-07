@@ -21,7 +21,7 @@ const fixedPosteo = {
   reposteos_count: 0,
 };
 
-const mockSql = jest.fn(async (_strings: readonly string[], ..._values: unknown[]): Promise<any[]> => [fixedPosteo]);
+const mockSql = jest.fn(async (): Promise<any[]> => [fixedPosteo]);
 
 jest.mock('@/services/neon', () => ({
   __esModule: true,
@@ -32,16 +32,31 @@ jest.mock('@/infrastructure/auth/session', () => ({
   getSessionUser: jest.fn(),
 }));
 
+jest.mock('@/services/cloudinary', () => ({
+  __esModule: true,
+  default: {
+    uploader: {
+      destroy: jest.fn(() => Promise.resolve({ result: 'ok' })),
+    },
+  },
+  ensureCloudinaryConfigured: jest.fn(),
+}));
+
 import { PUT, PATCH, DELETE } from './route';
 import { getSessionUser } from '@/infrastructure/auth/session';
+import cloudinary, { ensureCloudinaryConfigured } from '@/services/cloudinary';
 
 const mockGetSessionUser = getSessionUser as jest.Mock;
+const mockDestroy = cloudinary.uploader.destroy as jest.Mock;
+const mockEnsureCloudinaryConfigured = ensureCloudinaryConfigured as jest.Mock;
 
 describe('/api/posteo/[id] route', () => {
   beforeEach(() => {
     mockSql.mockClear();
     mockSql.mockImplementation(async () => [fixedPosteo]);
     mockGetSessionUser.mockReset();
+    mockDestroy.mockClear();
+    mockEnsureCloudinaryConfigured.mockClear();
   });
 
   describe('PUT (toggle like)', () => {
@@ -158,6 +173,22 @@ describe('/api/posteo/[id] route', () => {
 
       expect(response.status).toBe(200);
       expect(body.result).toEqual(fixedPosteo);
+      expect(mockDestroy).not.toHaveBeenCalled();
+    });
+
+    it('deletes the Cloudinary asset when the post has an image_public_id', async () => {
+      mockGetSessionUser.mockResolvedValue({ id: 42 });
+      const posteoConImagen = { ...fixedPosteo, imagen_public_id: 'twitter-clone/posteos/42/abc' };
+      mockSql.mockImplementation(async () => [posteoConImagen]);
+      const req = new NextRequest('http://localhost/api/posteo/7', { method: 'DELETE' });
+
+      const response = await DELETE(req, { params: { id: 7 } });
+
+      expect(response.status).toBe(200);
+      expect(mockEnsureCloudinaryConfigured).toHaveBeenCalledTimes(1);
+      expect(mockDestroy).toHaveBeenCalledWith('twitter-clone/posteos/42/abc');
     });
   });
 });
+
+
