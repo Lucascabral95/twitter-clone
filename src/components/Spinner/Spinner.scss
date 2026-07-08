@@ -2,8 +2,8 @@
     display: inline-block;
     width: 18px;
     height: 18px;
-    border: 2px solid rgba(255, 255, 255, 0.4);
-    border-top-color: #fff;
+    border: 2px solid var(--borde-sutil-hover);
+    border-top-color: var(--texto-primario);
     border-radius: 50%;
     animation: spinner-rotate 0.7s linear infinite;
 }

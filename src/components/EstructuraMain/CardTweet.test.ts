@@ -51,3 +51,14 @@ test('does not hijack clicks on the author profile link', () => {
 
   expect(push).not.toHaveBeenCalled();
 });
+
+test('shows mensajeVacio when there are no posts and it was provided', () => {
+  render(React.createElement(CardTweet, { posteos: [], mensajeVacio: 'No encontramos publicaciones para tu búsqueda.' }));
+  expect(screen.getByText('No encontramos publicaciones para tu búsqueda.')).toBeInTheDocument();
+});
+
+test('renders nothing extra when there are no posts and mensajeVacio was not provided', () => {
+  const { container } = render(React.createElement(CardTweet, { posteos: [] }));
+  expect(container.querySelector('.sin-posteos')).not.toBeInTheDocument();
+  expect(container.querySelector('.contenedor-boton-ver-mas')).not.toBeInTheDocument();
+});

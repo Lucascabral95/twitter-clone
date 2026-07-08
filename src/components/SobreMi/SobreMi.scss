@@ -20,21 +20,27 @@
                 flex-direction: column;
                 justify-content: center;
                 margin: 8px 12px 10px 12px;
-                padding: 14px 12px;
-                border-radius: 8px;
-                border: 1px solid #333639;
-                border: 0.2px solid #cc008890;
+                padding: 12px;
+                border-radius: var(--radius-md);
+                background-color: var(--superficie-2);
+                border: 1px solid var(--borde-sutil);
+                transition: border-color var(--transition-fast);
+
+                &:focus-within {
+                    border-color: var(--color-foco);
+                }
 
                 input {
                     width: 100%;
-                    color: var(--letra-titular);
+                    color: var(--texto-primario);
                     background-color: transparent;
-                    font-size: 15px;
-                    
+                    font-size: 14px;
+                    font-family: inherit;
+
                     &::placeholder {
-                        color: var(--color-gris);
-                        font-size: 15px;
-                        font-weight: 600;
+                        color: var(--texto-terciario);
+                        font-size: 14px;
+                        font-weight: 500;
                     }
 
                     &:focus {
@@ -43,8 +49,10 @@
                 }
 
                 label{
-                    color: var(--color-gris);
-                    font-size: 12px;
+                    color: var(--texto-terciario);
+                    font-size: 11px;
+                    text-transform: uppercase;
+                    letter-spacing: .03em;
                     margin: 0 0 4px 0;
                     font-weight: 600;
                 }
@@ -56,16 +64,20 @@
                 align-items: center;
                 justify-content: center;
                 margin: 16px 0 0 0;
-                border-radius: 4px;
-                
+
                 button {
-                    padding: 6px 16px;
-                    border-radius: 16px;
-                    color: var(--letra-titular);
-                    background-color: var(--color-llamativo);
+                    padding: 8px 16px;
+                    border-radius: var(--radius-sm);
+                    color: var(--acento-texto);
+                    background-color: var(--acento-fondo);
                     border: none;
-                    font-weight: bolder;
-                    font-size: 16px;
+                    font-weight: 600;
+                    font-size: 13px;
+
+                    &:hover {
+                        transition: opacity var(--transition-fast);
+                        opacity: 0.85;
+                    }
                 }
             }
         }

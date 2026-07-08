@@ -12,16 +12,20 @@
             .input-busqueda {
                 width: 100%;
                 display: flex;
-                padding: 6px 10px 6px 14px;
-                border-radius: 16px;
-                border: 1px solid rgba(128, 128, 128, 0.355);
-                background-color: var(--fondo-busqueda);
+                padding: 9px 10px 9px 14px;
+                border-radius: var(--radius-md);
+                border: 1px solid var(--borde-sutil);
+                background-color: var(--superficie-2);
 
                 input {
                     width: 100%;
                     border: none;
-                    background-color: var(--fondo-busqueda);
-                    color: var(--letra-titular);
+                    background-color: transparent;
+                    color: var(--texto-primario);
+
+                    &::placeholder {
+                        color: var(--texto-terciario);
+                    }
 
                     &:focus {
                         outline: none;
@@ -31,17 +35,17 @@
                     display: flex;
                     justify-content: center;
                     align-items: center;
-                    border-radius: 50%;
+                    border-radius: var(--radius-sm);
                     padding: 4px;
+                    transition: background-color var(--transition-fast);
 
                     .icon{
-                        color: var(--letra-titular);
-                        font-size: 20px;
+                        color: var(--texto-terciario);
+                        font-size: 18px;
                     }
 
                     &:hover{
-                        transition: 0.2s ease-in-out;
-                        background-color: rgba(255, 255, 255, 0.07);
+                        background-color: var(--superficie-3);
                     }
                 }
             }
@@ -55,8 +59,8 @@
                     flex: 1 1 auto;
                     margin: 0 12px 0 0;
                     p {
-                        color: var(--letra-titular);
-                        font-size: 15px;
+                        color: var(--texto-secundario);
+                        font-size: 12.5px;
                         white-space: nowrap;
                     }
                 }
@@ -64,10 +68,12 @@
                 .publicacion-o-usuario {
                     width: 100%;
                     margin: 2px 0 0 0;
-                    padding: 6px;
-                    border-radius: 16px;
-                    background-color: var(--fondo-busqueda);
-                    color: var(--letra-titular);
+                    padding: 7px 10px;
+                    border-radius: var(--radius-sm);
+                    background-color: var(--superficie-2);
+                    border: 1px solid var(--borde-sutil);
+                    color: var(--texto-primario);
+                    font-size: 12.5px;
 
                     &:focus{
                         outline: none;
@@ -75,10 +81,9 @@
 
                     option {
                         width: 100%;
-                        color: var(--letra-titular);
-                        background-color: var(--fondo-busqueda);
+                        color: var(--texto-primario);
+                        background-color: var(--superficie-2);
                         padding: 12px;
-                        border-radius: 16px;
                         cursor: pointer;
 
                         &:focus{
@@ -86,7 +91,7 @@
                         }
 
                         &:hover{
-                            background-color: rgba(255, 255, 255, 0.07);
+                            background-color: var(--superficie-3);
                         }
                     }
                 }

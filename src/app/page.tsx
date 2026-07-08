@@ -6,78 +6,52 @@ import Footer from '@/components/Footer/Footer';
 import Register from '@/components/Register/Register';
 import Login from '@/components/Register/Login';
 import { useAuthModals } from '@/presentation/hooks';
+import './page.scss';
 
 const Home: React.FC = () => {
   const { isOpenRegister, isOpenLogin, openRegister, openLogin, closeRegister, closeLogin } = useAuthModals();
 
   return (
-    <div className="pagina-principal">
-      <div className="pagina-principal-contenedor">
-        <div className="secciones-inicio">
-          <div className="contenedores-medios">
-            <div className="medio-contenedor medio-contenedor-logo">
-              <div className="imagen-logo">
-                <Image
-                  className="imagen"
-                  src="/img/twitter.svg"
-                  alt="Logo"
-                  width={380}
-                  height={340}
-                />
-              </div>
-            </div>
-
-            <div className="medio-contenedor medio-contenedor-form">
-              <div className="imagen-de-logo">
-                <Image
-                  className="imagen-d-e-logo"
-                  src="/img/twitter.svg"
-                  alt="Logo"
-                  width={100}
-                  height={100}
-                />
-              </div>
-
-              <div className="titulo-home">
-                <h2>Lo que está pasando ahora</h2>
-              </div>
-
-              <div className="subtitulo-home">
-                <h3>Unite hoy</h3>
-              </div>
-
-              <div className="crear-cuenta">
-                <button className="crear-cuenta-boton" onClick={openRegister}>
-                  Crear cuenta
-                </button>
-              </div>
-
-              <div className="terminos-condiciones">
-                <p>
-                  Al registrarte, aceptás los Términos y Condiciones y la Política de privacidad,
-                  incluida la política de Uso de Cookies.
-                </p>
-              </div>
-
-              <div className="tenes-cuenta">
-                <div className="texto">
-                  <p>¿Ya tenés una cuenta?</p>
-                </div>
-
-                {isOpenRegister && <Register onClose={closeRegister} />}
-
-                <div className="boton-inicio-sesion">
-                  <button onClick={openLogin}>Iniciar sesión</button>
-                </div>
-
-                {isOpenLogin && <Login onClose={closeLogin} />}
-              </div>
-            </div>
+    <div className="landing">
+      <div className="split">
+        <div className="panel-logo">
+          <div className="mark">
+            <Image src="/img/twitter.svg" alt="Logo" width={48} height={48} priority />
           </div>
         </div>
 
-        <Footer />
+        <div className="panel-form">
+          <div className="lockup">
+            <div className="mark">
+              <Image src="/img/twitter.svg" alt="Logo" width={20} height={20} />
+            </div>
+          </div>
+
+          <h1>Lo que está pasando ahora</h1>
+          <h2 className="sub">Unite hoy</h2>
+
+          <button className="btn-primary" onClick={openRegister}>
+            Crear cuenta
+          </button>
+
+          <p className="terms">
+            Al registrarte, aceptás los Términos y Condiciones y la Política de privacidad,
+            incluida la política de Uso de Cookies.
+          </p>
+
+          <div className="tenes-cuenta">
+            <p>¿Ya tenés una cuenta?</p>
+            <button className="btn-secondary" onClick={openLogin}>
+              Iniciar sesión
+            </button>
+          </div>
+        </div>
       </div>
+
+      <Footer />
+
+      {isOpenRegister && <Register onClose={closeRegister} />}
+      {isOpenLogin && <Login onClose={closeLogin} />}
     </div>
   );
 };

@@ -7,7 +7,6 @@ import { RiBearSmileLine } from "react-icons/ri";
 import "./Header.scss";
 import Avvvatars from 'avvvatars-react'
 import { formatearFecha } from '@/utils/formatearFecha';
-import { usePathname } from "next/navigation";
 import useStore from "@/zustand";
 import { Toaster } from 'react-hot-toast';
 import SeguidosSeguidores from "../SeguidosSeguidores/SeguidosSeguidores";
@@ -52,14 +51,11 @@ type TMisDatos = {
 };
 
 const Header: React.FC<TMisDatos> = ({ dataUser, misDatosPersonales, seguidores }: TMisDatos) => {
-    const pathname = usePathname();
     const [isOpenSeguidosSeguidores, setIsOpenSeguidosSeguidores] = useState<boolean>(false);
     const getCookieLogueo = useStore((s) => s.getCookieLogueo);
     const datosLogueo = useStore((s) => s.datosLogueo);
     const existeEnMiListaDeAmigos = useStore((s) => s.existeEnMiListaDeAmigos);
     const esMiAmigo = useStore((s) => s.esMiAmigo);
-    const seguirUsuario = useStore((s) => s.seguirUsuario);
-    const eliminarSeguimiento = useStore((s) => s.eliminarSeguimiento);
     const misSeguidos = useStore((s) => s.misSeguidos);
     const obtenerSeguidores = useStore((s) => s.obtenerSeguidores);
     const [seguidosOSeguidores, setSeguidosOSeguidores] = useState<string>("");
@@ -101,21 +97,10 @@ const Header: React.FC<TMisDatos> = ({ dataUser, misDatosPersonales, seguidores 
                             <button
                                 type="button"
                                 className="boton-de-follow"
-                                aria-label={pathname === "/home" ? "Mi cuenta" : esMiAmigo ? "Dejar de seguir" : "Seguir"}
-                                onClick={pathname === "/home" ? () => { } :
-                                    esMiAmigo ? () => eliminarSeguimiento(datosLogueo?.id as number, dataUser?.id) : () => seguirUsuario(datosLogueo?.id as number, dataUser?.id)}>
+                                aria-label="Mi cuenta"
+                                onClick={() => { }}>
                                 <div className="texto">
-                                    {
-                                        pathname === "/home"
-                                            ?
-                                            <p> Mi cuenta </p>
-                                            :
-                                            esMiAmigo
-                                                ?
-                                                <p> Dejar de seguir </p>
-                                                :
-                                                <p> Seguir </p>
-                                    }
+                                    <p> Mi cuenta </p>
                                 </div>
                                 <div className="icono">
                                     <FaTwitter className="icon" />

@@ -729,12 +729,18 @@
                     align-items: center;
                     justify-content: flex-end;
                     margin: 4px 0 6px 0;
-    
+
                     p {
                         font-size: 12.42px;
                     }
                 }
             }
         }
-    }    
+    }
+}
+
+@media (min-width: 1024px) {
+    .header {
+        display: none;
+    }
 }

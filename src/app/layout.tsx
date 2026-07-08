@@ -3,6 +3,8 @@ import localFont from "next/font/local";
 import "./globals.css";
 import "./App.scss";
 import Navbar from "@/components/Navbar/Navbar";
+import Sidebar from "@/components/Sidebar/Sidebar";
+import BuscadorSuperior from "@/components/BuscadorSuperior/BuscadorSuperior";
 import AuthRefreshProvider from "@/presentation/providers/AuthRefreshProvider";
 
 const geistSans = localFont({
@@ -33,7 +35,13 @@ export default function RootLayout({
       >
         <AuthRefreshProvider>
           <Navbar />
-          {children}
+          <div className="app-shell">
+            <Sidebar />
+            <div className="app-content">
+              <BuscadorSuperior />
+              {children}
+            </div>
+          </div>
         </AuthRefreshProvider>
       </body>
     </html>

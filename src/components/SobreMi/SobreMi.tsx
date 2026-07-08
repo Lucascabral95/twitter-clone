@@ -1,5 +1,4 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { usePathname } from 'next/navigation';
 import axios from 'axios';
 import { Toaster } from 'react-hot-toast';
 import useSWR from 'swr';
@@ -11,17 +10,20 @@ import './SobreMi.scss';
 
 const fetcher = (url: string) => axios.get(url).then(res => res.data.result[0]);
 
-const SobreMi: React.FC<IID> = ({ id }) => {
+interface SobreMiProps extends IID {
+    editable?: boolean;
+}
+
+const SobreMi: React.FC<SobreMiProps> = ({ id, editable = false }) => {
     const [datos, setDatos] = useState<IPosteo>({
         biografia: '',
         localizacion: '',
         sitio_web: '',
         cumpleanos: ''
     });
-    
-    const pathname = usePathname();
-    const isEditable = useMemo(() => pathname === "/home", [pathname]);
-    
+
+    const isEditable = editable;
+
     const { error, isLoading } = useSWR(
         `/api/datospersonales/${Number(id)}`,
         fetcher,

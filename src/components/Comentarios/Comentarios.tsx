@@ -183,7 +183,7 @@ const Comentarios: React.FC<{ dataPosteo: IPosteo }> = ({ dataPosteo }) => {
                         <textarea onChange={(e) => { setComentario(e.target.value.length); setContenido(e.target.value) }} value={contenido}
                             maxLength={700} className="textarea-de-comentarioo" placeholder="Publicá tu respuesta..." required />
                         <div className="texto-de-aclaracion">
-                            <p style={{ color: comentario === 700 ? "red" : "var(--color-letra-gris)" }}> {comentario}/700 </p>
+                            <p style={{ color: comentario === 700 ? "var(--color-error)" : "var(--texto-terciario)" }}> {comentario}/700 </p>
                         </div>
                         <div className="boton-de-comentar">
                             <button type="submit"> Comentar </button>

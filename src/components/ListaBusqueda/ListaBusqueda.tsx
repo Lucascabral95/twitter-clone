@@ -15,10 +15,12 @@ interface Usuario {
 interface ListaProps {
     datos: Usuario[];
     palabra: string;
-    cerrarBusqueda: () => void
+    cerrarBusqueda: () => void;
+    cargando?: boolean;
 }
 
-const ListaBusqueda: React.FC<ListaProps> = ({ datos, palabra, cerrarBusqueda }) => {
+const ListaBusqueda: React.FC<ListaProps> = ({ datos, palabra, cerrarBusqueda, cargando = false }) => {
+    const sinResultados = !cargando && datos.length === 0;
 
     return (
         <motion.div
@@ -54,6 +56,12 @@ const ListaBusqueda: React.FC<ListaProps> = ({ datos, palabra, cerrarBusqueda })
                             </div>
                         </Link>
                     ))}
+
+                    {sinResultados && (
+                        <div className="sin-resultados">
+                            <p>No encontramos usuarios que coincidan con &quot;{palabra}&quot;.</p>
+                        </div>
+                    )}
                 </div>
 
             </div>

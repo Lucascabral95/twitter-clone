@@ -49,7 +49,7 @@ const PosteoFeed: React.FC = () => {
         </div>
 
         <div className="reglainput">
-          <p style={{ color: titulo === TITULO_MAX ? 'red' : 'var(--color-letra-gris)' }}>
+          <p style={{ color: titulo === TITULO_MAX ? 'var(--color-error)' : 'var(--texto-terciario)' }}>
             {titulo}/{TITULO_MAX}
           </p>
         </div>
@@ -67,7 +67,7 @@ const PosteoFeed: React.FC = () => {
         </div>
 
         <div className="reglainput">
-          <p style={{ color: contenido === CONTENIDO_MAX ? 'red' : 'var(--color-letra-gris)' }}>
+          <p style={{ color: contenido === CONTENIDO_MAX ? 'var(--color-error)' : 'var(--texto-terciario)' }}>
             {contenido}/{CONTENIDO_MAX}
           </p>
         </div>

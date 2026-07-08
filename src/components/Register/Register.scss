@@ -1,4 +1,4 @@
-﻿.register {
+.register {
     width: 100%;
     height: 100vh;
     display: flex;
@@ -7,35 +7,48 @@
     top: 0;
     left: 0;
     position: fixed;
-    background: var(--fondo-color-modal);
-    backdrop-filter: var(--fondo-blur-modal);
+    background: rgba(0, 0, 0, .72);
+    backdrop-filter: blur(14px);
+    z-index: 10;
 
     .contenedor-register {
         width: 100%;
-        max-width: 600px;
+        max-width: 440px;
         height: fit-content;
-        padding: 0 16px 60px 16px;
-        background-color: black;
-        border-radius: 8px;
-        border: var(--borde-modal);
+        padding: 0 32px 32px 32px;
+        background-color: var(--superficie-2);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--borde-sutil);
+        box-shadow: var(--shadow-modal);
 
         .superior {
             display: flex;
-            justify-content: center;
             justify-content: space-between;
-            height: 53px;
+            align-items: center;
+            height: 64px;
 
             .icono {
+                width: 36px;
+                height: 36px;
                 display: flex;
                 align-items: center;
+                justify-content: center;
                 cursor: pointer;
                 background: none;
                 border: none;
+                border-radius: var(--radius-md);
+                color: var(--texto-secundario);
                 padding: 0;
+                transition: background-color var(--transition-fast), color var(--transition-fast);
 
                 .icon {
-                    color: white;
-                    font-size: 24px;
+                    color: inherit;
+                    font-size: 20px;
+                }
+
+                &:hover {
+                    background: var(--superficie-3);
+                    color: var(--texto-primario);
                 }
             }
 
@@ -46,17 +59,18 @@
         }
 
         .medio {
-            padding: 0 80px;
+            padding: 0;
 
             .medio-titulo {
-                height: 76px;
                 display: flex;
                 align-items: center;
 
                 h3 {
-                    color: white;
-                    font-size: 31px;
-                    font-weight: 700;
+                    color: var(--texto-primario);
+                    font-size: 22px;
+                    font-weight: 600;
+                    letter-spacing: -.01em;
+                    margin: 0 0 20px;
                 }
             }
 
@@ -71,18 +85,32 @@
                         display: flex;
                         align-items: center;
                         padding: 0 12px;
-                        border-radius: 8px;
-                        border: 1px solid #71767b68;
+                        border-radius: var(--radius-md);
+                        background: var(--superficie-1);
+                        border: 1px solid var(--borde-sutil);
+                        transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+
+                        &:focus-within {
+                            border-color: var(--color-foco);
+                            box-shadow: 0 0 0 3px rgba(59, 130, 246, .15);
+                        }
+
+                        &.error {
+                            border-color: var(--color-error);
+                            background: var(--color-error-fondo);
+                        }
 
                         input {
                             width: 100%;
-                            color: white;
+                            color: var(--texto-primario);
                             background-color: transparent;
                             user-select: none;
-                            height: 56px;
+                            height: 48px;
+                            font-size: 15px;
+                            font-family: inherit;
 
                             &::placeholder {
-                                color: var(--color-letra-gris);
+                                color: var(--texto-terciario);
                             }
 
                             &:focus {
@@ -95,21 +123,21 @@
                     .texto-aclaratorio {
                         display: flex;
                         align-items: center;
-                        margin: 2px 0 20px -2px;
+                        margin: 6px 0 16px 2px;
 
                         p {
-                            color: var(--color-letra-gris);
-                            font-size: 11px;
+                            color: var(--texto-secundario);
+                            font-size: 11.5px;
                             margin: 0 0 0 8px;
                         }
                     }
 
                     .contenedor-texto-de-error {
-                        margin: 2px 0 20px 0;
+                        margin: 6px 0 16px 2px;
 
                         p {
-                            color: red;
-                            font-size: 12px;
+                            color: var(--color-error);
+                            font-size: 11.5px;
                         }
                     }
 
@@ -120,7 +148,7 @@
                         justify-content: center;
                         gap: 10px;
                         margin: 8px 0 0 0;
-                        color: var(--color-letra-gris);
+                        color: var(--texto-secundario);
 
                         p {
                             font-size: 13px;
@@ -132,26 +160,27 @@
                         width: 100%;
 
                         button {
-                            border-radius: 16px;
-                            height: 38px;
+                            border-radius: var(--radius-md);
+                            height: 44px;
                             display: flex;
                             justify-content: center;
                             align-items: center;
-                            color: white;
-                            background-color: var(--fondo-celeste-boton);
+                            color: var(--acento-texto);
+                            background-color: var(--acento-fondo);
                             width: 100%;
                             font-weight: 600;
-                            margin: 40px 0 0 0;
+                            font-size: 15px;
+                            border: none;
+                            margin: 32px 0 0 0;
 
                             &:hover {
-                                transition: 0.2s;
-                                background-color: var(--fondo-celeste-boton);
-                                opacity: 0.95;
+                                transition: opacity var(--transition-fast);
+                                opacity: 0.85;
                             }
 
                             &:disabled {
                                 cursor: wait;
-                                opacity: 0.72;
+                                opacity: 0.6;
                             }
                         }
                     }
@@ -160,14 +189,6 @@
         }
     }
 }
-
-
-
-
-
-
-
-
 
 @media (max-width: 704px) {
 
@@ -182,46 +203,30 @@
             width: 100%;
             height: 100vh;
             max-width: 100%;
-            padding: 0 16px 16px 16px;
+            padding: 0 20px 20px 20px;
             border-radius: 0px;
             border: none;
+            box-shadow: none;
 
             .superior {
                 width: 100%;
                 display: flex;
-                justify-content: center;
                 justify-content: space-between;
-                height: 53px;
-
-                .icono {
-                    display: flex;
-                    align-items: center;
-
-                    .icon {
-                        font-size: 24px;
-                    }
-                }
-
-                .imagen-register {
-                    display: flex;
-                    align-items: center;
-
-                }
+                align-items: center;
+                height: 64px;
             }
 
             .medio {
                 width: 100%;
-                padding: 0 20px;
+                padding: 0;
 
                 .medio-titulo {
                     height: 60px;
                     display: flex;
-                    flex-direction: column;
-                    justify-content: space-between;
-                    align-items: flex-start;
+                    align-items: center;
 
                     h3 {
-                        font-size: 31px;
+                        font-size: 22px;
                     }
                 }
 
@@ -229,7 +234,7 @@
                     display: flex;
                     flex-direction: column;
                     justify-content: space-between;
-                    height: calc(100vh - 161px);
+                    height: calc(100vh - 144px);
 
                     .formulario-interno {
                         width: 100% !important;
@@ -245,8 +250,7 @@
                             padding: 0 12px;
 
                             input {
-                                height: 56px;
-
+                                height: 48px;
                             }
 
                         }
@@ -254,10 +258,10 @@
                         .texto-aclaratorio {
                             display: flex;
                             align-items: center;
-                            margin: 2px 0 12px -2px;
+                            margin: 6px 0 12px 2px;
 
                             p {
-                                font-size: 11px;
+                                font-size: 11.5px;
                                 margin: 0 0 0 8px;
                             }
                         }
@@ -270,7 +274,7 @@
                         justify-content: center;
                         gap: 10px;
                         margin: 8px 0 0 0;
-                        color: var(--color-letra-gris);
+                        color: var(--texto-secundario);
 
                         p {
                             font-size: 13px;
@@ -282,12 +286,12 @@
                         width: 100%;
 
                         button {
-                            height: 38px;
+                            height: 44px;
                             display: flex;
                             justify-content: center;
                             align-items: center;
                             width: 100%;
-                            margin: 40px 0 0 0;
+                            margin: 32px 0 0 0;
 
                         }
                     }
