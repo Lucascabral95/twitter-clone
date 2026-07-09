@@ -1,6 +1,10 @@
-const mockState: any = {
+﻿const mockState: any = {
   posteos: [],
   posteosUser: [],
+  posteosUserOwnerId: null,
+  posteosUserRequestId: null,
+  loadingTweetsUser: false,
+  posteosUserError: '',
   posteosTotales: 0,
   esMiAmigo: false,
   loading: false,
@@ -84,3 +88,4 @@ export const create = (initializer: any) => {
 };
 
 export default { create };
+

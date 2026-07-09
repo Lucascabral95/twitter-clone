@@ -1,47 +1,47 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import useStore from '@/zustand';
 import { DataUser } from '@/infrastructure/interfaces';
-import { userService } from '@/infrastructure/services';
+import { useProfileData } from './useProfileData';
+
+function getErrorMessage(error: unknown): string {
+  const responseError = (error as { response?: { data?: { error?: string } } })?.response?.data?.error;
+  return responseError ?? 'Usuario no encontrado';
+}
 
 export const useUserData = () => {
   const { id } = useParams();
+  const userId = Number(id);
+  const validUserId = Number.isFinite(userId) && userId > 0;
   const getTweetsByIDUser = useStore((s) => s.getTweetsByIDUser);
   const posteosUser = useStore((s) => s.posteosUser);
+  const posteosUserOwnerId = useStore((s) => s.posteosUserOwnerId);
+  const loadingTweetsUser = useStore((s) => s.loadingTweetsUser);
+  const posteosUserError = useStore((s) => s.posteosUserError);
   const hasMoreTweetsUser = useStore((s) => s.hasMoreTweetsUser);
   const loadMoreTweetsUser = useStore((s) => s.loadMoreTweetsUser);
-  const [dataUser, setDataUser] = useState<DataUser>({} as DataUser);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
+  const { profile, error: profileError, loading: profileLoading } = useProfileData(validUserId ? userId : null);
 
   useEffect(() => {
-    if (!id) return;
-    getTweetsByIDUser(Number(id));
-  }, [getTweetsByIDUser, id]);
+    if (!validUserId) return;
+    getTweetsByIDUser(userId);
+  }, [getTweetsByIDUser, userId, validUserId]);
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (!id) return;
-
-      const result = await userService.getUserById(Number(id));
-      if (result && result.success) {
-        setDataUser(result.data ?? ({} as DataUser));
-      } else if (result) {
-        setError(result.error);
-      }
-      setLoading(false);
-    };
-
-    fetchUserData();
-  }, [id]);
+  const tweetsReady = validUserId && posteosUserOwnerId === userId;
+  const error = !validUserId
+    ? 'Usuario no encontrado'
+    : profileError
+      ? getErrorMessage(profileError)
+      : posteosUserError;
+  const loading = validUserId && !error && (profileLoading || loadingTweetsUser || !tweetsReady);
 
   return {
-    dataUser,
+    dataUser: profile?.usuario ?? ({} as DataUser),
     error,
     loading,
-    posteosUser,
-    userId: Number(id),
-    hasMoreTweetsUser,
-    loadMoreTweetsUser: () => loadMoreTweetsUser(Number(id)),
+    posteosUser: tweetsReady ? posteosUser : [],
+    userId,
+    hasMoreTweetsUser: tweetsReady ? hasMoreTweetsUser : false,
+    loadMoreTweetsUser: () => loadMoreTweetsUser(userId),
   };
 };

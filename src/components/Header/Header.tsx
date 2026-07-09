@@ -1,15 +1,17 @@
-"use client";
-import React, { useEffect, useState } from "react";
+﻿"use client";
+import React, { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
+import axios, { AxiosError } from "axios";
+import toast from "react-hot-toast";
 import { BiSolidBackpack } from "react-icons/bi";
 import { FaBirthdayCake, FaRegCalendarAlt, FaTwitter } from "react-icons/fa";
 import { RiBearSmileLine } from "react-icons/ri";
 import "./Header.scss";
 import Avvvatars from 'avvvatars-react'
 import { formatearFecha } from '@/utils/formatearFecha';
-import useStore from "@/zustand";
 import { Toaster } from 'react-hot-toast';
 import SeguidosSeguidores from "../SeguidosSeguidores/SeguidosSeguidores";
+import { useProfileData } from "@/presentation/hooks/useProfileData";
 
 interface IMisDatosPersonales {
     biografia: string;
@@ -23,7 +25,7 @@ interface IMisDatosPersonales {
 }
 
 interface IDataUser {
-    email: string; 
+    email: string;
     exp: number;
     fecha_creacion: string;
     iat: number;
@@ -50,28 +52,56 @@ type TMisDatos = {
     seguidores: ISeguidosYSeguidores[];
 };
 
-const Header: React.FC<TMisDatos> = ({ dataUser, misDatosPersonales, seguidores }: TMisDatos) => {
+type ListaTipo = "seguidos" | "seguidores";
+
+const listasIniciales = {
+    seguidos: [] as ISeguidosYSeguidores[],
+    seguidores: [] as ISeguidosYSeguidores[],
+};
+
+const Header: React.FC<TMisDatos> = ({ dataUser }: TMisDatos) => {
+    const userId = dataUser?.id;
+    const { profile, loading } = useProfileData(userId);
     const [isOpenSeguidosSeguidores, setIsOpenSeguidosSeguidores] = useState<boolean>(false);
-    const getCookieLogueo = useStore((s) => s.getCookieLogueo);
-    const datosLogueo = useStore((s) => s.datosLogueo);
-    const existeEnMiListaDeAmigos = useStore((s) => s.existeEnMiListaDeAmigos);
-    const esMiAmigo = useStore((s) => s.esMiAmigo);
-    const misSeguidos = useStore((s) => s.misSeguidos);
-    const obtenerSeguidores = useStore((s) => s.obtenerSeguidores);
-    const [seguidosOSeguidores, setSeguidosOSeguidores] = useState<string>("");
+    const [seguidosOSeguidores, setSeguidosOSeguidores] = useState<ListaTipo>("seguidos");
+    const [listas, setListas] = useState(listasIniciales);
+    const [listasCargadas, setListasCargadas] = useState<Record<ListaTipo, boolean>>({ seguidos: false, seguidores: false });
 
     useEffect(() => {
-        const fetchData = async () => {
-            await getCookieLogueo();
-            obtenerSeguidores();
-            
-            if (datosLogueo?.id) {
-                existeEnMiListaDeAmigos(datosLogueo.id, dataUser.id);
-            }
-        };
+        setIsOpenSeguidosSeguidores(false);
+        setSeguidosOSeguidores("seguidos");
+        setListas(listasIniciales);
+        setListasCargadas({ seguidos: false, seguidores: false });
+    }, [userId]);
 
-        fetchData();
-    }, [getCookieLogueo, datosLogueo?.id, esMiAmigo]);
+    const cargarLista = useCallback(async (tipo: ListaTipo) => {
+        if (!userId || listasCargadas[tipo]) return;
+
+        const endpoint = tipo === "seguidos" ? `/api/seguimientos/${userId}` : `/api/seguimientos/seguidores/${userId}`;
+        const { data } = await axios.get<{ result: ISeguidosYSeguidores[] }>(endpoint);
+
+        setListas((prev) => ({ ...prev, [tipo]: data.result }));
+        setListasCargadas((prev) => ({ ...prev, [tipo]: true }));
+    }, [listasCargadas, userId]);
+
+    const abrirLista = useCallback(async (tipo: ListaTipo) => {
+        try {
+            setSeguidosOSeguidores(tipo);
+            await cargarLista(tipo);
+            setIsOpenSeguidosSeguidores(true);
+        } catch (error) {
+            const message = error instanceof AxiosError
+                ? error.response?.data?.error ?? error.message
+                : "No se pudo cargar la lista";
+            toast.error(message, { position: "top-center", duration: 2500 });
+        }
+    }, [cargarLista]);
+
+    if (!userId || loading || !profile) {
+        return null;
+    }
+
+    const { usuario, datosPersonales, stats } = profile;
 
     return (
         <header className="header-header">
@@ -88,17 +118,17 @@ const Header: React.FC<TMisDatos> = ({ dataUser, misDatosPersonales, seguidores 
                 <div className="contenido-header">
                     <div className="foto-follow">
                         <div className="foto-perfil">
-                            <Avvvatars size={137} style="shape" value={dataUser?.email} />
+                            <Avvvatars size={137} style="shape" value={usuario.email} />
                         </div>
                         <div className="foto-perfil-mobile">
-                            <Avvvatars size={92.3} style="shape" value={dataUser?.email} />
+                            <Avvvatars size={92.3} style="shape" value={usuario.email} />
                         </div>
                         <div className="follow">
                             <button
                                 type="button"
                                 className="boton-de-follow"
                                 aria-label="Mi cuenta"
-                                onClick={() => { }}>
+                                disabled>
                                 <div className="texto">
                                     <p> Mi cuenta </p>
                                 </div>
@@ -110,14 +140,14 @@ const Header: React.FC<TMisDatos> = ({ dataUser, misDatosPersonales, seguidores 
                     </div>
                     <div className="nombre-de-usuario">
                         <div className="nombre">
-                            <h2> {dataUser?.nombre} </h2>
+                            <h2> {usuario.nombre} </h2>
                         </div>
                         <div className="icono">
                             <RiBearSmileLine className="icon" />
                         </div>
                     </div>
                     <div className="descripcion">
-                        <p> {misDatosPersonales?.biografia} </p>
+                        <p> {datosPersonales?.biografia ?? ""} </p>
                     </div>
                     <div className="caracteristicas">
                         <div className="car">
@@ -128,29 +158,31 @@ const Header: React.FC<TMisDatos> = ({ dataUser, misDatosPersonales, seguidores 
                                 <p> Disponible </p>
                             </div>
                         </div>
-                        <div className="car">
-                            <div className="icono-de-caracteristica">
-                                <FaBirthdayCake className="icon" />
+                        {datosPersonales?.cumpleanos && (
+                            <div className="car">
+                                <div className="icono-de-caracteristica">
+                                    <FaBirthdayCake className="icon" />
+                                </div>
+                                <div className="texto">
+                                    <p> {formatearFecha(datosPersonales.cumpleanos, 'l')} </p>
+                                </div>
                             </div>
-                            <div className="texto">
-                                <p> {formatearFecha(misDatosPersonales?.cumpleanos, 'l')} </p>
-                            </div>
-                        </div>
+                        )}
                         <div className="car">
                             <div className="icono-de-caracteristica">
                                 <FaRegCalendarAlt className="icon" />
                             </div>
                             <div className="texto">
-                                <p> Unido el {formatearFecha(dataUser?.fecha_creacion, 'L')} </p>
+                                <p> Unido el {formatearFecha(usuario.fecha_creacion, 'L')} </p>
                             </div>
                         </div>
                     </div>
                     <div className="seguidos-seguidores">
-                        <button type="button" className="seg" onClick={() => { setIsOpenSeguidosSeguidores(true); setSeguidosOSeguidores("seguidos") }}>
-                            <p> {misSeguidos.length || 0} seguido(s) </p>
+                        <button type="button" className="seg" onClick={() => void abrirLista("seguidos")}>
+                            <p> {stats.seguidos} seguido(s) </p>
                         </button>
-                        <button type="button" className="seg seg-seguidores" onClick={() => { setIsOpenSeguidosSeguidores(true); setSeguidosOSeguidores("seguidores") }}>
-                            <p> {seguidores?.length || 0} seguidor(es) </p>
+                        <button type="button" className="seg seg-seguidores" onClick={() => void abrirLista("seguidores")}>
+                            <p> {stats.seguidores} seguidor(es) </p>
                         </button>
                     </div>
                 </div>
@@ -158,7 +190,7 @@ const Header: React.FC<TMisDatos> = ({ dataUser, misDatosPersonales, seguidores 
                 {isOpenSeguidosSeguidores &&
                     <SeguidosSeguidores
                         setIsOpenSeguidosSeguidores={setIsOpenSeguidosSeguidores}
-                        misSeguidos={seguidosOSeguidores === "seguidos" ? misSeguidos: seguidores}
+                        misSeguidos={seguidosOSeguidores === "seguidos" ? listas.seguidos : listas.seguidores}
                     />
                 }
 

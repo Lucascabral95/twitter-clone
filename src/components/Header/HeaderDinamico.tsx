@@ -1,38 +1,17 @@
-"use client"
+﻿"use client"
 import "./Header.scss"
-import React, { useEffect, useState } from 'react'
-import useStore from "@/zustand"
+import React, { useCallback, useEffect, useState } from 'react'
 import { formatearFecha } from '@/utils/formatearFecha';
 import Image from "next/image"
 import Avvvatars from "avvvatars-react"
-import { usePathname } from "next/navigation"
 import { BiSolidBackpack } from "react-icons/bi";
 import { FaBirthdayCake, FaRegCalendarAlt, FaTwitter } from "react-icons/fa";
 import { RiBearSmileLine } from "react-icons/ri";
 import SeguidosSeguidores from "../SeguidosSeguidores/SeguidosSeguidores";
 import { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import axios, { AxiosError } from "axios";
-
-interface DataUser {
-    id: number;
-    nombre: string;
-    email: string;
-    fecha_creacion: string;
-    identificador: string;
-    created_at: string;
-    updated_at: string
-}
-
-interface MisDatosPersonales {
-    id: number;
-    biografia: string;
-    localizacion: string;
-    sitio_web: string;
-    cumpleanos: string;
-    usuario_id: number;
-    created_at: string;
-    updated_at: string
-}
+import { useProfileData } from "@/presentation/hooks/useProfileData";
 
 interface SeguidosYSeguidores {
     id_seguimiento: number;
@@ -49,124 +28,99 @@ interface HeaderDinamicoProps {
     id: number
 }
 
+type ListaTipo = "seguidos" | "seguidores";
+
+const listasIniciales = {
+    seguidos: [] as SeguidosYSeguidores[],
+    seguidores: [] as SeguidosYSeguidores[],
+};
+
 const HeaderDinamico: React.FC<HeaderDinamicoProps> = ({ id }) => {
-    const pathname = usePathname();
-    const existeEnMiListaDeAmigos = useStore((s) => s.existeEnMiListaDeAmigos);
-    const esMiAmigo = useStore((s) => s.esMiAmigo);
-    const datosLogueo = useStore((s) => s.datosLogueo);
-    const getCookieLogueo = useStore((s) => s.getCookieLogueo);
-    const eliminarSeguimiento = useStore((s) => s.eliminarSeguimiento);
-    const seguirUsuario = useStore((s) => s.seguirUsuario);
+    const { profile, loading, mutateProfile } = useProfileData(id);
     const [isOpenSeguidosSeguidores, setIsOpenSeguidosSeguidores] = useState<boolean>(false);
-    const [dataUser, setDataUser] = useState<DataUser>({} as DataUser);
-    const [misDatosPersonales, setMisDatosPersonales] = useState<MisDatosPersonales>({} as MisDatosPersonales);
-    const [seguidosOSeguidores, setSeguidosOSeguidores] = useState<string>("seguidos");
-    const [misSeguidos, setMisSeguidos] = useState<SeguidosYSeguidores[]>([]);
-    const [seguidores, setSeguidores] = useState<SeguidosYSeguidores[]>([]);
+    const [seguidosOSeguidores, setSeguidosOSeguidores] = useState<ListaTipo>("seguidos");
+    const [listas, setListas] = useState(listasIniciales);
+    const [listasCargadas, setListasCargadas] = useState<Record<ListaTipo, boolean>>({ seguidos: false, seguidores: false });
+    const [followBusy, setFollowBusy] = useState(false);
 
     useEffect(() => {
-        if (id) {
-            getCookieLogueo();
-            existeEnMiListaDeAmigos(datosLogueo.id, id);
-        }
-    }, [getCookieLogueo])
-
-    useEffect(() => {
-        existeEnMiListaDeAmigos(datosLogueo.id, id);
-    }, [datosLogueo?.id])
-
-    useEffect(() => {
-        const obtenerDatosDelUsuario = async () => {
-            try {
-                const result = await axios.get(`/api/usuario/${id}`);
-
-                if (result.status === 200) {
-                    setDataUser(result.data.result);
-                    console.log(result.data.results)
-                }
-
-            } catch (error) {
-                if (error instanceof AxiosError) {
-                    if (error.response) {
-                        console.log(error.response.data.error);
-                    } else {
-                        console.log(error);
-                    }
-                }
-            }
-        }
-
-        obtenerDatosDelUsuario();
+        setIsOpenSeguidosSeguidores(false);
+        setSeguidosOSeguidores("seguidos");
+        setListas(listasIniciales);
+        setListasCargadas({ seguidos: false, seguidores: false });
+        setFollowBusy(false);
     }, [id]);
 
-    useEffect(() => {
-        const obtenerSeguimientosDelUsuario = async () => {
-            try {
-                const results = await axios.get(`/api/seguimientos/seguidores/${id}`)
+    const cargarLista = useCallback(async (tipo: ListaTipo) => {
+        if (listasCargadas[tipo]) return;
 
-                if (results.status === 200) {
-                    setSeguidores(results.data.result);
-                }
+        const endpoint = tipo === "seguidos" ? `/api/seguimientos/${id}` : `/api/seguimientos/seguidores/${id}`;
+        const { data } = await axios.get<{ result: SeguidosYSeguidores[] }>(endpoint);
 
-            } catch (error) {
-                if (error instanceof AxiosError) {
-                    if (error.response) {
-                        console.log(error.response.data.error);
-                    } else {
-                        console.log(error);
-                    }
-                }
-            }
+        setListas((prev) => ({ ...prev, [tipo]: data.result }));
+        setListasCargadas((prev) => ({ ...prev, [tipo]: true }));
+    }, [id, listasCargadas]);
+
+    const abrirLista = useCallback(async (tipo: ListaTipo) => {
+        try {
+            setSeguidosOSeguidores(tipo);
+            await cargarLista(tipo);
+            setIsOpenSeguidosSeguidores(true);
+        } catch (error) {
+            const message = error instanceof AxiosError
+                ? error.response?.data?.error ?? error.message
+                : "No se pudo cargar la lista";
+            toast.error(message, { position: "top-center", duration: 2500 });
         }
+    }, [cargarLista]);
 
-        obtenerSeguimientosDelUsuario();
-    }, [seguidosOSeguidores])
+    const toggleFollow = useCallback(async () => {
+        if (!profile || profile.relacion.esMiPerfil || !profile.relacion.viewerId || followBusy) return;
 
-    useEffect(() => {
-        const obtenerSeguimientosDelUsuario = async () => {
-            try {
-                const results = await axios.get(`/api/seguimientos/${id}`)
+        const previous = profile;
+        const nextLoSigo = !profile.relacion.loSigo;
+        const nextProfile = {
+            ...profile,
+            stats: {
+                ...profile.stats,
+                seguidores: Math.max(profile.stats.seguidores + (nextLoSigo ? 1 : -1), 0),
+            },
+            relacion: {
+                ...profile.relacion,
+                loSigo: nextLoSigo,
+            },
+        };
 
-                if (results.status === 200) {
-                    setMisSeguidos(results.data.result);
-                }
+        setFollowBusy(true);
+        await mutateProfile(nextProfile, false);
 
-            } catch (error) {
-                if (error instanceof AxiosError) {
-                    if (error.response) {
-                        console.log(error.response.data.error);
-                    } else {
-                        console.log(error);
-                    }
-                }
+        try {
+            if (nextLoSigo) {
+                await axios.post(`/api/seguimientos/${profile.relacion.viewerId}`, { id_a_seguir: profile.usuario.id });
+            } else {
+                await axios.delete(`/api/seguimientos/${profile.relacion.viewerId}`, { data: { id_a_seguir: profile.usuario.id } });
             }
+
+            setListasCargadas((prev) => ({ ...prev, seguidores: false }));
+            await mutateProfile();
+        } catch (error) {
+            await mutateProfile(previous, false);
+            const message = error instanceof AxiosError
+                ? error.response?.data?.error ?? error.message
+                : "No se pudo actualizar el seguimiento";
+            toast.error(message, { position: "top-center", duration: 2500 });
+        } finally {
+            setFollowBusy(false);
         }
+    }, [followBusy, mutateProfile, profile]);
 
-        obtenerSeguimientosDelUsuario();
-    }, [seguidosOSeguidores])
+    if (loading || !profile) {
+        return null;
+    }
 
-    useEffect(() => {
-        const obtenerDatosPersonales = async () => {
-            try {
-                const result = await axios.get(`/api/datospersonales/${id}`);
-
-                if (result.status === 200) {
-                    setMisDatosPersonales(result.data.result[0]);
-                }
-
-            } catch (error) {
-                if (error instanceof AxiosError) {
-                    if (error.response) {
-                        console.log(error.response.data.error);
-                    } else {
-                        console.log(error);
-                    }
-                }
-            }
-        }
-
-        obtenerDatosPersonales();
-    }, [])
+    const { usuario, datosPersonales, stats, relacion } = profile;
+    const followText = relacion.esMiPerfil ? "Mi cuenta" : relacion.loSigo ? "Dejar de seguir" : "Seguir";
+    const followDisabled = relacion.esMiPerfil || !relacion.viewerId || followBusy;
 
     return (
         <header className="header-header">
@@ -183,30 +137,20 @@ const HeaderDinamico: React.FC<HeaderDinamicoProps> = ({ id }) => {
                 <div className="contenido-header">
                     <div className="foto-follow">
                         <div className="foto-perfil">
-                            <Avvvatars size={137} style="shape" value={dataUser?.email} />
+                            <Avvvatars size={137} style="shape" value={usuario.email} />
                         </div>
                         <div className="foto-perfil-mobile">
-                            <Avvvatars size={92.3} style="shape" value={dataUser?.email} />
+                            <Avvvatars size={92.3} style="shape" value={usuario.email} />
                         </div>
                         <div className="follow">
                             <button
                                 type="button"
                                 className="boton-de-follow"
-                                aria-label={pathname === "/home" ? "Mi cuenta" : esMiAmigo ? "Dejar de seguir" : "Seguir"}
-                                onClick={pathname === "/home" ? () => { } :
-                                    esMiAmigo ? () => eliminarSeguimiento(datosLogueo?.id as number, dataUser?.id) : () => seguirUsuario(datosLogueo?.id as number, dataUser?.id)}>
+                                aria-label={followText}
+                                disabled={followDisabled}
+                                onClick={toggleFollow}>
                                 <div className="texto">
-                                    {
-                                        pathname === "/home"
-                                            ?
-                                            <p> Mi cuenta </p>
-                                            :
-                                            esMiAmigo
-                                                ?
-                                                <p> Dejar de seguir </p>
-                                                :
-                                                <p> Seguir </p>
-                                    }
+                                    <p> {followText} </p>
                                 </div>
                                 <div className="icono">
                                     <FaTwitter className="icon" />
@@ -216,14 +160,14 @@ const HeaderDinamico: React.FC<HeaderDinamicoProps> = ({ id }) => {
                     </div>
                     <div className="nombre-de-usuario">
                         <div className="nombre">
-                            <h2> {dataUser?.nombre} </h2>
+                            <h2> {usuario.nombre} </h2>
                         </div>
                         <div className="icono">
                             <RiBearSmileLine className="icon" />
                         </div>
                     </div>
                     <div className="descripcion">
-                        <p> {misDatosPersonales?.biografia} </p>
+                        <p> {datosPersonales?.biografia ?? ""} </p>
                     </div>
                     <div className="caracteristicas">
                         <div className="car">
@@ -234,29 +178,31 @@ const HeaderDinamico: React.FC<HeaderDinamicoProps> = ({ id }) => {
                                 <p> Disponible </p>
                             </div>
                         </div>
-                        <div className="car">
-                            <div className="icono-de-caracteristica">
-                                <FaBirthdayCake className="icon" />
+                        {datosPersonales?.cumpleanos && (
+                            <div className="car">
+                                <div className="icono-de-caracteristica">
+                                    <FaBirthdayCake className="icon" />
+                                </div>
+                                <div className="texto">
+                                    <p> {formatearFecha(datosPersonales.cumpleanos, 'l')} </p>
+                                </div>
                             </div>
-                            <div className="texto">
-                                <p> {formatearFecha(misDatosPersonales?.cumpleanos, 'l')} </p>
-                            </div>
-                        </div>
+                        )}
                         <div className="car">
                             <div className="icono-de-caracteristica">
                                 <FaRegCalendarAlt className="icon" />
                             </div>
                             <div className="texto">
-                                <p> Unido el {formatearFecha(dataUser?.fecha_creacion, 'l')} </p>
+                                <p> Unido el {formatearFecha(usuario.fecha_creacion, 'l')} </p>
                             </div>
                         </div>
                     </div>
                     <div className="seguidos-seguidores">
-                        <button type="button" className="seg" onClick={() => { setIsOpenSeguidosSeguidores(true); setSeguidosOSeguidores("seguidos") }}>
-                            <p> {misSeguidos.length || 0} seguido(s) </p>
+                        <button type="button" className="seg" onClick={() => void abrirLista("seguidos")}>
+                            <p> {stats.seguidos} seguido(s) </p>
                         </button>
-                        <button type="button" className="seg seg-seguidores" onClick={() => { setIsOpenSeguidosSeguidores(true); setSeguidosOSeguidores("seguidores") }}>
-                            <p> {seguidores?.length || 0} seguidor(es) </p>
+                        <button type="button" className="seg seg-seguidores" onClick={() => void abrirLista("seguidores")}>
+                            <p> {stats.seguidores} seguidor(es) </p>
                         </button>
                     </div>
                 </div>
@@ -264,7 +210,7 @@ const HeaderDinamico: React.FC<HeaderDinamicoProps> = ({ id }) => {
                 {isOpenSeguidosSeguidores &&
                     <SeguidosSeguidores
                         setIsOpenSeguidosSeguidores={setIsOpenSeguidosSeguidores}
-                        misSeguidos={seguidosOSeguidores === "seguidos" ? misSeguidos : seguidores}
+                        misSeguidos={seguidosOSeguidores === "seguidos" ? listas.seguidos : listas.seguidores}
                     />
                 }
 

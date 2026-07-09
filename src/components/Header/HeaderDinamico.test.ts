@@ -1,29 +1,50 @@
-import React from 'react';
+﻿import React from 'react';
 import { render, screen } from '@testing-library/react';
-import axios from 'axios';
 import HeaderDinamico from './HeaderDinamico';
-import useStore from '@/zustand';
+import { useProfileData } from '@/presentation/hooks/useProfileData';
+
+jest.mock('@/presentation/hooks/useProfileData', () => ({
+  useProfileData: jest.fn(),
+}));
+
+const profile = {
+  usuario: { id: 1, nombre: 'Nombre', email: 'a@a.com', fecha_creacion: '2024-01-01', identificador: '' },
+  datosPersonales: { id: 1, biografia: 'Bio', cumpleanos: '2000-01-01', localizacion: '', sitio_web: '', usuario_id: 1, created_at: '', updated_at: '' },
+  stats: { seguidos: 2, seguidores: 3 },
+  relacion: { viewerId: 2, esMiPerfil: false, loSigo: true },
+};
 
 beforeEach(() => {
-  (useStore as any).__setMockState({ datosLogueo: { id: 2 } });
-  jest.spyOn(axios, 'get').mockImplementation((url: any) => {
-    if (String(url).includes('/api/usuario/1')) {
-      return Promise.resolve({ status: 200, data: { result: { id:1, nombre:'Nombre', email:'a@a.com', fecha_creacion:'2024-01-01' } } });
-    }
-    if (String(url).includes('/api/seguimientos/seguidores/1')) {
-      return Promise.resolve({ status: 200, data: { result: [] } });
-    }
-    if (String(url).includes('/api/seguimientos/1')) {
-      return Promise.resolve({ status: 200, data: { result: [] } });
-    }
-    if (String(url).includes('/api/datospersonales/1')) {
-      return Promise.resolve({ status: 200, data: { result: [{ biografia:'Bio', cumpleanos:'2000-01-01' }] } });
-    }
-    return Promise.resolve({ status: 200, data: { result: [] } });
+  jest.clearAllMocks();
+  (useProfileData as jest.Mock).mockReturnValue({
+    profile,
+    loading: false,
+    error: undefined,
+    mutateProfile: jest.fn(),
   });
 });
 
-test('renders dynamic header with user name', async () => {
+test('renders dynamic header with profile data and stats', () => {
   render(React.createElement(HeaderDinamico, { id: 1 }));
-  expect(await screen.findByText('Nombre')).toBeInTheDocument();
+
+  expect(screen.getByText('Nombre')).toBeInTheDocument();
+  expect(screen.getByText('Bio')).toBeInTheDocument();
+  expect(screen.getByText(/2 seguido/)).toBeInTheDocument();
+  expect(screen.getByText(/3 seguidor/)).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Dejar de seguir' })).toBeInTheDocument();
+});
+
+test('does not render stale placeholders while profile is loading', () => {
+  (useProfileData as jest.Mock).mockReturnValue({
+    profile: undefined,
+    loading: true,
+    error: undefined,
+    mutateProfile: jest.fn(),
+  });
+
+  const { container } = render(React.createElement(HeaderDinamico, { id: 1 }));
+
+  expect(container).toBeEmptyDOMElement();
+  expect(screen.queryByText(/0 seguido/)).not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: 'Seguir' })).not.toBeInTheDocument();
 });
