@@ -11,6 +11,12 @@ import './Search.scss';
 const Search: React.FC = () => {
   const { response, arrayDeBusqueda, handleSearchChange, handleTypeChange, clearSearch } = useSearch();
 
+  const hayBusqueda = response.busqueda.trim().length > 0;
+  const tipoTexto = response.tipoDeBusqueda === 'publicaciones' ? 'publicaciones' : 'usuarios';
+  const mensajeVacio = hayBusqueda
+    ? `No encontramos ${tipoTexto} para tu búsqueda.`
+    : `Escribí algo para buscar ${tipoTexto}.`;
+
   return (
     <div className="search">
       <div className="contenedor-search">
@@ -43,9 +49,9 @@ const Search: React.FC = () => {
         </div>
 
         {response.tipoDeBusqueda === 'publicaciones' ? (
-          <CardTweet posteos={arrayDeBusqueda} />
+          <CardTweet posteos={arrayDeBusqueda} mensajeVacio={mensajeVacio} />
         ) : (
-          <BusquedaDeUsuarios usuarios={arrayDeBusqueda} />
+          <BusquedaDeUsuarios usuarios={arrayDeBusqueda} mensajeVacio={mensajeVacio} />
         )}
 
         <Toaster />

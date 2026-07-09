@@ -27,12 +27,14 @@
                     height: 47.40px;
                     cursor: pointer;
                     width: 33.33%;
-                    border-bottom: 3px solid transparent;
-                    border-top: 3px solid transparent;
+                    border-bottom: 2px solid transparent;
+                    border-top: none;
                     border-left: none;
                     border-right: none;
                     background: none;
                     padding: 0;
+                    text-decoration: none;
+                    transition: background-color var(--transition-fast), border-color var(--transition-fast);
 
                     .seccion-texto {
                         display: flex;
@@ -40,16 +42,22 @@
                         justify-content: center;
 
                         p {
-                            color: var(--color-letra-gris);
-                            font-weight: bolder;
-                            font-size: 15.61px;
+                            color: var(--texto-terciario);
+                            font-weight: 600;
+                            font-size: 12.5px;
                         }
                     }
 
                     &:hover {
-                        transition: 0.2s ease-in-out;
-                        background-color: rgba(255, 255, 255, 0.1);
-                        border-bottom: 3px solid var(--color-llamativo);
+                        background-color: var(--superficie-2);
+                    }
+
+                    &.active {
+                        border-bottom-color: var(--texto-primario);
+
+                        .seccion-texto p {
+                            color: var(--texto-primario);
+                        }
                     }
                 }
             }
@@ -66,15 +74,16 @@
         width: 100%;
         display: flex;
         justify-content: space-between;
-        border-radius: 10px;
+        border-radius: var(--radius-lg);
         padding: 16px;
         margin: 0 0 20px 0;
-        background-color: rgba(255, 255, 255, 0.1);
+        background-color: var(--superficie-2);
+        border: 1px solid var(--borde-sutil);
         cursor: pointer;
 
         &:hover {
-            transition: 0.3s ease-in-out;
-            box-shadow: 0px 4px 6px rgba(255, 255, 255, 0.5), 0px -4px 6px rgba(255, 255, 255, 0.5), 4px 0px 6px rgba(255, 255, 255, 0.5), -4px 0px 6px rgba(255, 255, 255, 0.5);
+            transition: border-color var(--transition-fast);
+            border-color: var(--borde-sutil-hover);
         }
 
         .foto-card {
@@ -102,14 +111,14 @@
                     cursor: pointer;
 
                     p {
-                        font-size: 14.71px;
-                        font-weight: bolder;
-                        color: var(--letra-titular);
+                        font-size: 14px;
+                        font-weight: 600;
+                        color: var(--texto-primario);
                     }
 
                     &:hover {
                         p {
-                            transition: 0.2s ease-in-out;
+                            transition: color var(--transition-fast);
                             text-decoration: underline;
                             text-underline-offset: 1.2px;
                         }
@@ -123,8 +132,8 @@
 
                     p {
                         margin: 4px 0 0 0;
-                        font-size: 11.96px;
-                        color: var(--color-gris);
+                        font-size: 11px;
+                        color: var(--texto-terciario);
                     }
                 }
             }
@@ -149,9 +158,10 @@
                     align-items: center;
 
                     p {
-                        color: var(--letra-titular);
-                        font-weight: bolder;
-                        font-size: 21.97px;
+                        color: var(--texto-primario);
+                        font-weight: 700;
+                        font-size: 16px;
+                        letter-spacing: -.01em;
                     }
                 }
             }
@@ -167,18 +177,19 @@
                     align-items: center;
 
                     p {
-                        color: var(--letra-titular);
-                        font-size: 16px;
+                        color: var(--texto-secundario);
+                        font-size: 14px;
+                        line-height: 1.45;
                     }
                 }
             }
 
             .imagen-posteo-card {
                 width: 100%;
-                border-radius: 12px;
+                border-radius: var(--radius-md);
                 overflow: hidden;
                 margin: 0 0 14px 0;
-                border: 0.5px solid rgba(128, 128, 128, 0.355);
+                border: 1px solid var(--borde-sutil);
 
                 img {
                     width: 100%;
@@ -205,8 +216,8 @@
                 }
 
                 p {
-                    color: var(--color-gris);
-                    font-size: 15px;
+                    color: var(--texto-terciario);
+                    font-size: 12.5px;
                     margin: 0 8px 0 0;
                 }
 
@@ -217,24 +228,24 @@
                     z-index: 1999;
 
                     .icon {
-                        color: var(--color-gris);
+                        color: var(--texto-terciario);
                         font-size: 16px;
                     }
                 }
 
                 .metrica-comentarios .icono:hover .icon {
-                    transition: 0.2s ease-in-out;
-                    color: var(--color-llamativo);
+                    transition: color var(--transition-fast);
+                    color: var(--color-foco);
                 }
 
                 .metrica-reposteos .icono:hover .icon {
-                    transition: 0.2s ease-in-out;
-                    color: #17bf63;
+                    transition: color var(--transition-fast);
+                    color: var(--color-exito);
                 }
 
                 .metrica-likes .icono:hover .icon {
-                    transition: 0.2s ease-in-out;
-                    color: red;
+                    transition: color var(--transition-fast);
+                    color: var(--color-error);
                 }
             }
         }
@@ -247,16 +258,17 @@
         justify-content: center;
 
         .boton-ver-mas {
-            border-radius: 16px;
-            color: var(--letra-titular);
+            border-radius: var(--radius-sm);
+            color: var(--acento-texto);
             font-weight: 600;
             border: none;
-            background-color: var(--fondo-celeste-boton);
+            background-color: var(--acento-fondo);
             padding: 8px 18px;
+            font-size: 12.5px;
 
             &:hover {
-                transition: 0.2s ease-in-out;
-                opacity: 0.90;
+                transition: opacity var(--transition-fast);
+                opacity: 0.85;
             }
         }
     }
@@ -269,9 +281,9 @@
 
             p {
                 font-weight: 600;
-                font-size: 22px;
+                font-size: 18px;
                 text-align: center;
-                color: var(--letra-titular);
+                color: var(--texto-primario);
             }
         }
 

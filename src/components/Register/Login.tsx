@@ -50,10 +50,7 @@ const Login: React.FC<LoginProps> = ({ onClose }) => {
 
           <form className="formulario" onSubmit={onSubmit} noValidate>
             <div className="formulario-interno">
-              <div
-                className="contenedor-input"
-                style={{ border: errors.email ? '1px solid red' : '1px solid #71767b68' }}
-              >
+              <div className={errors.email ? 'contenedor-input error' : 'contenedor-input'}>
                 <input
                   type="email"
                   placeholder="Correo electronico"
@@ -71,10 +68,7 @@ const Login: React.FC<LoginProps> = ({ onClose }) => {
                 </div>
               )}
 
-              <div
-                className="contenedor-input"
-                style={{ border: errors.password ? '1px solid red' : '1px solid #71767b68' }}
-              >
+              <div className={errors.password ? 'contenedor-input error' : 'contenedor-input'}>
                 <input
                   type="password"
                   placeholder="Contraseña"

@@ -8,15 +8,15 @@
     top: 0;
     left: 0;
     z-index: 10002;
-    background-color: red;
-    background: var(--fondo-color-modal);
-    backdrop-filter: var(--fondo-blur-modal);
+    background: rgba(0, 0, 0, .72);
+    backdrop-filter: blur(14px);
 
     .contenedor-seguidos-seguidores {
-        border-radius: 8px;
-        background-color: var(--fondo-negro);
+        border-radius: var(--radius-lg);
+        background-color: var(--superficie-2);
+        border: 1px solid var(--borde-sutil);
+        box-shadow: var(--shadow-modal);
         padding: 16px;
-        border: var(--borde-modal);
         min-width: 474px;
         min-height: 170px;
         overflow-y: scroll;
@@ -37,17 +37,17 @@
                 cursor: pointer;
                 display: flex;
                 align-items: center;
-                padding: 5px;
-                border-radius: 50%;
+                padding: 6px;
+                border-radius: var(--radius-sm);
+                transition: background-color var(--transition-fast);
 
                 .icon {
-                    color: var(--letra-titular);
-                    font-size: 20px;
+                    color: var(--texto-secundario);
+                    font-size: 18px;
                 }
 
                 &:hover {
-                    transition: 0.2s ease-in-out;
-                    background-color: var(--color-gris);
+                    background-color: var(--superficie-3);
                 }
             }
         }

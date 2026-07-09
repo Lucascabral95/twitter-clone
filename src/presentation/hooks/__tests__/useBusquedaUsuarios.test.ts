@@ -53,7 +53,7 @@ describe('useBusquedaUsuarios', () => {
     expect(result.current.usuarios.map((u) => u.id)).toEqual([2])
   })
 
-  it('hace nueva petición para la misma palabra con distinta capitalización (clave de caché exacta)', async () => {
+  it('reutiliza la lista completa ya cacheada para la misma palabra con distinta capitalización (sin nueva petición)', async () => {
     const axiosMock = createAxiosMock(usuariosMock)
     const { result } = renderHook(() => useBusquedaUsuarios(axiosMock))
 
@@ -68,8 +68,26 @@ describe('useBusquedaUsuarios', () => {
       await result.current.buscar('pedro')
     })
 
-    expect(get).toHaveBeenCalledTimes(1)
+    expect(get).not.toHaveBeenCalled()
     expect(result.current.usuarios.map((u) => u.id)).toEqual([2])
+  })
+
+  it('trae la lista de usuarios una sola vez sin importar cuántas búsquedas distintas se hagan', async () => {
+    const axiosMock = createAxiosMock(usuariosMock)
+    const { result } = renderHook(() => useBusquedaUsuarios(axiosMock))
+
+    await act(async () => {
+      await result.current.buscar('juan')
+    })
+    await act(async () => {
+      await result.current.buscar('pedro')
+    })
+    await act(async () => {
+      await result.current.buscar('maria')
+    })
+
+    const get = (axiosMock as unknown as { get: jest.Mock }).get
+    expect(get).toHaveBeenCalledTimes(1)
   })
 
   it('llama a /api/usuario y respeta el contrato de datos', async () => {

@@ -49,11 +49,6 @@ class DAODatosPersonales {
                 select id, biografia, localizacion, sitio_web, cumpleanos, usuario_id, created_at, updated_at
                 from datos_personales where usuario_id = ${id}
             `;
-
-            if (datos.length === 0) {
-                throw { error: "Sin datos", status: 404 };
-            }
-
             return datos as DatosPersonales[];
         } catch (error) {
             throw error as CustomError;

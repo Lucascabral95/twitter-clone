@@ -12,14 +12,15 @@ interface BusquedaProps {
         id: number,
         email: string,
         nombre: string
-    }[]
+    }[];
+    mensajeVacio?: string;
 }
 
 interface Seguidor {
     id_a_seguir: number;
 }
 
-const BusquedaDeUsuarios: React.FC<BusquedaProps> = ({ usuarios }) => {
+const BusquedaDeUsuarios: React.FC<BusquedaProps> = ({ usuarios, mensajeVacio = 'Sin seguidores ni seguidos' }) => {
     const datosLogueo = useStore((s) => s.datosLogueo);
     const getCookieLogueo = useStore((s) => s.getCookieLogueo);
     const seguirUsuario = useStore((s) => s.seguirUsuario);
@@ -91,7 +92,7 @@ const BusquedaDeUsuarios: React.FC<BusquedaProps> = ({ usuarios }) => {
 
                 {usuarios?.length === 0 &&
                     <div className="sin-seguidos-seguidores">
-                        <p> Sin seguidores ni seguidos </p>
+                        <p> {mensajeVacio} </p>
                     </div>
                 }
 

@@ -1,0 +1,93 @@
+.buscador-superior {
+    display: none;
+    width: 100%;
+    justify-content: center;
+    padding: 12px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 500;
+    background-color: var(--superficie-1);
+    border-bottom: 1px solid var(--borde-sutil);
+
+    .contenedor-buscador-superior {
+        position: relative;
+        width: 100%;
+        max-width: 480px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--borde-sutil);
+        background-color: var(--superficie-2);
+        padding: 8px 14px;
+        transition: border-color var(--transition-fast);
+
+        &:focus-within {
+            border-color: var(--color-foco);
+        }
+
+        .lupa {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+
+            .icon {
+                color: var(--texto-terciario);
+                font-size: 16px;
+            }
+        }
+
+        input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--texto-primario);
+            font-size: 14px;
+            font-family: inherit;
+
+            &::placeholder {
+                color: var(--texto-terciario);
+            }
+
+            &:focus {
+                outline: none;
+            }
+        }
+
+        .limpiar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+
+            .icon {
+                color: var(--texto-terciario);
+                font-size: 16px;
+            }
+
+            &:hover {
+                .icon {
+                    color: var(--texto-primario);
+                }
+            }
+        }
+
+        .lista-busqueda {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            width: 100%;
+        }
+    }
+}
+
+@media (min-width: 1024px) {
+    .buscador-superior {
+        display: flex;
+    }
+}

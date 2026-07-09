@@ -1,36 +1,23 @@
 'use client';
-
 import React from 'react';
-import CardSecciones from '@/components/EstructuraMain/CardSecciones';
-import HeaderDinamico from '@/components/Header/HeaderDinamico';
-import NotFound from '@/components/NotFound/NotFound';
-import SkeletonTweet from '@/components/Skeleton/SkeletonTweet';
-import { useUserData } from '@/presentation/hooks';
+import { useParams } from 'next/navigation';
 
-const UserID: React.FC = () => {
-  const { error, loading, posteosUser, userId, hasMoreTweetsUser, loadMoreTweetsUser } = useUserData();
+import CardTweet from '@/components/EstructuraMain/CardTweet';
+import useStore from '@/zustand';
 
-  if (loading) {
-    return <SkeletonTweet />;
-  }
+const InicioUsuario: React.FC = () => {
+  const { id } = useParams();
+  const posteosUser = useStore((s) => s.posteosUser);
+  const hasMoreTweetsUser = useStore((s) => s.hasMoreTweetsUser);
+  const loadMoreTweetsUser = useStore((s) => s.loadMoreTweetsUser);
 
   return (
-    <section>
-      {!error ? (
-        <>
-          <HeaderDinamico id={userId} />
-          <CardSecciones
-            id={userId}
-            publicaciones={posteosUser}
-            hasMorePublicaciones={hasMoreTweetsUser}
-            onLoadMorePublicaciones={loadMoreTweetsUser}
-          />
-        </>
-      ) : (
-        <NotFound error={error} />
-      )}
-    </section>
+    <CardTweet
+      posteos={posteosUser}
+      hasMore={hasMoreTweetsUser}
+      onLoadMore={() => loadMoreTweetsUser(Number(id))}
+    />
   );
 };
 
-export default UserID;
+export default InicioUsuario;

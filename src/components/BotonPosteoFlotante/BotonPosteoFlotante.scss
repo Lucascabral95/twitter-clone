@@ -155,3 +155,11 @@
         }
     }
 }
+
+@media (min-width: 1024px) {
+    .boton-posteo-flotante,
+    .boton-busqueda-flotante,
+    .boton-logout-flotante {
+        display: none;
+    }
+}

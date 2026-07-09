@@ -12,3 +12,15 @@ test('renders users and triggers follow', () => {
   fireEvent.click(btn);
   expect(seguirUsuario).toHaveBeenCalledWith(1, 2);
 });
+
+test('shows the default empty message when no mensajeVacio is provided', () => {
+  (useStore as any).__setMockState({ datosLogueo: { id: 1 }, misSeguidos: [] });
+  render(React.createElement(BusquedaDeUsuarios, { usuarios: [] }));
+  expect(screen.getByText('Sin seguidores ni seguidos')).toBeInTheDocument();
+});
+
+test('shows a custom mensajeVacio when provided', () => {
+  (useStore as any).__setMockState({ datosLogueo: { id: 1 }, misSeguidos: [] });
+  render(React.createElement(BusquedaDeUsuarios, { usuarios: [], mensajeVacio: 'No encontramos usuarios para tu búsqueda.' }));
+  expect(screen.getByText('No encontramos usuarios para tu búsqueda.')).toBeInTheDocument();
+});

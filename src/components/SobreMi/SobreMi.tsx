@@ -1,5 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import React, { useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { Toaster } from 'react-hot-toast';
 import useSWR from 'swr';
@@ -11,45 +10,56 @@ import './SobreMi.scss';
 
 const fetcher = (url: string) => axios.get(url).then(res => res.data.result[0]);
 
-const SobreMi: React.FC<IID> = ({ id }) => {
-    const [datos, setDatos] = useState<IPosteo>({
-        biografia: '',
-        localizacion: '',
-        sitio_web: '',
-        cumpleanos: ''
-    });
-    
-    const pathname = usePathname();
-    const isEditable = useMemo(() => pathname === "/home", [pathname]);
-    
-    const { error, isLoading } = useSWR(
-        `/api/datospersonales/${Number(id)}`,
+interface SobreMiProps extends IID {
+    editable?: boolean;
+}
+
+const datosVacios: IPosteo = {
+    biografia: '',
+    localizacion: '',
+    sitio_web: '',
+    cumpleanos: '',
+};
+
+const normalizarFecha = (fecha?: string) => {
+    if (!fecha) return '';
+
+    return new Date(fecha).toISOString().split('T')[0];
+};
+
+const SobreMi: React.FC<SobreMiProps> = ({ id, editable = false }) => {
+    const userId = Number(id);
+    const puedePedirDatos = Number.isFinite(userId) && userId > 0;
+
+    const { data, isLoading } = useSWR(
+        puedePedirDatos ? `/api/datospersonales/${userId}` : null,
         fetcher,
         {
             revalidateOnFocus: false,
-            onSuccess: (data) => {
-                if (data) setDatos(data);
-            }
+            revalidateOnReconnect: false,
+            revalidateIfStale: false,
+            refreshInterval: 0,
         }
     );
 
-    const sinDatos = useMemo(() => !!error, [error]);
-
-    const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = event.target;
-        setDatos(prev => ({ ...prev, [name]: value }));
-    }, []);
+    const datosIniciales = useMemo<IPosteo>(() => data ?? datosVacios, [data]);
+    const sinDatos = useMemo(() => !data, [data]);
+    const fechaFormateada = useMemo(() => normalizarFecha(datosIniciales.cumpleanos), [datosIniciales.cumpleanos]);
 
     const handleSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
-        guardarDatos(event, datos as Datos, id, sinDatos);
-    }, [datos, id, sinDatos]);
-    const fechaFormateada = useMemo(() => {
-        return datos?.cumpleanos
-            ? new Date(datos.cumpleanos).toISOString().split("T")[0]
-            : "";
-    }, [datos?.cumpleanos]);
+        const formData = new FormData(event.currentTarget);
+        const datosFormulario: Datos = {
+            ...(datosIniciales as Datos),
+            biografia: String(formData.get('biografia') ?? ''),
+            localizacion: String(formData.get('localizacion') ?? ''),
+            sitio_web: String(formData.get('sitio_web') ?? ''),
+            cumpleanos: String(formData.get('cumpleanos') ?? ''),
+        };
 
-    if (isLoading) {
+        guardarDatos(event, datosFormulario, userId, sinDatos);
+    }, [datosIniciales, userId, sinDatos]);
+
+    if (!puedePedirDatos || isLoading) {
         return <Loading />;
     }
 
@@ -58,27 +68,25 @@ const SobreMi: React.FC<IID> = ({ id }) => {
             <div className="contenedor-sobre-mi">
                 <form onSubmit={handleSubmit} className="formulario-datos-personales">
                     <div className="contenedor-input">
-                        <label htmlFor="biografia">Biografía</label>
+                        <label htmlFor="biografia">Biograf&iacute;a</label>
                         <input
                             type="text"
                             id="biografia"
                             name="biografia"
-                            value={datos?.biografia}
-                            placeholder="Biografía"
-                            onChange={handleChange}
-                            readOnly={!isEditable}
+                            defaultValue={datosIniciales.biografia}
+                            placeholder="Biograf&iacute;a"
+                            readOnly={!editable}
                         />
                     </div>
                     <div className="contenedor-input">
-                        <label htmlFor="localizacion">Localización</label>
+                        <label htmlFor="localizacion">Localizaci&oacute;n</label>
                         <input
                             type="text"
                             id="localizacion"
                             name="localizacion"
-                            value={datos?.localizacion}
-                            placeholder="Localización"
-                            onChange={handleChange}
-                            readOnly={!isEditable}
+                            defaultValue={datosIniciales.localizacion}
+                            placeholder="Localizaci&oacute;n"
+                            readOnly={!editable}
                         />
                     </div>
                     <div className="contenedor-input">
@@ -87,29 +95,27 @@ const SobreMi: React.FC<IID> = ({ id }) => {
                             type="text"
                             id="sitio_web"
                             name="sitio_web"
-                            value={datos?.sitio_web}
+                            defaultValue={datosIniciales.sitio_web}
                             placeholder="Sitio Web"
-                            onChange={handleChange}
-                            readOnly={!isEditable}
+                            readOnly={!editable}
                         />
                     </div>
                     <div className="contenedor-input">
-                        <label htmlFor="fechaCumpleaños">Cumpleaños</label>
+                        <label htmlFor="fechaCumpleanos">Cumplea&ntilde;os</label>
                         <input
                             type="date"
-                            id="fechaCumpleaños"
+                            id="fechaCumpleanos"
                             name="cumpleanos"
-                            readOnly={!isEditable}
-                            value={fechaFormateada}
+                            readOnly={!editable}
+                            defaultValue={fechaFormateada}
                             min="1950-01-01"
                             max="2050-12-31"
-                            onChange={handleChange}
                         />
                     </div>
-                    {isEditable && (
+                    {editable && (
                         <div className="contenedor-input-boton">
                             <button type="submit">
-                                {!sinDatos ? "Actualizar" : "Guardar"}
+                                {!sinDatos ? 'Actualizar' : 'Guardar'}
                             </button>
                         </div>
                     )}

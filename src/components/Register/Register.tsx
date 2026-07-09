@@ -36,9 +36,9 @@ const Register: React.FC<RegisterProps> = ({ onClose }) => {
     >
       <div className="contenedor-register" ref={modalRef} role="dialog" aria-modal="true">
         <div className="superior">
-          <div className="icono" onClick={onClose}>
+          <button type="button" className="icono" onClick={onClose} aria-label="Cerrar registro">
             <IoMdClose className="icon" />
-          </div>
+          </button>
           <div className="imagen-register">
             <Image className="imagen" src="/img/twitter.svg" alt="Logo" width={28} height={28} />
           </div>
@@ -52,10 +52,7 @@ const Register: React.FC<RegisterProps> = ({ onClose }) => {
 
           <form className="formulario" onSubmit={onSubmit} noValidate>
             <div className="formulario-interno">
-              <div
-                className="contenedor-input"
-                style={{ border: errors.nombre ? '1px solid red' : '1px solid #71767b68' }}
-              >
+              <div className={errors.nombre ? 'contenedor-input error' : 'contenedor-input'}>
                 <input
                   type="text"
                   placeholder="Nombre y apellido"
@@ -73,10 +70,7 @@ const Register: React.FC<RegisterProps> = ({ onClose }) => {
                 </div>
               )}
 
-              <div
-                className="contenedor-input"
-                style={{ border: errors.email ? '1px solid red' : '1px solid #71767b68' }}
-              >
+              <div className={errors.email ? 'contenedor-input error' : 'contenedor-input'}>
                 <input
                   type="email"
                   placeholder="Correo electrónico"
@@ -94,10 +88,7 @@ const Register: React.FC<RegisterProps> = ({ onClose }) => {
                 </div>
               )}
 
-              <div
-                className="contenedor-input"
-                style={{ border: errors.password ? '1px solid red' : '1px solid #71767b68' }}
-              >
+              <div className={errors.password ? 'contenedor-input error' : 'contenedor-input'}>
                 <input
                   type="password"
                   placeholder="Contraseña"

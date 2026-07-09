@@ -18,7 +18,28 @@ export const useBusquedaUsuarios = (
 ): BusquedaResult => {
   const [usuarios, setUsuarios] = useState<Usuario[]>([])
   const [loading, setLoading] = useState(false)
-  const cacheRef = useRef<Map<string, Usuario[]>>(new Map())
+  // Cachea la lista completa de usuarios una sola vez; cada búsqueda subsiguiente
+  // filtra en memoria en vez de volver a pegarle al servidor por cada letra tipeada.
+  const todosRef = useRef<Usuario[] | null>(null)
+  const fetchPromiseRef = useRef<Promise<Usuario[]> | null>(null)
+
+  const obtenerTodos = useCallback(async (): Promise<Usuario[]> => {
+    if (todosRef.current) return todosRef.current
+
+    if (!fetchPromiseRef.current) {
+      fetchPromiseRef.current = axiosInstance
+        .get<{ result: Usuario[] }>('/api/usuario')
+        .then(({ data }) => {
+          todosRef.current = data.result
+          return data.result
+        })
+        .finally(() => {
+          fetchPromiseRef.current = null
+        })
+    }
+
+    return fetchPromiseRef.current
+  }, [axiosInstance])
 
   const buscar = useCallback(
     async (query: string) => {
@@ -27,25 +48,18 @@ export const useBusquedaUsuarios = (
         return
       }
 
-      if (cacheRef.current.has(query)) {
-        setUsuarios(cacheRef.current.get(query) || [])
-        return
-      }
-
       setLoading(true)
       try {
-        const { data } = await axiosInstance.get<{ result: Usuario[] }>(
-          '/api/usuario'
-        )
+        const todos = await obtenerTodos()
+        const q = query.toLowerCase()
 
-        const filtrados = data.result.filter(
-          (user) =>
-            user.email.toLowerCase().includes(query.toLowerCase()) ||
-            user.nombre.toLowerCase().includes(query.toLowerCase())
+        setUsuarios(
+          todos.filter(
+            (user) =>
+              user.email.toLowerCase().includes(q) ||
+              user.nombre.toLowerCase().includes(q)
+          )
         )
-
-        cacheRef.current.set(query, filtrados)
-        setUsuarios(filtrados)
       } catch (error) {
         if (error instanceof AxiosError) {
           console.error(
@@ -58,7 +72,7 @@ export const useBusquedaUsuarios = (
         setLoading(false)
       }
     },
-    [axiosInstance]
+    [obtenerTodos]
   )
 
   return { usuarios, buscar, loading }

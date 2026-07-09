@@ -32,6 +32,7 @@ interface CardTweetProps {
     posteos: IPosteos[];
     hasMore?: boolean;
     onLoadMore?: () => void;
+    mensajeVacio?: string;
 }
 
 function vieneDeElementoInteractivo(target: EventTarget | null): boolean {
@@ -133,7 +134,7 @@ const CardTweetItem: React.FC<{ item: IPosteos }> = ({ item }) => {
 
 const MemoizedCardTweetItem = React.memo(CardTweetItem);
 
-const CardTweet: React.FC<CardTweetProps> = ({ posteos, hasMore = false, onLoadMore }) => {
+const CardTweet: React.FC<CardTweetProps> = ({ posteos, hasMore = false, onLoadMore, mensajeVacio }) => {
     const sentinelRef = useInfiniteScroll({
         hasMore,
         onLoadMore: onLoadMore ?? (() => {}),
@@ -147,7 +148,13 @@ const CardTweet: React.FC<CardTweetProps> = ({ posteos, hasMore = false, onLoadM
 
             {posteos.length === 0
                 ?
-                null
+                (mensajeVacio && (
+                    <div className="sin-posteos">
+                        <div className="texto">
+                            <p>{mensajeVacio}</p>
+                        </div>
+                    </div>
+                ))
                 :
                 <div className="contenedor-boton-ver-mas">
                     {hasMore && onLoadMore && (

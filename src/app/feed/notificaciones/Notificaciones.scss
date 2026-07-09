@@ -7,15 +7,16 @@
         padding: 0 16px;
 
         .titulo-notificaciones {
-            color: var(--letra-titular);
-            font-size: 22px;
-            font-weight: bolder;
-            margin: 0 0 16px 0;
+            color: var(--texto-primario);
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -.01em;
+            margin: 0 0 20px 0;
         }
 
         .estado-notificaciones {
-            color: var(--color-gris);
-            font-size: 15px;
+            color: var(--texto-secundario);
+            font-size: 14px;
         }
 
         .lista-notificaciones {
@@ -26,48 +27,52 @@
 
             .item-notificacion {
                 width: 100%;
-                border-bottom: 0.5px solid rgba(128, 128, 128, 0.355);
+                border: 1px solid var(--borde-sutil);
+                border-radius: var(--radius-lg);
+                background-color: var(--superficie-2);
+                margin: 0 0 8px 0;
+                overflow: hidden;
 
                 &.no-leida {
-                    background-color: rgba(255, 255, 255, 0.05);
+                    border-color: var(--borde-sutil-hover);
                 }
 
                 .contenido-notificacion {
                     width: 100%;
                     display: flex;
                     align-items: center;
-                    padding: 12px 8px;
+                    padding: 12px 16px;
                     gap: 12px;
 
                     &:hover {
-                        transition: 0.2s ease-in-out;
-                        background-color: rgba(255, 255, 255, 0.07);
+                        transition: background-color var(--transition-fast);
+                        background-color: var(--superficie-3);
                     }
 
                     .icono-tipo {
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        width: 24px;
+                        width: 20px;
 
                         .icon {
                             font-size: 20px;
                         }
 
                         .icono-like {
-                            color: red;
+                            color: var(--color-error);
                         }
 
                         .icono-comentario {
-                            color: var(--color-llamativo);
+                            color: var(--color-foco);
                         }
 
                         .icono-reposteo {
-                            color: #17bf63;
+                            color: var(--color-exito);
                         }
 
                         .icono-follow {
-                            color: var(--color-llamativo);
+                            color: var(--color-foco);
                         }
                     }
 
@@ -81,17 +86,18 @@
                         gap: 2px;
 
                         p {
-                            color: var(--letra-titular);
-                            font-size: 14.5px;
+                            color: var(--texto-secundario);
+                            font-size: 13px;
 
                             strong {
-                                font-weight: 700;
+                                color: var(--texto-primario);
+                                font-weight: 600;
                             }
                         }
 
                         .fecha-notificacion {
-                            color: var(--color-gris);
-                            font-size: 12.5px;
+                            color: var(--texto-terciario);
+                            font-size: 11px;
                         }
                     }
                 }
