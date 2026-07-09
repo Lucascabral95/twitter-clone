@@ -1,4 +1,4 @@
-# CI/CD
+﻿# CI/CD
 
 This project uses GitHub Actions as a quality gate and Vercel as the deployment platform. The production branch is `main`.
 
@@ -20,8 +20,37 @@ This project uses GitHub Actions as a quality gate and Vercel as the deployment 
 ## Production Deploy
 
 - Vercel deploys production automatically when `main` receives the merge.
-- GitHub Actions does not deploy with the Vercel CLI; it only validates quality before merge.
+- Production deployments are gated by Vercel's Ignored Build Step.
+- GitHub Actions does not deploy with the Vercel CLI; it validates quality before Vercel is allowed to build production.
 - `VERCEL_TOKEN` is not required in GitHub while native Vercel Git deployment is used.
+
+## Vercel Production Gate
+
+Configure this in Vercel Project Settings:
+
+1. Open `Settings > Git`.
+2. Set `Ignored Build Step` to:
+
+   ```bash
+   node scripts/vercel-should-build.mjs
+   ```
+
+3. Add this Vercel environment variable to Production:
+
+   ```bash
+   GITHUB_ACTIONS_READ_TOKEN=<github-token-with-actions-read-access>
+   ```
+
+The token must be able to read GitHub Actions workflow runs for this repository. A fine-grained GitHub token scoped to this repository with Actions read access is enough.
+
+The script gates only `main` by default. For production commits on `main`, Vercel waits until the GitHub Actions workflow named `CI` finishes successfully for the same commit SHA. If CI fails, is cancelled, cannot be found, or times out, Vercel skips the production build.
+
+Optional variables:
+
+- `VERCEL_GATED_BRANCH`: defaults to `main`.
+- `GITHUB_REQUIRED_WORKFLOW_NAME`: defaults to `CI`.
+- `VERCEL_CI_GATE_TIMEOUT_MS`: defaults to 15 minutes.
+- `VERCEL_CI_GATE_POLL_INTERVAL_MS`: defaults to 15 seconds.
 
 ## Recommended Branch Protection
 
