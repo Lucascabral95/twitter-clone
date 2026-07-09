@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios'
+﻿import axios, { AxiosError } from 'axios'
 import { create } from 'zustand'
 import toast from 'react-hot-toast';
 import { logger } from '@/infrastructure/logger';
@@ -8,8 +8,8 @@ interface Dat {
     tipoDeBusqueda: string;
 }
 
-// Cancela la búsqueda anterior cuando llega una nueva: evita que una respuesta lenta
-// y obsoleta pise el resultado de una búsqueda más reciente (carrera de requests).
+// Cancela la bÃºsqueda anterior cuando llega una nueva: evita que una respuesta lenta
+// y obsoleta pise el resultado de una bÃºsqueda mÃ¡s reciente (carrera de requests).
 let searchAbortController: AbortController | null = null;
 
 interface Logueo {
@@ -42,7 +42,7 @@ interface Posteos {
 }
 
 // Fila cruda que devuelve `POST /api/posteo` (tabla `posteos`), sin el join con
-// `usuarios` que sí trae la vista `usuarios_posteos`. Se enriquece con `datosLogueo`
+// `usuarios` que sÃ­ trae la vista `usuarios_posteos`. Se enriquece con `datosLogueo`
 // para poder prependear al feed con la misma forma que `Posteos`.
 interface PosteoCreado {
     id: number;
@@ -89,6 +89,10 @@ interface Pagination {
 interface StoreState {
     posteos: Posteos[];
     posteosUser: Posteos[];
+    posteosUserOwnerId: number | null;
+    posteosUserRequestId: number | null;
+    loadingTweetsUser: boolean;
+    posteosUserError: string;
     posteosTotales: number;
     esMiAmigo: boolean;
     loading: boolean;
@@ -132,6 +136,10 @@ interface StoreState {
 const useStore = create<StoreState>((set, get) => ({
     posteos: [],
     posteosUser: [],
+    posteosUserOwnerId: null,
+    posteosUserRequestId: null,
+    loadingTweetsUser: false,
+    posteosUserError: "",
     posteosTotales: 0,
     loading: true,
     error: false,
@@ -201,7 +209,7 @@ const useStore = create<StoreState>((set, get) => ({
             });
         } catch (error) {
             if (error instanceof AxiosError) {
-                logger.error('Error al cargar más posteos:', error.response?.data?.error ?? error.message);
+                logger.error('Error al cargar mÃ¡s posteos:', error.response?.data?.error ?? error.message);
             }
         }
     },
@@ -287,21 +295,45 @@ const useStore = create<StoreState>((set, get) => ({
     },
 
     getTweetsByIDUser: async (id: number): Promise<void> => {
-        set({ loading: true });
+        const userId = Number(id);
+        set({
+            loading: true,
+            loadingTweetsUser: true,
+            posteosUser: [],
+            posteosUserOwnerId: null,
+            posteosUserRequestId: userId,
+            posteosUserError: "",
+            nextCursorTweetsUser: null,
+            hasMoreTweetsUser: false,
+        });
 
         try {
-            const response = await axios.get(`/api/posteo?creador_id=${Number(id)}&limit=${get().limit}`);
+            const response = await axios.get(`/api/posteo?creador_id=${userId}&limit=${get().limit}`);
+            if (get().posteosUserRequestId !== userId) return;
+
             const pagination: Pagination | undefined = response.data.pagination;
             set({
                 posteosUser: response.data.result,
+                posteosUserOwnerId: userId,
                 loading: false,
+                loadingTweetsUser: false,
                 posteosTotales: response.data.result.length,
                 nextCursorTweetsUser: pagination?.nextCursor ?? null,
                 hasMoreTweetsUser: pagination?.hasMore ?? false,
             });
         } catch (error) {
             if (error instanceof AxiosError) {
-                set({ error: true, loading: false });
+                if (get().posteosUserRequestId !== userId) return;
+
+                const message = error.response?.data?.error ?? error.message ?? "Error al cargar posteos del usuario";
+                set({
+                    error: true,
+                    loading: false,
+                    loadingTweetsUser: false,
+                    posteosUser: [],
+                    posteosUserOwnerId: userId,
+                    posteosUserError: message,
+                });
                 if (error.response) {
                     logger.error(error.response.data.error);
                 } else {
@@ -312,11 +344,15 @@ const useStore = create<StoreState>((set, get) => ({
     },
 
     loadMoreTweetsUser: async (id: number): Promise<void> => {
-        const { nextCursorTweetsUser, hasMoreTweetsUser, limit, posteosUser } = get();
+        const userId = Number(id);
+        const { nextCursorTweetsUser, hasMoreTweetsUser, limit, posteosUser, posteosUserOwnerId } = get();
+        if (posteosUserOwnerId !== userId) return;
         if (!hasMoreTweetsUser || nextCursorTweetsUser === null) return;
 
         try {
-            const response = await axios.get(`/api/posteo?creador_id=${Number(id)}&limit=${limit}&cursor=${nextCursorTweetsUser}`);
+            const response = await axios.get(`/api/posteo?creador_id=${userId}&limit=${limit}&cursor=${nextCursorTweetsUser}`);
+            if (get().posteosUserOwnerId !== userId) return;
+
             const pagination: Pagination | undefined = response.data.pagination;
             set({
                 posteosUser: [...posteosUser, ...response.data.result],
@@ -325,7 +361,7 @@ const useStore = create<StoreState>((set, get) => ({
             });
         } catch (error) {
             if (error instanceof AxiosError) {
-                logger.error('Error al cargar más posteos del usuario:', error.response?.data?.error ?? error.message);
+                logger.error('Error al cargar mÃ¡s posteos del usuario:', error.response?.data?.error ?? error.message);
             }
         }
     },
@@ -389,7 +425,7 @@ const useStore = create<StoreState>((set, get) => ({
             }
             if (error instanceof AxiosError) {
                 const errorMessage = error.response?.data?.error || error.message || "Error desconocido";
-                logger.error("Error al obtener resultados de búsqueda:", errorMessage);
+                logger.error("Error al obtener resultados de bÃºsqueda:", errorMessage);
             } else {
                 logger.log(error);
             }
@@ -575,3 +611,4 @@ const useStore = create<StoreState>((set, get) => ({
 }));
 
 export default useStore;
+

@@ -1,12 +1,12 @@
-import { NextResponse } from "next/server";
-import { getSessionUser } from "@/infrastructure/auth/session";
+﻿import { getSessionUser } from "@/infrastructure/auth/session";
+import { jsonNoStore } from "@/infrastructure/http/jsonNoStore";
 
 export async function GET() {
   const user = await getSessionUser();
 
   if (!user) {
-    return NextResponse.json({ result: "No hay sesion" }, { status: 401 });
+    return jsonNoStore({ result: "No hay sesion" }, { status: 401 });
   }
 
-  return NextResponse.json({ result: user }, { status: 200 });
+  return jsonNoStore({ result: user }, { status: 200 });
 }
